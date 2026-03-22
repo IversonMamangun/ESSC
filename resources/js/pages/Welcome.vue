@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
-import { dashboard, login, register } from '@/routes';
-import TopBar from '@/components/sections/TopBar.vue';
+import Home from '@/components/sections/Home.vue';
 import Navbar from '@/components/sections/Navbar.vue';
+import TopBar from '@/components/sections/TopBar.vue';
+
 
 withDefaults(
     defineProps<{
@@ -17,4 +17,5 @@ withDefaults(
 <template>
     <TopBar />
    <Navbar />
+   <Home />
 </template>
