@@ -207,7 +207,7 @@ const commitments = [
         <div 
           v-for="solution in solutions" 
           :key="solution.id"
-          class="flex flex-col bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden h-full min-h-[420px]"
+          class="flex flex-col bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden h-full min-h-105"
         >
           <img 
             :src="solution.image" 
@@ -215,7 +215,7 @@ const commitments = [
             class="w-full h-56 object-cover block"
           />
 
-          <div class="flex flex-col flex-grow p-6 md:p-8">
+          <div class="flex flex-col grow p-6 md:p-8">
             <h3 class="text-xl font-bold text-[#009933] mb-4">
               {{ solution.title }}
             </h3>
