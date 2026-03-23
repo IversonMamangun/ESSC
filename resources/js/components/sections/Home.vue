@@ -1,5 +1,53 @@
 <script setup lang="ts">
-// Define your data here so it's easy to update later!
+import { onMounted } from 'vue';
+
+const solutions = [
+  {
+    id: 1,
+    title: 'Industrial Chemical Products',
+    description: 'Preventive maintenance chemicals, industrial cleaners, corrosion protection, and specialty coatings designed to improve equipment performance and lifespan.',
+    image: '/assets/Industrial Chemical Products.png'
+  },
+  {
+    id: 2,
+    title: 'Environmental & Sanitation Solutions',
+    description: 'Eco-friendly cleaning systems, microbial technologies, and wastewater treatment solutions that support environmental protection.',
+    image: '/assets/Environmental & Sanitation.png'
+  },
+  {
+    id: 3,
+    title: 'Agricultural Enhancement Products',
+    description: 'Soil conditioners, bio-organic fertilizers, microbial activators, and plant growth enhancers that support modern sustainable agriculture.',
+    image: '/assets/Agricultural Enhancement.png'
+  },
+  {
+    id: 4,
+    title: 'Infrastructure & Energy Solutions',
+    description: 'Solar lighting systems including solar streetlights and floodlights designed for municipalities, infrastructure projects, and agricultural estates.',
+    image: '/assets/Infrastructure & Energy.png'
+  }
+];
+
+onMounted(() => {
+  const $ = (window as any).$;
+
+  $('.owl-carousel').owlCarousel({
+    loop: true,
+    margin: 24,
+    nav: true,
+    dots: false,
+    navText: [
+      "<img src='/assets/icons and vector/9.png' alt='Previous' class='w-12 h-12 transition hover:scale-110 drop-shadow-md'>",
+      "<img src='/assets/icons and vector/10.png' alt='Next' class='w-12 h-12 transition hover:scale-110 drop-shadow-md'>" 
+    ],
+    responsive: {
+      0: { items: 1 },
+      768: { items: 2 },
+      1024: { items: 3 }
+    }
+  });
+});
+
 const commitments = [
   {
     id: 1,
@@ -147,5 +195,88 @@ const commitments = [
       </div>
     </div>
   </section>
-  
+  <section class="flex flex-col items-center justify-center px-4 md:px-16 lg:px-24 py-16 md:py-24">
+    <div class="w-full max-w-7xl relative">
+      
+      <h2 class="text-3xl md:text-4xl font-bold text-[#009933] mb-12 text-center md:text-left">
+        Our Core Solutions
+      </h2>
+
+      <div class="owl-carousel owl-theme relative">
+        
+        <div 
+          v-for="solution in solutions" 
+          :key="solution.id"
+          class="flex flex-col bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden h-full min-h-[420px]"
+        >
+          <img 
+            :src="solution.image" 
+            :alt="solution.title" 
+            class="w-full h-56 object-cover block"
+          />
+
+          <div class="flex flex-col flex-grow p-6 md:p-8">
+            <h3 class="text-xl font-bold text-[#009933] mb-4">
+              {{ solution.title }}
+            </h3>
+            
+            <p class="text-gray-600 text-base leading-relaxed mb-8 line-clamp-1" :title="solution.description">
+              {{ solution.description }}
+            </p>
+
+            <a 
+              href="#" 
+              class="w-full text-center py-3 bg-[#006633] text-white font-semibold rounded-lg hover:bg-green-800 transition mt-auto block"
+            >
+              Read more
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
 </template>
+<style>
+.owl-theme .owl-nav {
+  margin: 0 !important;
+}
+
+.owl-theme .owl-nav [class*='owl-'] {
+  position: absolute !important;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  z-index: 10;
+}
+
+/* Desktop: Push completely outside the carousel (-4rem) */
+.owl-theme .owl-nav .owl-prev {
+  left: -4rem; 
+}
+.owl-theme .owl-nav .owl-next {
+  right: -4rem;
+}
+
+/* Tablet: Bring them slightly closer so they don't clip the screen edge */
+@media (max-width: 1024px) {
+  .owl-theme .owl-nav .owl-prev { left: -2rem; }
+  .owl-theme .owl-nav .owl-next { right: -2rem; }
+}
+
+/* Mobile: Keep them just inside the edges so they fit on small phone screens */
+@media (max-width: 768px) {
+  .owl-theme .owl-nav .owl-prev { left: 0.5rem; }
+  .owl-theme .owl-nav .owl-next { right: 0.5rem; }
+}
+/* 
+.owl-theme .owl-dots {
+  margin-top: 24px !important;
+}
+.owl-theme .owl-dots .owl-dot.active span, 
+.owl-theme .owl-dots .owl-dot:hover span {
+  background: #009933 !important;
+} */
+</style>
