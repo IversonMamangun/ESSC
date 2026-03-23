@@ -10,7 +10,7 @@
         <span class="text-[#009933]">Reliable Industrial Solutions</span> for the Philippines
       </h1>
           
-      <div class="relative w-full rounded-2xl overflow-hidden shadow-2xl">
+      <div class="relative w-full rounded-2xl overflow-hidden shadow-2xl mb-12">
         
         <img
           src="/assets/landing page pic.png"
@@ -33,22 +33,31 @@
           </h2>
 
           <div class="flex flex-wrap justify-center gap-4">
+            
             <router-link
               to="/learn-more"
-              class="px-8 py-3 bg-[#009933] text-white font-medium text-lg rounded-lg hover:bg-green-700 transition"
+              class="px-8 py-3 bg-white text-[#009933] font-semibold text-lg rounded-lg hover:bg-gray-100 transition"
             >
               Learn More
             </router-link>
 
             <router-link
               to="/contact"
-              class="px-8 py-3 bg-white text-[#009933] font-medium text-lg rounded-lg hover:bg-gray-100 transition"
+              class="px-8 py-3 bg-transparent border-2 border-white text-white font-semibold text-lg rounded-lg hover:bg-white/20 transition"
             >
               Contact Us
             </router-link>
+            
           </div>
-
         </div>
+      </div>
+      
+      <div class="flex flex-wrap items-center justify-center gap-6 md:gap-8 w-full">
+        <img src="/assets/icons and vector/1.png" alt="Partner 1" class="h-15 md:h-22 w-auto object-contain">
+        <img src="/assets/icons and vector/2.png" alt="Partner 2" class="h-15 md:h-22 w-auto object-contain">
+        <img src="/assets/icons and vector/3.png" alt="Partner 3" class="h-15 md:h-22 w-auto object-contain">
+        <img src="/assets/icons and vector/4.png" alt="Partner 4" class="h-15 md:h-22 w-auto object-contain">
+        <img src="/assets/icons and vector/5.png" alt="Partner 5" class="h-15 md:h-22 w-auto object-contain">
       </div>
 
     </div>
