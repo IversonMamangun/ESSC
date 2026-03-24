@@ -68,18 +68,6 @@ const productCategories = [
   },
 ];
 
-const industries = [
-  'Government Agencies',
-  'Local Government Units',
-  'Industrial Manufacturing',
-  'Agricultural Enterprises',
-  'Construction and Infrastructure',
-  'Healthcare Institutions',
-  'Educational Institutions',
-  'Transportation and Fleet Maintenance',
-  'Environmental and Sanitation Programs'
-];
-
 const showAll = ref(false);
 
 const initCarousel = () => {
@@ -92,6 +80,7 @@ const initCarousel = () => {
     margin: 24,
     nav: true,
     dots: false,
+    lazyLoad: true,
     navText: [
       "<img src='/assets/icons and vector/9.png' alt='Previous' class='w-12 h-12 transition hover:scale-110 drop-shadow-md'>",
       "<img src='/assets/icons and vector/10.png' alt='Next' class='w-12 h-12 transition hover:scale-110 drop-shadow-md'>" 
@@ -122,73 +111,69 @@ const toggleCategories = async () => {
 <template>
   <section class="fade-in-up relative z-30 w-full py-16">
     <div class="mx-auto mb-12 flex max-w-7xl items-center justify-center px-4">
-      <h2 class="px-4 text-center text-3xl font-bold whitespace-nowrap text-[#009933] sm:px-6 sm:py-3 sm:text-2xl md:text-4xl">
-        Products and Solutions Page
-      </h2>
+      <h2 class="px-4 text-center text-3xl font-bold text-[#009933] sm:text-2xl md:text-4xl lg:text-5xl">
+  Products and Solutions Page
+</h2>
+
     </div>
 
     <template v-for="(category, index) in productCategories" :key="category.id">
-      
       <div v-if="showAll || index === 0" class="mx-auto w-full max-w-7xl px-4 md:px-16 lg:px-24 mb-16">
         
-        <h2 class="text-2xl font-bold text-center text-[#009933] mb-2">
+        <h2 class="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-[#009933] mb-2">
           {{ category.title }}
         </h2>
         
-        <p class="text-center text-gray-600 mb-6">
+        <p class="text-center text-gray-600 mb-6 text-sm sm:text-base md:text-lg lg:text-xl">
           {{ category.subtitle }}
         </p>
 
         <div class="relative w-full">
-          <div class="industrial-carousel owl-carousel owl-theme">
-            
+          <div class="owl-carousel industrial-carousel owl-theme">
             <div
               v-for="item in category.items"
               :key="item.id"
-              class=" bg-white p-2 rounded-xl shadow-md text-center hover:shadow-lg transition flex flex-col items-center justify-center w-full"
+              class="bg-white p-2 rounded-xl shadow-md text-center hover:shadow-lg transition flex flex-col items-center justify-center w-full"
             >
               <img
                 :src="item.image"
                 :alt="item.name"
-                class="h-1/2 w-auto object-contain mb-3 hover:scale-105 transition duration-300"
+                class="h-32 sm:h-40 md:h-48 w-auto object-contain mb-3 hover:scale-105 transition duration-300"
               />
               <h3 class="text-sm md:text-base font-semibold text-gray-800 px-2 line-clamp-2 leading-snug">
                 {{ item.name }}
               </h3>
             </div>
-
           </div>
         </div>
 
-        <p v-if="category.footer" class="text-center text-gray-700 mt-6">
+        <p v-if="category.footer" class="text-center text-gray-700 mt-6 text-sm sm:text-base md:text-lg">
           {{ category.footer }}
         </p>
-        
       </div>
     </template>
 
     <div class="flex justify-center mt-4 w-full px-4">
       <button 
         @click="toggleCategories"
-        class="bg-[#009933] text-white font-semibold text-lg px-10 py-3 rounded-xl shadow hover:bg-green-700 transition-colors"
+        class="bg-[#009933] text-white font-semibold text-base sm:text-lg px-6 sm:px-10 py-2 sm:py-3 rounded-xl shadow hover:bg-green-700 transition-colors"
       >
         {{ showAll ? 'View Less' : 'See All Categories' }}
       </button>
     </div>
   </section>
- <section class="relative flex w-full items-center justify-center py-16 md:py-24 min-h-[300px]">
-    
+
+  <section class="relative flex w-full items-center justify-center py-16 md:py-24 min-h-75">
     <img 
       src="/assets/Industries We Serve.png" 
       alt="Industries We Serve" 
-      class="absolute inset-0 h-full w-full object-cover lg:object-fill"
+      class="absolute inset-0 h-full w-full object-cover"
     />
     
     <div class="absolute inset-0"></div>
 
     <div class="relative z-10 w-full max-w-7xl px-4 md:px-16 lg:px-24 flex flex-col items-start text-left">
-      
-      <h2 class="mb-4 text-3xl font-bold text-white md:text-4xl lg:text-5xl">
+            <h2 class="mb-4 text-3xl font-bold text-white md:text-4xl lg:text-5xl">
         Industries We Serve
       </h2>
       
@@ -207,7 +192,6 @@ const toggleCategories = async () => {
         <li>Agricultural Enterprises</li>
         <li>Transportation and Fleet Maintenance Operations</li>
       </ul>
-
     </div>
   </section>
 </template>
