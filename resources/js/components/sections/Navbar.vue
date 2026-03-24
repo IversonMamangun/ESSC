@@ -61,7 +61,7 @@ const navLinks = [
     
     <div class="flex items-center justify-between w-full p-4 lg:px-6">
       
-      <div class="flex-shrink-0 flex items-center">
+      <div class="flex shrink-0  items-center">
         <a href="#" @click.prevent="setActive('Home', 'home')" class="block focus:outline-none focus:ring-2 focus:ring-[#009933] rounded-md">
           <img 
             src="/assets/logos/logo top.png" 

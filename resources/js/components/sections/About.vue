@@ -140,7 +140,7 @@ onMounted(() => {
           <div 
             v-for="member in managementTeam" 
             :key="member.id"
-            class="relative rounded-2xl shadow-lg border border-gray-100 overflow-hidden h-[400px] group"
+            class="relative rounded-2xl shadow-lg border border-gray-100 overflow-hidden h-100 group"
           >
             <img 
               :src="member.image" 
