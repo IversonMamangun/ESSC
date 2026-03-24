@@ -68,6 +68,18 @@ const productCategories = [
   },
 ];
 
+const industries = [
+  'Government Agencies',
+  'Local Government Units',
+  'Industrial Manufacturing',
+  'Agricultural Enterprises',
+  'Construction and Infrastructure',
+  'Healthcare Institutions',
+  'Educational Institutions',
+  'Transportation and Fleet Maintenance',
+  'Environmental and Sanitation Programs'
+];
+
 const showAll = ref(false);
 
 const initCarousel = () => {
@@ -164,22 +176,38 @@ const toggleCategories = async () => {
       </button>
     </div>
   </section>
-  <section>
-    <div>
-        <img src="/assets/Industries We Serve.png" alt="">
-        <h2 class="px-4 text-center text-2xl font-bold whitespace-nowrap text-white sm:px-6 sm:py-3 sm:text-xl md:text-3xl">Industries We Serve</h2>
-        <p>ESSC provides solutions to various sectors including:</p>
-        <ul>
-            <li>Government Agencies</li>
-            <li>Local Government Units</li>
-            <li>Industrial Manufacturing</li>
-            <li>Agricultural Enterprises</li>
-            <li>Construction and Infrastructure</li>
-            <li>Healthcare Institutions</li>
-            <li>Educational Institutions</li>
-            <li>Transportation and Fleet Maintenance</li>
-            <li>Environmental and Sanitation Programs</li>
-        </ul>
+ <section class="relative flex w-full items-center justify-center py-16 md:py-24 min-h-[300px]">
+    
+    <img 
+      src="/assets/Industries We Serve.png" 
+      alt="Industries We Serve" 
+      class="absolute inset-0 h-full w-full object-cover lg:object-fill"
+    />
+    
+    <div class="absolute inset-0"></div>
+
+    <div class="relative z-10 w-full max-w-7xl px-4 md:px-16 lg:px-24 flex flex-col items-start text-left">
+      
+      <h2 class="mb-4 text-3xl font-bold text-white md:text-4xl lg:text-5xl">
+        Industries We Serve
+      </h2>
+      
+      <p class="mb-6 text-lg text-gray-200 md:text-xl">
+        ESSC supplies solutions to a wide range of industries including:
+      </p>
+
+      <ul class="list-inside list-disc space-y-2 text-base font-medium text-white md:text-lg">
+        <li>National Government Agencies</li>
+        <li>Local Government Units (LGUs)</li>
+        <li>Government-Owned and Controlled Corporations (GOCCs)</li>
+        <li>Infrastructure and Public Works Projects</li>
+        <li>Hospitals and Healthcare Facilities</li>
+        <li>Educational Institutions</li>
+        <li>Industrial and Manufacturing Facilities</li>
+        <li>Agricultural Enterprises</li>
+        <li>Transportation and Fleet Maintenance Operations</li>
+      </ul>
+
     </div>
   </section>
 </template>
