@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import About from '@/components/sections/About.vue';
+import Capabilities from '@/components/sections/Capabilities.vue';
 import Home from '@/components/sections/Home.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import ProductSolution from '@/components/sections/ProductSolution.vue';
@@ -22,4 +23,5 @@ withDefaults(
     <Home />
     <About />
     <ProductSolution />
+    <Capabilities />
 </template>
