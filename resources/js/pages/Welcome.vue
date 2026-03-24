@@ -2,6 +2,7 @@
 import About from '@/components/sections/About.vue';
 import Home from '@/components/sections/Home.vue';
 import Navbar from '@/components/sections/Navbar.vue';
+import ProductSolution from '@/components/sections/ProductSolution.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 
 
@@ -20,4 +21,5 @@ withDefaults(
     <Navbar />
     <Home />
     <About />
+    <ProductSolution />
 </template>
