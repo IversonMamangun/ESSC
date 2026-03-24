@@ -232,7 +232,6 @@ const commitments = [
             </a>
           </div>
         </div>
-
       </div>
     </div>
   </section>
@@ -252,7 +251,6 @@ const commitments = [
   z-index: 10;
 }
 
-/* Desktop: Push completely outside the carousel (-4rem) */
 .owl-theme .owl-nav .owl-prev {
   left: -4rem; 
 }
@@ -260,23 +258,14 @@ const commitments = [
   right: -4rem;
 }
 
-/* Tablet: Bring them slightly closer so they don't clip the screen edge */
 @media (max-width: 1024px) {
   .owl-theme .owl-nav .owl-prev { left: -2rem; }
   .owl-theme .owl-nav .owl-next { right: -2rem; }
 }
 
-/* Mobile: Keep them just inside the edges so they fit on small phone screens */
 @media (max-width: 768px) {
   .owl-theme .owl-nav .owl-prev { left: 0.5rem; }
   .owl-theme .owl-nav .owl-next { right: 0.5rem; }
 }
-/* 
-.owl-theme .owl-dots {
-  margin-top: 24px !important;
-}
-.owl-theme .owl-dots .owl-dot.active span, 
-.owl-theme .owl-dots .owl-dot:hover span {
-  background: #009933 !important;
-} */
+
 </style>
