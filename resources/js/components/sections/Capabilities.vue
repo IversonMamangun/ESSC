@@ -130,7 +130,7 @@ onMounted(() => {
                         <img
                             :src="logo"
                             alt="Client Logo"
-                            class="h-22 w-22 max-h-full max-w-full min-w-2.5 min-w-2.5 rounded-full border border-white bg-white object-contain shadow-md transition-transform duration-300 md:h-auto md:w-auto"
+                            class="h-22 w-22 max-h-full max-w-full min-w-2.5 rounded-full border border-white bg-white object-contain shadow-md transition-transform duration-300 md:h-auto md:w-auto"
                         />
                     </div>
                 </div>

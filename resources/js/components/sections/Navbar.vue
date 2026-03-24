@@ -26,9 +26,11 @@ const setActive = (linkName: string, sectionId: string) => {
   isMenuOpen.value = false
   
   const element = document.getElementById(sectionId)
+
   if (element) {
     // 100px offset to account for sticky header
     const y = element.getBoundingClientRect().top + window.scrollY - 100 
+    
     window.scrollTo({ top: y, behavior: 'smooth' })
   }
 }
