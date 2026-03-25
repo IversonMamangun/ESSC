@@ -32,6 +32,8 @@ const setActive = (linkName: string, sectionId: string) => {
     const y = element.getBoundingClientRect().top + window.scrollY - 100 
     
     window.scrollTo({ top: y, behavior: 'smooth' })
+  } else {
+    console.warn(`Could not find section with ID: ${sectionId}`); 
   }
 }
 
