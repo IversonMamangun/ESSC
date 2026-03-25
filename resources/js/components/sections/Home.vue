@@ -104,7 +104,7 @@ const commitments = [
                 />
 
                 <div
-                    class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 p-6 text-center md:p-12"
+                    class="absolute inset-0 flex flex-col items-center justify-center p-6 text-center md:p-12"
                 >
                     <p
                         class="mb-6 max-w-6xl text-lg leading-relaxed text-gray-100 md:text-xl lg:text-2xl"
