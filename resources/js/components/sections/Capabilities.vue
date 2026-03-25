@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 
-// Extracted capabilities
 const capabilities = [
     'Bulk supply and scheduled product delivery',
     'Customized product sourcing',
@@ -10,7 +9,6 @@ const capabilities = [
     'Logistics coordination and inventory management',
 ];
 
-// Extracted logos for the carousel
 const logos = [
     '/assets/logos/logo1.png',
     '/assets/logos/logo2.png',
@@ -20,40 +18,39 @@ const logos = [
     '/assets/logos/logo6.png',
 ];
 
-// Reference to the carousel DOM element
 const carouselRef = ref(null);
 
 onMounted(() => {
     const $ = (window as any).$;
 
     if ($ && carouselRef.value) {
-       $(carouselRef.value).owlCarousel({
-        loop: true,
-        margin: 30,
-        nav: false,
-        dots: false,
-        autoplay: true,
-        autoplayTimeout: 3000,
-        autoplayHoverPause: true,
-        lazyLoad: true,
-        responsive: {
-          0: { items: 2 },   // phones
-          640: { items: 3 }, // larger phones
-          1024: { items: 4 }, // tablets
-          1280: { items: 6 }, // desktops
-        },
-      });
-
+        $(carouselRef.value).owlCarousel({
+            loop: true,
+            margin: 30,
+            nav: false,
+            dots: false,
+            autoplay: true,
+            autoplayTimeout: 3000,
+            autoplayHoverPause: true,
+            lazyLoad: true,
+            responsive: {
+                0: { items: 2 },
+                640: { items: 3 },
+                1024: { items: 4 },
+                1280: { items: 6 },
+            },
+        });
     }
 });
 </script>
 
 <template>
-    <section class="flex w-full flex-col items-center gap-12 pb-16 md:pb-24 pt-10">
+    <section
+        class="flex w-full flex-col items-center gap-12 pt-10 pb-16 md:pb-24"
+    >
         <div
             class="relative flex min-h-32 w-full flex-col items-center justify-center overflow-hidden py-4 md:min-h-40 md:py-6"
         >
-            <!-- Image wrapper with max-w-7xl -->
             <div class="absolute inset-0 flex w-full justify-center">
                 <img
                     src="/assets/Our Capabilities.png"
@@ -130,11 +127,14 @@ onMounted(() => {
                         <img
                             :src="logo"
                             alt="Client Logo"
-                            class="h-22 w-22 max-h-full max-w-full min-w-2.5 rounded-full border border-white bg-white object-contain shadow-md transition-transform duration-300 md:h-auto md:w-auto"
+                            class="h-22 max-h-full w-22 max-w-full min-w-2.5 rounded-full border border-white bg-white object-contain shadow-md transition-transform duration-300 md:h-auto md:w-auto"
                         />
                     </div>
                 </div>
             </div>
+            <p class="text-center text-gray-700">
+                And many more partners across the country.
+            </p>
         </div>
     </section>
 </template>
