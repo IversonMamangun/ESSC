@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import About from '@/components/sections/About.vue';
 import Capabilities from '@/components/sections/Capabilities.vue';
+import Contact from '@/components/sections/Contact.vue';
 import Home from '@/components/sections/Home.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import NewsUpdate from '@/components/sections/NewsUpdate.vue';
@@ -26,4 +27,5 @@ withDefaults(
     <ProductSolution />
     <Capabilities />
     <NewsUpdate />
+    <Contact />
 </template>
