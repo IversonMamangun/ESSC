@@ -34,9 +34,9 @@ onMounted(() => {
             autoplayHoverPause: true,
             lazyLoad: true,
             responsive: {
-                0: { items: 2 },
-                640: { items: 3 },
-                1024: { items: 4 },
+                0: { items: 3 },
+                640: { items: 5 },
+                1024: { items: 6 },
                 1280: { items: 6 },
             },
         });
@@ -116,8 +116,8 @@ onMounted(() => {
                     agricultural organizations, and institutions including:
                 </p>
             </div>
-
-            <div class="w-full">
+            <div class="items-center mx-auto mt-4 flex w-full max-w-7xl flex-col gap-8 px-4 lg:px-12">
+            <div class="flex items-center w-full max-w-2xl ">
                 <div ref="carouselRef" class="owl-carousel owl-theme gap-2">
                     <div
                         class="item flex justify-center"
@@ -127,9 +127,10 @@ onMounted(() => {
                         <img
                             :src="logo"
                             alt="Client Logo"
-                            class="h-22 max-h-full w-22 max-w-full min-w-2.5 rounded-full border border-white bg-white object-contain shadow-md transition-transform duration-300 md:h-auto md:w-auto"
+                            class="h-22 max-h-25 w-25 max-w-full min-w-2 min-h-2 rounded-full border border-white bg-white object-contain shadow-md transition-transform duration-300 md:h-auto md:w-auto"
                         />
                     </div>
+                </div>
                 </div>
             </div>
             <p class="text-center text-gray-700">
