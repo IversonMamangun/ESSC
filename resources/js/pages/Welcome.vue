@@ -3,6 +3,7 @@ import About from '@/components/sections/About.vue';
 import Capabilities from '@/components/sections/Capabilities.vue';
 import Home from '@/components/sections/Home.vue';
 import Navbar from '@/components/sections/Navbar.vue';
+import NewsUpdate from '@/components/sections/NewsUpdate.vue';
 import ProductSolution from '@/components/sections/ProductSolution.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 
@@ -24,4 +25,5 @@ withDefaults(
     <About />
     <ProductSolution />
     <Capabilities />
+    <NewsUpdate />
 </template>
