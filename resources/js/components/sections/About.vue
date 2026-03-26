@@ -58,7 +58,6 @@ const valuedCustomers = [
 onMounted(() => {
   const $ = (window as any).$;
 
-  // Initialize the Management Team Carousel
   $('.management-carousel').owlCarousel({
     loop: true,
     margin: 24,
@@ -176,7 +175,7 @@ onMounted(() => {
       <Transition name="fade">
         <div 
           v-if="isModalOpen" 
-          class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6"
+          class="fixed inset-0 z-100 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6"
           @click.self="isModalOpen = false"
         >
           <div class="relative w-full max-w-5xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
@@ -193,8 +192,7 @@ onMounted(() => {
               </button>
             </div>
 
-            <div class="p-6 sm:p-8 overflow-y-auto flex flex-col gap-10 text-gray-700 leading-relaxed">
-              
+              <div class="p-6 sm:p-8 overflow-y-auto overscroll-contain scroll-smooth custom-scrollbar flex flex-col gap-10 text-gray-700 leading-relaxed">
               <section class="bg-green-50/50 p-6 rounded-xl border border-green-100">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -400,5 +398,29 @@ onMounted(() => {
 @media (max-width: 768px) {
   .owl-theme .owl-nav .owl-prev { left: 0.5rem; }
   .owl-theme .owl-nav .owl-next { right: 0.5rem; }
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #c1c1c1 #f9fafb;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px; 
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f9fafb; 
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #d1d5db; 
+  border-radius: 10px;
+  border: 2px solid #f9fafb; 
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #009933; 
 }
 </style>
