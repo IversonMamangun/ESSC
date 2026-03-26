@@ -3,7 +3,6 @@ import { onMounted, ref } from 'vue';
 
 const isModalOpen = ref(false);
 
-// Management Team Data for the carousel
 const managementTeam = [
   {
     id: 1,
@@ -366,7 +365,6 @@ onMounted(() => {
 </template>
 
 <style>
-/* Transitions for the Modal */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -377,7 +375,6 @@ onMounted(() => {
   opacity: 0;
 }
 
-/* Owl Carousel Navigation Overrides */
 .owl-theme .owl-nav {
   margin: 0 !important;
 }

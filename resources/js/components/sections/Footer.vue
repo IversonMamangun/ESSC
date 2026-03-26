@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-// Automatically computes the current year for the copyright text
 const currentYear = computed(() => new Date().getFullYear());
 </script>
 

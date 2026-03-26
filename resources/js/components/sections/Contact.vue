@@ -1,5 +1,4 @@
 <script setup lang="ts">
-// You can add your form handling logic here later
 </script>
 
 <template>

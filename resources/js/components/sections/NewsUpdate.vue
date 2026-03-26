@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'; // Added computed
-
+import { ref, computed } from 'vue'; 
 interface NewsItem {
     id: number;
     title: string;
@@ -13,7 +12,6 @@ interface NewsItem {
 const isFeaturedExpanded = ref(false);
 const featuredText = "Everlasting Star Sales Corporation (ESSC) continues to strengthen its nationwide supply capability to support large-scale government and industrial requirements. With enhanced logistics coordination, improved inventory systems, and strong supplier partnerships, ESSC ensures reliable and timely delivery of industrial chemicals, environmental solutions, and agricultural products. This expansion reinforces the company’s commitment to supporting infrastructure development, operational efficiency, and sustainable practices across the Philippines.";
 
-// New state for toggling the View All layout
 const showAll = ref(false);
 
 const recentNews = ref<NewsItem[]>([
@@ -44,7 +42,6 @@ const recentNews = ref<NewsItem[]>([
         link: '#',
         isExpanded: false,
     },
-    // Added dummy items to demonstrate the View All functionality
     {
         id: 4,
         title: 'New Eco-Friendly Packaging Launched',
@@ -65,7 +62,6 @@ const recentNews = ref<NewsItem[]>([
     },
 ]);
 
-// Computed property to slice the array to a maximum of 3 when showAll is false
 const displayedNews = computed(() => {
     return showAll.value ? recentNews.value : recentNews.value.slice(0, 3);
 });

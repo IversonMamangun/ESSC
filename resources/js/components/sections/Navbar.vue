@@ -5,7 +5,6 @@ const isMenuOpen = ref(false)
 const activeLink = ref('Home')
 const isDarkMode = ref(false)
 
-// Sync initial dark mode state on load
 onMounted(() => {
   if (
     document.documentElement.classList.contains('dark') ||
@@ -20,7 +19,6 @@ const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value
 }
 
-// Update state, close menu, and scroll to the correct section
 const setActive = (linkName: string, sectionId: string) => {
   activeLink.value = linkName
   isMenuOpen.value = false
@@ -28,7 +26,6 @@ const setActive = (linkName: string, sectionId: string) => {
   const element = document.getElementById(sectionId)
 
   if (element) {
-    // 100px offset to account for sticky header
     const y = element.getBoundingClientRect().top + window.scrollY - 100 
     
     window.scrollTo({ top: y, behavior: 'smooth' })
@@ -47,7 +44,6 @@ const toggleDarkMode = () => {
   }
 }
 
-// Define the navigation links to keep the template clean
 const navLinks = [
   { name: 'Home', id: 'home' },
   { name: 'About Us', id: 'about' },
@@ -61,7 +57,7 @@ const navLinks = [
 </script>
 
 <template>
-  <nav class="relative bg-white dark:bg-neutral-900 w-full max-w-7xl mx-auto rounded-2xl shadow-lg border border-neutral-100 dark:border-neutral-800 transition-all duration-300 z-50">
+  <nav class="relative bg-white dark:bg-[#263d2f] w-full max-w-7xl mx-auto rounded-2xl shadow-lg border border-neutral-100 dark:border-neutral-800 transition-all duration-300 z-50">
     
     <div class="flex items-center justify-between w-full p-4 lg:px-6">
       
@@ -144,7 +140,6 @@ const navLinks = [
 </template>
 
 <style scoped>
-/* Optional transition for the mobile menu */
 .menu-slide-enter-active,
 .menu-slide-leave-active {
   transition: all 0.3s ease-out;
