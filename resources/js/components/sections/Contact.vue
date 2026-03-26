@@ -15,25 +15,25 @@
                     <input 
                         type="text" 
                         placeholder="Your Name" 
-                        class="w-full rounded-md border border-[#009933] px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#009933] focus:ring-offset-1"
+                        class="w-full rounded-md border dark:placeholder-gray-300 border-[#009933] px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#009933] focus:ring-offset-1"
                     />
                     
                     <input 
                         type="email" 
                         placeholder="Email Address" 
-                        class="w-full rounded-md border border-[#009933] px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#009933] focus:ring-offset-1"
+                        class="w-full rounded-md border dark:placeholder-gray-300 border-[#009933] px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#009933] focus:ring-offset-1"
                     />
                     
                     <input 
                         type="text" 
                         placeholder="Subject" 
-                        class="w-full rounded-md border border-[#009933] px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#009933] focus:ring-offset-1"
+                        class="w-full rounded-md border dark:placeholder-gray-300 border-[#009933] px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#009933] focus:ring-offset-1"
                     />
                     
                     <textarea 
                         rows="5" 
                         placeholder="Message" 
-                        class="w-full resize-none rounded-md border border-[#009933] px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#009933] focus:ring-offset-1"
+                        class="w-full resize-none rounded-md dark:placeholder-gray-300 border border-[#009933] px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#009933] focus:ring-offset-1"
                     ></textarea>
                     
                     <button 
@@ -51,7 +51,7 @@
                     <h3 class="text-2xl font-semibold text-[#009933] lg:text-3xl">
                         Get in touch
                     </h3>
-                    <p class="mt-2 text-gray-600">
+                    <p class="mt-2 text-gray-600 dark:text-gray-300">
                         Have questions or need more information about our products and services? Reach out to us and our team will get back to you shortly.
                     </p>
                 </div>
@@ -64,7 +64,7 @@
                         </div>
                         <div class="flex flex-col">
                             <h3 class="text-lg font-semibold text-[#009933]">Call Us</h3>
-                            <p class="text-gray-800">(632) 4310-5357</p>
+                            <p class="text-gray-800 dark:text-gray-300">(632) 4310-5357</p>
                         </div>
                     </div>
 
@@ -74,7 +74,7 @@
                         </div>
                         <div class="flex flex-col">
                             <h3 class="text-lg font-semibold text-[#009933]">Email Us</h3>
-                            <p class="text-gray-800">Sample.essc@gmail.com</p>
+                            <p class="text-gray-800 dark:text-gray-300">Sample.essc@gmail.com</p>
                         </div>
                     </div>
 
@@ -84,7 +84,7 @@
                         </div>
                         <div class="flex flex-col">
                             <h3 class="text-lg font-semibold text-[#009933]">Address</h3>
-                            <p class="text-gray-800">#85 Doña Justina Street corner Dalton StreetFilinvest II, Batasan HillsQuezon City, Philippines</p>
+                            <p class="text-gray-800 dark:text-gray-300">#85 Doña Justina Street corner Dalton StreetFilinvest II, Batasan HillsQuezon City, Philippines</p>
                         </div>
                     </div>
 

@@ -59,7 +59,7 @@ const currentYear = computed(() => new Date().getFullYear());
         <div class="flex w-full flex-col items-center justify-evenly gap-3 bg-[#006633] px-6 py-4 text-center text-xs text-white md:flex-row md:px-12 md:text-sm">
             <div class="leading-relaxed">
                 © {{ currentYear }} 
-                <a href="/" class="font-semibold hover:underline">Everlasting Star Sales Corporation</a>. 
+                <a href="Everlastingssc.com" class="font-semibold hover:underline">Everlasting Star Sales Corporation</a>. 
                 <br class="md:hidden" />
                 All Rights Reserved.
             </div>

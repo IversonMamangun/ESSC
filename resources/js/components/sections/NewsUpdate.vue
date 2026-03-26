@@ -107,11 +107,11 @@ const getFirstSentence = (text: string) => {
                 
                 <div class="flex flex-col">
                     <div class="mb-4">
-                        <h2 class="mb-2 text-xl leading-tight font-semibold text-[#0035AD] lg:text-2xl">
+                        <h2 class="mb-2 text-xl leading-tight font-semibold text-[#0035AD] dark:text-blue-300 lg:text-2xl">
                             ESSC Expands Supply Capability for Government and
                             Industrial Projects
                         </h2>
-                        <p class="text-sm leading-relaxed text-gray-700 md:text-base transition-all">
+                        <p class="text-sm leading-relaxed text-gray-700 dark:text-gray-300 md:text-base transition-all">
                             {{ isFeaturedExpanded ? featuredText : getFirstSentence(featuredText) }}
                         </p>
                     </div>
@@ -122,7 +122,7 @@ const getFirstSentence = (text: string) => {
                             alt="Featured News Update"
                             class="h-full w-full object-cover"
                         />
-                        <div class="absolute inset-0 bg-gradient-to-t from-green-700 from-0% to-transparent to-50%"></div>
+                        <div class="absolute inset-0 bg-linear-to-t from-green-700 from-0% to-transparent to-50%"></div>
 
                         <div class="absolute inset-x-0 bottom-0 z-10 flex items-center justify-between p-4 sm:p-5">
                             <h3 class="text-sm font-medium text-white">
@@ -145,10 +145,10 @@ const getFirstSentence = (text: string) => {
                         class="flex items-start gap-4"
                     >
                         <div class="flex flex-1 flex-col pr-2">
-                            <h3 class="mb-1 text-base leading-tight font-semibold text-[#0035AD] sm:text-lg">
+                            <h3 class="mb-1 text-base leading-tight font-semibold text-[#0035AD] dark:text-blue-300 sm:text-lg">
                                 {{ item.title }}
                             </h3>
-                            <p class="text-xs text-gray-600 transition-all sm:text-sm">
+                            <p class="text-xs text-gray-600 dark:text-gray-300 transition-all sm:text-sm">
                                 {{ item.isExpanded ? item.excerpt : getFirstSentence(item.excerpt) }}
                             </p>
                         </div>

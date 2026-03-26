@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
 import { onMounted } from 'vue';
+
 const solutions = [
     {
         id: 1,
@@ -86,7 +87,7 @@ const commitments = [
     >
         <div class="flex w-full max-w-7xl flex-col items-center">
             <h1
-                class="mb-8 w-full text-center text-2xl leading-tight font-bold text-gray-900 md:text-5xl lg:text-6xl"
+                class="mb-8 w-full text-center text-2xl leading-tight font-bold text-gray-900 dark:text-white md:text-5xl lg:text-6xl"
             >
                 <span class="text-[#009933]"
                     >Reliable Industrial Solutions</span
@@ -135,14 +136,14 @@ const commitments = [
 
                     <div class="flex flex-wrap justify-center gap-4">
                         <Link
-                            href="/learn-more"
+                            href="#about"
                             class="rounded-lg bg-white px-8 py-3 text-lg font-semibold text-[#009933] transition hover:bg-gray-100"
                         >
                             Learn More
                         </Link>
 
                         <Link
-                            href="/contact"
+                            href="#contact"
                             class="rounded-lg border-2 border-white bg-transparent px-8 py-3 text-lg font-semibold text-white transition hover:bg-white/20"
                         >
                             Contact Us
@@ -183,7 +184,7 @@ const commitments = [
         </div>
     </section>
 
-    <section class="flex flex-col items-center justify-center px-4 py-16">
+    <section class="flex flex-col items-center justify-center px-4 py-8">
         <div class="w-full max-w-7xl">
             <div
                 class="grid grid-cols-1 items-center gap-12 md:grid-cols-2 lg:gap-16"
@@ -194,13 +195,13 @@ const commitments = [
                     >
                         About ESSC
                     </h2>
-                    <p class="text-lg leading-relaxed text-gray-700 md:text-xl">
+                    <p class="text-lg leading-relaxed text-gray-700 md:text-xl dark:text-gray-300">
                         Established in 2015, Everlasting Star Sales Corporation
                         has grown into a trusted supplier of industrial
                         maintenance chemicals, environmental sanitation
                         solutions, and agricultural enhancement technologies.
                     </p>
-                    <p class="text-lg leading-relaxed text-gray-700 md:text-xl">
+                    <p class="text-lg leading-relaxed text-gray-700 md:text-xl dark:text-gray-300">
                         The company serves both public and private sector
                         clients and actively supports government procurement
                         programs by maintaining compliance with national
@@ -228,7 +229,7 @@ const commitments = [
         </div>
     </section>
 
-    <section class="flex flex-col items-center justify-center px-4 pb-24">
+    <section class="flex flex-col items-center justify-center px-4 pb-16">
         <div class="flex w-full max-w-7xl flex-col">
             <h2
                 class="mx-2 rounded-2xl bg-[#006633] px-8 py-6 text-left text-xl leading-snug font-bold text-white shadow-xl md:px-12 md:text-2xl"
@@ -264,7 +265,7 @@ const commitments = [
         </div>
     </section>
     <section
-        class="flex flex-col items-center justify-center px-4 py-16 md:px-16 md:py-24 lg:px-24"
+        class="flex flex-col items-center justify-center px-4 py-8 md:px-16 md:py-12 lg:px-20"
     >
         <div class="relative w-full max-w-7xl">
             <h2

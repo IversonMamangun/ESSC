@@ -43,7 +43,7 @@ onMounted(() => {
             <h2 class="text-xl font-bold text-[#009933] md:text-2xl">
                 Commitment to Quality
             </h2>
-            <p class="text-base leading-relaxed text-gray-700 md:text-lg">
+            <p class="text-base leading-relaxed text-gray-700 dark:text-gray-300 md:text-lg">
                 ESSC ensures that all products meet industry safety
                 standards and regulatory requirements. The company promotes
                 environmentally responsible chemical solutions that help
@@ -56,7 +56,7 @@ onMounted(() => {
             <h2 class="text-xl font-bold text-[#009933] md:text-2xl">
                 Partial list of valued Customers
             </h2>
-            <p class="text-base leading-relaxed text-gray-700 md:text-lg">
+            <p class="text-base leading-relaxed text-gray-700 dark:text-gray-300 md:text-lg">
                 ESSC proudly serves various industrial companies,
                 agricultural organizations, and institutions including:
             </p>
@@ -79,7 +79,7 @@ onMounted(() => {
                 </div>
             </div>
             
-            <p class="text-center text-gray-700">
+            <p class="text-center text-gray-700 dark:text-gray-300">
                 And many more partners across the country.
             </p>
         </div>

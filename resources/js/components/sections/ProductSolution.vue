@@ -124,7 +124,7 @@ const toggleCategories = async () => {
           {{ category.title }}
         </h2>
         
-        <p class="text-center text-gray-600 mb-6 text-sm sm:text-base md:text-lg lg:text-xl">
+        <p class="text-center text-gray-600 dark:text-gray-300 mb-6 text-sm sm:text-base md:text-lg lg:text-xl">
           {{ category.subtitle }}
         </p>
 
@@ -147,7 +147,7 @@ const toggleCategories = async () => {
           </div>
         </div>
 
-        <p v-if="category.footer" class="text-center text-gray-700 mt-6 text-sm sm:text-base md:text-lg">
+        <p v-if="category.footer" class="text-center text-gray-700 dark:text-gray-300 mt-6 text-sm sm:text-base md:text-lg">
           {{ category.footer }}
         </p>
       </div>

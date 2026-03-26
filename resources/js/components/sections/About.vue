@@ -81,7 +81,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <section class="flex flex-col items-center justify-center px-4 py-16 md:py-24">
+    <section class="flex flex-col items-center justify-center px-4 py-8 md:py-24">
       <div class="w-full max-w-7xl">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start">
           
@@ -102,10 +102,10 @@ onMounted(() => {
 
             <div class="flex flex-col gap-4">
               <h3 class="text-xl md:text-2xl font-bold text-[#009933]">Company Overview</h3>
-              <p class="text-gray-700 text-lg leading-relaxed">
+              <p class="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
                 Everlasting Star Sales Corporation (ESSC) is a Filipino-owned enterprise established on December 16, 2015. The company specializes in the manufacturing, trading, distribution, and supply of industrial chemicals, environmental technologies, and agricultural enhancement products.
               </p>
-              <p class="text-gray-700 text-lg leading-relaxed">
+              <p class="text-gray-700 dark:text-gray-300 text-lg leading-relaxed">
                 ESSC provides high-performance solutions that support infrastructure reliability, industrial productivity, and sustainable agriculture throughout the Philippines.
               </p>
             </div>
@@ -140,7 +140,7 @@ onMounted(() => {
       </div>
     </section>
       
-    <section class="fade-in-up relative z-30 w-full py-12 md:py-16">
+    <section class="fade-in-up relative z-30 w-full py-8 md:py-16">
       <div class="flex items-center justify-center max-w-7xl mx-auto px-4 mb-12">
         <div class="h-1 flex-1 bg-[#009933] rounded-r-xl sm:h-2 md:h-2 lg:h-3"></div>
         <h2 class="whitespace-nowrap px-4 text-center text-xl font-semibold text-[#009933] sm:px-6 sm:py-3 sm:text-2xl md:text-4xl">
