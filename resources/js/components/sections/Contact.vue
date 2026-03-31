@@ -59,7 +59,7 @@
                     
                     <div class="flex items-start gap-4">
                         <div class="flex shrink-0 items-center justify-center pt-1">
-                            <img src="/assets/Contact Us/Call us.png" alt="Phone" class="h-12 w-12 object-contain" />
+                            <img src="/assets/Contact Us/call us.png" alt="Phone" class="h-12 w-12 object-contain" />
                         </div>
                         <div class="flex flex-col">
                             <h3 class="text-lg font-semibold text-[#009933]">Call Us</h3>
