@@ -83,7 +83,7 @@ const commitments = [
 
 <template>
     <section
-        class="flex flex-col items-center justify-center px-4 py-16 md:py-24"
+        class="flex flex-col items-center justify-center px-4 py-12 md:py-8"
     >
         <div class="flex w-full max-w-7xl flex-col items-center">
             <h1

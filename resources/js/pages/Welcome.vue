@@ -24,7 +24,7 @@ withDefaults(
 <template>
     <TopBar />
     
-    <div class="sticky top-0 z-50">
+    <div class="sticky top-0 z-50 mt-8">
         <Navbar />
     </div>
 

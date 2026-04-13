@@ -14,25 +14,25 @@
                     <input 
                         type="text" 
                         placeholder="Your Name" 
-                        class="w-full rounded-md border dark:placeholder-gray-300 border-[#009933] px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#009933] focus:ring-offset-1"
+                        class="w-full rounded-md border dark:placeholder-gray-300 bg-white px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#009933] focus:ring-offset-1"
                     />
                     
                     <input 
                         type="email" 
                         placeholder="Email Address" 
-                        class="w-full rounded-md border dark:placeholder-gray-300 border-[#009933] px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#009933] focus:ring-offset-1"
+                        class="w-full rounded-md border dark:placeholder-gray-300 bg-white px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#009933] focus:ring-offset-1"
                     />
                     
                     <input 
                         type="text" 
                         placeholder="Subject" 
-                        class="w-full rounded-md border dark:placeholder-gray-300 border-[#009933] px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#009933] focus:ring-offset-1"
+                        class="w-full rounded-md border dark:placeholder-gray-300 bg-white px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#009933] focus:ring-offset-1"
                     />
                     
                     <textarea 
                         rows="5" 
                         placeholder="Message" 
-                        class="w-full resize-none rounded-md dark:placeholder-gray-300 border border-[#009933] px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#009933] focus:ring-offset-1"
+                        class="w-full resize-none rounded-md dark:placeholder-gray-300 border bg-white px-4 py-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#009933] focus:ring-offset-1"
                     ></textarea>
                     
                     <button 
