@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { Link } from '@inertiajs/vue3' // Added Inertia Link
+import { home, logout, login, register } from '@/routes';
 
 const isMenuOpen = ref(false)
 const activeLink = ref('Home')
@@ -61,7 +63,7 @@ const navLinks = [
     
     <div class="flex items-center justify-between w-full p-4 lg:px-6">
       
-      <div class="flex shrink-0  items-center">
+      <div class="flex shrink-0 items-center">
         <a href="#" @click.prevent="setActive('Home', 'home')" class="block focus:outline-none focus:ring-2 focus:ring-[#009933] rounded-md">
           <img 
             src="/assets/logos/logo top.png" 
@@ -86,6 +88,21 @@ const navLinks = [
 
       <div class="flex items-center gap-2 shrink-0 ml-auto xl:ml-0">
         
+        <div class="hidden xl:flex items-center gap-3 mr-2">
+          <Link 
+            :href="login()" 
+            class="text-sm font-medium text-neutral-700 dark:text-gray-300 hover:text-[#009933] dark:hover:text-[#009933] transition-colors px-3 py-2 rounded-lg"
+          >
+            Log in
+          </Link>
+          <Link 
+            :href="register()" 
+            class="text-sm font-medium bg-[#009933] text-white px-4 py-2 rounded-lg hover:bg-green-700 hover:shadow-md transition-all active:scale-95"
+          >
+            Register
+          </Link>
+        </div>
+
         <button 
           @click="toggleDarkMode" 
           type="button" 
@@ -118,7 +135,7 @@ const navLinks = [
     </div>
 
     <transition name="menu-slide">
-      <div v-show="isMenuOpen" id="navbar-menu" class="xl:hidden absolute top-full left-0 mt-2 w-full border border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl overflow-hidden max-h-[70vh] overflow-y-auto custom-scrollbar">
+      <div v-show="isMenuOpen" id="navbar-menu" class="xl:hidden absolute top-full left-0 mt-2 w-full border border-neutral-100 dark:border-neutral-800 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl overflow-hidden max-h-[75vh] overflow-y-auto custom-scrollbar">
         <ul class="flex flex-col p-4 font-medium space-y-2">
           
           <li v-for="link in navLinks" :key="link.name">
@@ -131,8 +148,23 @@ const navLinks = [
               {{ link.name }}
             </a>
           </li>
-
         </ul>
+
+        <div class="p-4 pt-2 mt-2 border-t border-neutral-100 dark:border-neutral-800 flex flex-col gap-3">
+          <Link 
+            :href="login()"
+            class="w-full rounded-xl border border-gray-300 dark:border-neutral-600 px-4 py-3 text-center text-sm font-bold text-gray-700 dark:text-gray-200 active:scale-[0.98] transition-all"
+          >
+            Log in
+          </Link>
+          <Link 
+            :href="register()"
+            class="w-full rounded-xl bg-[#009933] px-4 py-3 text-center text-sm font-bold text-white shadow-md active:scale-[0.98] transition-all block focus:outline-none"
+          >
+            Register
+          </Link>
+        </div>
+
       </div>
     </transition>
 
