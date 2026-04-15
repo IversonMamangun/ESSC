@@ -15,10 +15,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Your existing User code
+        $this->call([
+            UserTypeSeeder::class,
+        ]);
+
         User::factory()->create([
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'phone' => '09123456789', 
+            'user_type_id' => 1,
         ]);
 
         // 2. Now it knows what Store and Product are

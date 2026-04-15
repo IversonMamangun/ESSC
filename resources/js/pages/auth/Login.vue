@@ -23,7 +23,7 @@ defineProps<{
 <template>
     <AuthBase
         title="Log in to your account"
-        description="Enter your email and password below to log in"
+        description="Enter your mobile number and password below to log in"
     >
         <Head title="Log in" />
 
@@ -41,19 +41,26 @@ defineProps<{
             class="flex flex-col gap-6"
         >
             <div class="grid gap-6">
+                
                 <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        name="email"
-                        required
-                        autofocus
-                        :tabindex="1"
-                        autocomplete="email"
-                        placeholder="email@example.com"
-                    />
-                    <InputError :message="errors.email" />
+                    <Label for="phone">Mobile Number</Label>
+                    <div class="flex">
+                        <span class="inline-flex items-center px-3 text-sm text-gray-500 bg-gray-50 border border-r-0 border-gray-300 rounded-l-md font-bold">
+                            +63
+                        </span>
+                        <Input
+                            id="phone"
+                            type="tel"
+                            name="phone"
+                            required
+                            autofocus
+                            :tabindex="1"
+                            autocomplete="tel"
+                            placeholder="912 345 6789"
+                            class="rounded-l-none"
+                        />
+                    </div>
+                    <InputError :message="errors.phone" />
                 </div>
 
                 <div class="grid gap-2">
@@ -62,7 +69,7 @@ defineProps<{
                         <TextLink
                             v-if="canResetPassword"
                             :href="request()"
-                            class="text-sm"
+                            class="text-sm text-[#009933] hover:text-green-700 font-medium"
                             :tabindex="5"
                         >
                             Forgot password?
@@ -80,20 +87,20 @@ defineProps<{
                 </div>
 
                 <div class="flex items-center justify-between">
-                    <Label for="remember" class="flex items-center space-x-3">
-                        <Checkbox id="remember" name="remember" :tabindex="3" />
+                    <Label for="remember" class="flex items-center space-x-3 cursor-pointer">
+                        <Checkbox id="remember" name="remember" :tabindex="3" class="text-[#009933] focus:ring-[#009933]" />
                         <span>Remember me</span>
                     </Label>
                 </div>
 
                 <Button
                     type="submit"
-                    class="mt-4 w-full"
+                    class="mt-4 w-full bg-[#009933] hover:bg-green-700 text-white transition-colors"
                     :tabindex="4"
                     :disabled="processing"
                     data-test="login-button"
                 >
-                    <Spinner v-if="processing" />
+                    <Spinner v-if="processing" class="mr-2" />
                     Log in
                 </Button>
             </div>
@@ -103,7 +110,9 @@ defineProps<{
                 v-if="canRegister"
             >
                 Don't have an account?
-                <TextLink :href="register()" :tabindex="5">Sign up</TextLink>
+                <TextLink :href="register()" :tabindex="5" class="text-[#009933] hover:text-green-700 hover:underline font-bold">
+                    Sign up
+                </TextLink>
             </div>
         </Form>
     </AuthBase>

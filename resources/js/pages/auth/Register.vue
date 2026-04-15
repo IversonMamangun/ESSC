@@ -14,8 +14,8 @@ import { store } from '@/routes/register';
 
 <template>
     <AuthBase
-        title="Create an account"
-        description="Enter your details below to create your account"
+        title="Welcome!"
+        description="Enter your mobile number to get started."
     >
         <Head title="Register" />
 
@@ -26,33 +26,26 @@ import { store } from '@/routes/register';
             class="flex flex-col gap-6"
         >
             <div class="grid gap-6">
+                
                 <div class="grid gap-2">
-                    <Label for="name">Name</Label>
-                    <Input
-                        id="name"
-                        type="text"
-                        required
-                        autofocus
-                        :tabindex="1"
-                        autocomplete="name"
-                        name="name"
-                        placeholder="Full name"
-                    />
-                    <InputError :message="errors.name" />
-                </div>
-
-                <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        required
-                        :tabindex="2"
-                        autocomplete="email"
-                        name="email"
-                        placeholder="email@example.com"
-                    />
-                    <InputError :message="errors.email" />
+                    <Label for="phone">Mobile Number</Label>
+                    <div class="flex">
+                        <span class="inline-flex items-center px-3 text-sm text-gray-500 bg-gray-50 border border-r-0 border-gray-300 rounded-l-md font-bold">
+                            +63
+                        </span>
+                        <Input
+                            id="phone"
+                            type="tel"
+                            required
+                            autofocus
+                            :tabindex="1"
+                            autocomplete="tel"
+                            name="phone"
+                            placeholder="912 345 6789"
+                            class="rounded-l-none"
+                        />
+                    </div>
+                    <InputError :message="errors.phone" />
                 </div>
 
                 <div class="grid gap-2">
@@ -60,36 +53,49 @@ import { store } from '@/routes/register';
                     <PasswordInput
                         id="password"
                         required
-                        :tabindex="3"
+                        :tabindex="2"
                         autocomplete="new-password"
                         name="password"
-                        placeholder="Password"
+                        placeholder="Create a password"
                     />
                     <InputError :message="errors.password" />
                 </div>
 
-                <div class="grid gap-2">
-                    <Label for="password_confirmation">Confirm password</Label>
-                    <PasswordInput
-                        id="password_confirmation"
-                        required
-                        :tabindex="4"
-                        autocomplete="new-password"
-                        name="password_confirmation"
-                        placeholder="Confirm password"
-                    />
-                    <InputError :message="errors.password_confirmation" />
+                <div class="grid gap-2 mt-2">
+                    <Label>Register as:</Label>
+                    <div class="flex items-center gap-6 mt-1 border border-gray-200 rounded-md p-3 bg-gray-50/50">
+                        <label class="flex items-center cursor-pointer">
+                            <input 
+                                type="radio" 
+                                name="user_type" 
+                                value="buyer"
+                                checked 
+                                class="text-[#009933] focus:ring-[#009933] w-4 h-4 border-gray-300"
+                            >
+                            <span class="ml-2 text-sm text-gray-700 font-medium">Buyer</span>
+                        </label>
+                        
+                        <label class="flex items-center cursor-pointer">
+                            <input 
+                                type="radio" 
+                                name="user_type" 
+                                value="seller" 
+                                class="text-[#009933] focus:ring-[#009933] w-4 h-4 border-gray-300"
+                            >
+                            <span class="ml-2 text-sm text-gray-700 font-medium">Seller</span>
+                        </label>
+                    </div>
+                    <InputError :message="errors.user_type" />
                 </div>
 
                 <Button
                     type="submit"
-                    class="mt-2 w-full"
-                    tabindex="5"
+                    class="mt-2 w-full bg-[#009933] hover:bg-green-700 text-white transition-colors"
+                    tabindex="3"
                     :disabled="processing"
-                    data-test="register-user-button"
                 >
-                    <Spinner v-if="processing" />
-                    Create account
+                    <Spinner v-if="processing" class="mr-2" />
+                    Sign Up
                 </Button>
             </div>
 
@@ -97,10 +103,11 @@ import { store } from '@/routes/register';
                 Already have an account?
                 <TextLink
                     :href="login()"
-                    class="underline underline-offset-4"
-                    :tabindex="6"
-                    >Log in</TextLink
+                    class="underline underline-offset-4 text-[#009933] hover:text-green-700 font-bold"
+                    :tabindex="4"
                 >
+                    Log in
+                </TextLink>
             </div>
         </Form>
     </AuthBase>
