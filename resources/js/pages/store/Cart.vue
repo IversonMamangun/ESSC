@@ -75,7 +75,8 @@ const formatPrice = (value: number) => {
                     <div class="text-6xl mb-4">🛒</div>
                     <h2 class="text-xl font-bold text-gray-800 mb-2">Your cart is empty</h2>
                     <p class="text-gray-500 mb-6">Looks like you haven't added anything to your cart yet.</p>
-                    <Link href="/store" class="bg-[#009933] text-white px-6 py-3 rounded-xl font-bold hover:bg-green-700 transition-colors">
+                    
+                    <Link href="/store" class="inline-block bg-[#009933] text-white px-6 py-3 rounded-xl font-bold hover:bg-green-700 transition-colors">
                         Continue Shopping
                     </Link>
                 </div>
@@ -93,7 +94,7 @@ const formatPrice = (value: number) => {
                         <div class="flex-1">
                             <p class="text-xs text-gray-400 font-bold uppercase tracking-wider mb-1">{{ item.store }}</p>
                             <h3 class="text-lg font-bold text-gray-800 leading-tight mb-2 line-clamp-2">
-                                <a href="#" class="hover:text-[#009933] transition-colors">{{ item.title }}</a>
+                                <Link href="/product" class="hover:text-[#009933] transition-colors">{{ item.title }}</Link>
                             </h3>
                             <p class="text-[#009933] font-black">{{ formatPrice(item.price) }}</p>
                         </div>
@@ -140,12 +141,15 @@ const formatPrice = (value: number) => {
                         <span class="text-3xl font-black text-[#009933]">{{ formatPrice(total) }}</span>
                     </div>
 
-                    <button 
-                        :disabled="cartItems.length === 0"
-                        class="w-full bg-[#009933] text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition-colors shadow-md disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    <Link 
+                        href="/checkout"
+                        :class="[
+                            'block w-full text-center bg-[#009933] text-white py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition-colors shadow-md',
+                            cartItems.length === 0 ? 'opacity-50 pointer-events-none cursor-not-allowed' : ''
+                        ]"
                     >
                         Proceed to Checkout
-                    </button>
+                    </Link>
                     
                     <div class="mt-4 flex items-center justify-center gap-2 text-xs text-gray-400">
                         <span>🔒</span> Secure SSL Checkout

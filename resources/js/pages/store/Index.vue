@@ -66,7 +66,7 @@ const allDiscoverItems = Array.from({ length: 100 }, (_, i) => ({
     location: 'Cebu City',
     price: `₱${(Math.random() * 2000 + 100).toFixed(2)}`,
     sold: Math.floor(Math.random() * 1000) + 5,
-    rating: (Math.random() * 1 + 4).toFixed(1) // Random rating between 4.0 and 5.0
+    rating: Number((Math.random() * 1 + 4).toFixed(1))
 }));
 
 // Pagination Setup

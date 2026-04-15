@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { Head } from '@inertiajs/vue3';
+import { Head, Link } from '@inertiajs/vue3'; // 1. Added Link import
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 
@@ -16,7 +16,6 @@ const product = {
     location: "Metro Manila",
     storeName: "Industrial Tech Supply Co.",
     description: "Professional-grade industrial drill with variable speed control, ergonomic grip, and a heavy-duty motor. Built specifically for construction and manufacturing environments.",
-    // We will use your existing images as placeholders
     images: [
         "/assets/Our Capabilities.png", 
         "/assets/logos/logo top.png" 
@@ -53,9 +52,9 @@ const decreaseQuantity = () => {
         <div class="w-full max-w-7xl bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 md:p-8">
             
             <nav class="text-sm text-gray-500 mb-6 flex items-center gap-2">
-                <a href="#" class="hover:text-[#009933]">Home</a>
+                <Link href="/" class="hover:text-[#009933]">Home</Link>
                 <span>›</span>
-                <a href="#" class="hover:text-[#009933]">Online Store</a>
+                <Link href="/store" class="hover:text-[#009933]">Online Store</Link>
                 <span>›</span>
                 <span class="text-gray-800 font-medium truncate">{{ product.title }}</span>
             </nav>
@@ -130,12 +129,12 @@ const decreaseQuantity = () => {
                     </div>
 
                     <div class="mt-10 flex gap-4">
-                        <button class="flex-1 py-4 border-2 border-[#009933] bg-green-50 text-[#009933] rounded-xl font-bold text-lg hover:bg-green-100 transition-colors flex items-center justify-center gap-2">
+                        <Link href="/cart" class="flex-1 py-4 border-2 border-[#009933] bg-green-50 text-[#009933] rounded-xl font-bold text-lg hover:bg-green-100 transition-colors flex items-center justify-center gap-2">
                             🛒 Add to Cart
-                        </button>
-                        <button class="flex-1 py-4 bg-[#009933] text-white rounded-xl font-bold text-lg hover:bg-green-700 transition-colors shadow-md hover:shadow-lg">
+                        </Link>
+                        <Link href="/checkout" class="flex-1 py-4 bg-[#009933] text-white rounded-xl font-bold text-lg hover:bg-green-700 transition-colors shadow-md hover:shadow-lg flex items-center justify-center">
                             Buy Now
-                        </button>
+                        </Link>
                     </div>
 
                 </div>
