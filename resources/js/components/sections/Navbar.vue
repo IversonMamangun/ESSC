@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Link } from '@inertiajs/vue3' // Added Inertia Link
+import { Link, router } from '@inertiajs/vue3' // Added 'router' here
 import { home, logout, login, register } from '@/routes';
 
 const isMenuOpen = ref(false)
@@ -21,12 +21,30 @@ const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value
 }
 
+// SMART ROUTING LOGIC
 const setActive = (linkName: string, sectionId: string) => {
   activeLink.value = linkName
   isMenuOpen.value = false
   
-  const element = document.getElementById(sectionId)
+  if (window.location.pathname !== '/') {
 
+    router.visit('/', {
+      onSuccess: () => {
+
+        setTimeout(() => {
+          const element = document.getElementById(sectionId)
+          if (element) {
+            const y = element.getBoundingClientRect().top + window.scrollY - 100
+            window.scrollTo({ top: y, behavior: 'smooth' })
+          }
+        }, 100)
+      }
+    })
+    return; 
+  }
+
+
+  const element = document.getElementById(sectionId)
   if (element) {
     const y = element.getBoundingClientRect().top + window.scrollY - 100 
     
@@ -46,10 +64,12 @@ const toggleDarkMode = () => {
   }
 }
 
+
 const navLinks = [
   { name: 'Home', id: 'home' },
   { name: 'About Us', id: 'about' },
   { name: 'Products & Solutions', id: 'products' },
+  { name: 'Online Store', id: 'Store', url: '/store' },   
   { name: 'Industries Served', id: 'industries' },
   { name: 'Capabilities', id: 'capabilities' },
   { name: 'Clients', id: 'clients' },
@@ -73,17 +93,29 @@ const navLinks = [
         </a>
       </div>
       
-      <div class="hidden xl:flex flex-1 items-center justify-center gap-6">
-        <a 
-          v-for="link in navLinks" 
-          :key="link.name"
-          href="#" 
-          @click.prevent="setActive(link.name, link.id)" 
-          :class="activeLink === link.name ? 'text-[#009933] font-semibold' : 'text-neutral-700 dark:text-gray-300'" 
-          class="whitespace-nowrap text-sm font-medium hover:text-[#009933] dark:hover:text-[#009933] transition-colors duration-300"
-        >
-          {{ link.name }}
-        </a>
+      <div class="hidden xl:flex flex-1 items-center justify-center gap-4">
+        <template v-for="link in navLinks" :key="link.name">
+          
+          <a 
+            v-if="link.url"
+            :href="link.url"
+            :class="activeLink === link.name ? 'text-[#009933] font-semibold' : 'text-neutral-700 dark:text-gray-300'" 
+            class="whitespace-nowrap text-sm font-medium hover:text-[#009933] dark:hover:text-[#009933] transition-colors duration-300"
+          >
+            {{ link.name }}
+          </a>
+
+          <a 
+            v-else
+            href="#" 
+            @click.prevent="setActive(link.name, link.id)" 
+            :class="activeLink === link.name ? 'text-[#009933] font-semibold' : 'text-neutral-700 dark:text-gray-300'" 
+            class="whitespace-nowrap text-sm font-medium hover:text-[#009933] dark:hover:text-[#009933] transition-colors duration-300"
+          >
+            {{ link.name }}
+          </a>
+          
+        </template>
       </div>
 
       <div class="flex items-center gap-2 shrink-0 ml-auto xl:ml-0">
@@ -91,15 +123,9 @@ const navLinks = [
         <div class="hidden xl:flex items-center gap-3 mr-2">
           <Link 
             :href="login()" 
-            class="text-sm font-medium text-neutral-700 dark:text-gray-300 hover:text-[#009933] dark:hover:text-[#009933] transition-colors px-3 py-2 rounded-lg"
-          >
-            Log in
-          </Link>
-          <Link 
-            :href="register()" 
             class="text-sm font-medium bg-[#009933] text-white px-4 py-2 rounded-lg hover:bg-green-700 hover:shadow-md transition-all active:scale-95"
           >
-            Register
+            Log in
           </Link>
         </div>
 
@@ -139,7 +165,18 @@ const navLinks = [
         <ul class="flex flex-col p-4 font-medium space-y-2">
           
           <li v-for="link in navLinks" :key="link.name">
+            
             <a 
+              v-if="link.url"
+              :href="link.url"
+              :class="activeLink === link.name ? 'text-[#009933] bg-green-50 dark:bg-neutral-800' : 'text-neutral-700 dark:text-gray-300'" 
+              class="block py-2.5 px-4 hover:bg-neutral-50 dark:hover:bg-neutral-800 rounded-lg transition-colors duration-300"
+            >
+              {{ link.name }}
+            </a>
+
+            <a 
+              v-else
               href="#" 
               @click.prevent="setActive(link.name, link.id)" 
               :class="activeLink === link.name ? 'text-[#009933] bg-green-50 dark:bg-neutral-800' : 'text-neutral-700 dark:text-gray-300'" 
@@ -147,21 +184,16 @@ const navLinks = [
             >
               {{ link.name }}
             </a>
+            
           </li>
         </ul>
 
         <div class="p-4 pt-2 mt-2 border-t border-neutral-100 dark:border-neutral-800 flex flex-col gap-3">
           <Link 
             :href="login()"
-            class="w-full rounded-xl border border-gray-300 dark:border-neutral-600 px-4 py-3 text-center text-sm font-bold text-gray-700 dark:text-gray-200 active:scale-[0.98] transition-all"
-          >
-            Log in
-          </Link>
-          <Link 
-            :href="register()"
             class="w-full rounded-xl bg-[#009933] px-4 py-3 text-center text-sm font-bold text-white shadow-md active:scale-[0.98] transition-all block focus:outline-none"
           >
-            Register
+            Log in
           </Link>
         </div>
 
