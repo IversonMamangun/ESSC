@@ -1,23 +1,26 @@
 <script setup lang="ts">
-import { ref } from 'vue';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, useForm } from '@inertiajs/vue3';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 
-// 1. Mock Order Data (Usually passed from the backend/cart)
-const orderSummary = {
-    subtotal: 5200.00,
-    tax: 624.00,
-    shipping: 150.00,
-    total: 5974.00,
-    items: [
-        { name: "Heavy Duty Industrial Drill Pro 2000", qty: 1, price: 4500.00 },
-        { name: "Safety Goggles (Anti-Fog)", qty: 2, price: 700.00 } // Total for 2
-    ]
-};
+// 1. Receive the real dynamic Order Summary from the Backend (CheckoutController)
+const props = defineProps<{
+    orderSummary: {
+        subtotal: number;
+        tax: number;
+        shipping: number;
+        total: number;
+        items: Array<{
+            name: string;
+            qty: number;
+            price: number;
+        }>;
+    }
+}>();
 
-// 2. Form State
-const form = ref({
+// 2. Form State using Inertia's useForm
+// This automatically handles processing states and validation errors
+const form = useForm({
     email: '',
     firstName: '',
     lastName: '',
@@ -28,19 +31,17 @@ const form = ref({
     paymentMethod: 'credit_card'
 });
 
-const isProcessing = ref(false);
-
-// 3. Fake Checkout Submission
+// 3. Real Checkout Submission
 const placeOrder = () => {
-    isProcessing.value = true;
-    
-    // Simulate a network request (e.g., 2 seconds)
-    setTimeout(() => {
-        isProcessing.value = false;
-        alert("🎉 Order Placed Successfully! In a real app, you would be redirected to a Thank You page.");
-    }, 2000);
+    // This sends the POST request to our checkout route
+    form.post('/checkout', {
+        preserveScroll: true,
+        // The backend handles the actual redirect on success, 
+        // but if validation fails, Inertia automatically catches the errors!
+    });
 };
 
+// Formats prices to Philippine Peso
 const formatPrice = (value: number) => {
     return `₱${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 };
@@ -125,13 +126,12 @@ const formatPrice = (value: number) => {
 
                     <button 
                         type="submit" 
-                        :disabled="isProcessing"
+                        :disabled="form.processing"
                         class="w-full bg-[#009933] text-white py-4 rounded-xl font-black text-lg hover:bg-green-700 transition-colors shadow-md disabled:bg-gray-400 flex items-center justify-center gap-2 mt-4"
                     >
-                        <span v-if="isProcessing">Processing...</span>
+                        <span v-if="form.processing">Processing...</span>
                         <span v-else>Place Order - {{ formatPrice(orderSummary.total) }}</span>
                     </button>
-
                 </form>
             </div>
 
