@@ -7,8 +7,6 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
-use App\Http\Responses\LoginResponse; 
-use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract; 
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,7 +24,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
-        $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
     }
 
     /**
