@@ -9,8 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('phone')->unique()->after('id');
-            // Make name and email optional since they fill it out later
+            $table->string('phone')->nullable()->after('id');
             $table->string('name')->nullable()->change();
             $table->string('email')->nullable()->change();
         });
