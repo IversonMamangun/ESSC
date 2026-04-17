@@ -17,21 +17,20 @@ class CartController extends Controller
     {
         $cart = $request->session()->get('cart', []);
         
-        // Fetch only the products that are currently in the session cart
         $products = Product::with('store')->whereIn('id', array_keys($cart))->get();
 
-        // Format the data exactly as your Cart.vue expects it
         $cartItems = $products->map(function ($product) use ($cart) {
             return [
                 'id' => $product->id,
                 'title' => $product->title,
                 'price' => (float) $product->price,
                 'quantity' => $cart[$product->id]['quantity'],
-                'image' => $product->image ?? '/assets/placeholder.png', 
+                'image' => $product->image ? '/storage/' . $product->image : '/assets/store/online-store.jpg', 
                 'store' => $product->store->name ?? 'Unknown Store',
             ];
         });
 
+        // We only need to send the items. Vue handles the math!
         return Inertia::render('store/Cart', [
             'cartItems' => $cartItems,
         ]);
@@ -62,5 +61,36 @@ class CartController extends Controller
         $request->session()->put('cart', $cart);
 
         return redirect()->route('cart.index')->with('success', 'Item added to cart.');
+    }
+    
+    public function update(Request $request, $productId): RedirectResponse
+    {
+        $validated = $request->validate([
+            'quantity' => ['required', 'integer', 'min:1'],
+        ]);
+
+        $cart = $request->session()->get('cart', []);
+
+        if (isset($cart[$productId])) {
+            $cart[$productId]['quantity'] = $validated['quantity'];
+            $request->session()->put('cart', $cart);
+        }
+
+        return back()->with('success', 'Cart updated.');
+    }
+
+    /**
+     * Remove an item from the cart.
+     */
+    public function destroy(Request $request, $productId): RedirectResponse
+    {
+        $cart = $request->session()->get('cart', []);
+
+        if (isset($cart[$productId])) {
+            unset($cart[$productId]);
+            $request->session()->put('cart', $cart);
+        }
+
+        return back()->with('success', 'Item removed.');
     }
 }
