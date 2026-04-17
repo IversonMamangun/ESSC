@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-// 1. Add these two lines so Laravel knows where your models are!
 use App\Models\Store; 
 use App\Models\Product;
 use Illuminate\Database\Seeder;
@@ -17,6 +16,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             UserTypeSeeder::class,
+            CategorySeeder::class,
         ]);
 
         User::factory()->create([
