@@ -14,23 +14,19 @@ class ProductController extends Controller
     public function show($id): Response
     {
         // 1. Find the product in the database or fail with a 404
-        $product = Product::with('store')->findOrFail($id);
-
+        $product = Product::with(['store', 'category'])->findOrFail($id);
         // 2. Format the data so it matches exactly what Show.vue expects
         $formattedProduct = [
             'id' => $product->id,
             'title' => $product->title,
             'price' => number_format($product->price, 2),
-            'oldPrice' => null, // Add logic for sales later
+            'oldPrice' => null, 
             'stock' => $product->stock,
             'description' => $product->description,
             'storeName' => $product->store->name ?? 'Unknown Store',
-            'location' => 'Philippines', // You can add a location column to stores later
-            
-            // Your migration only had one 'image' string column, but Vue expects an array
+            'category' => $product->category->name ?? 'Uncategorized',
+            'location' => 'Philippines', 
             'images' => $product->image ? ['/storage/' . $product->image] : ['/assets/store/online-store.jpg'],
-            
-            // Mock data for reviews until you build a reviews table
             'rating' => 5.0,
             'reviews' => 0,
             'sold' => 0,

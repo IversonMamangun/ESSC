@@ -7,12 +7,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Casts;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 #[Table('products')]
 #[Fillable(['store_id', 'category_id', 'title', 'price', 'stock', 'image', 'description'])]
 #[Casts(['price' => 'decimal:2', 'stock' => 'integer'])]
 class Product extends Model
 {
+    use HasFactory;
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);

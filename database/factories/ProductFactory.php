@@ -2,24 +2,24 @@
 
 namespace Database\Factories;
 
+use App\Models\Store;
+use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ProductFactory extends Factory
 {
     public function definition(): array
     {
-        // Generate a base price so we can make the old_price slightly higher
-        $price = fake()->randomFloat(2, 500, 10000); 
-
         return [
-            'title' => ucwords(fake()->words(4, true)), // e.g., "Heavy Duty Steel Hammer"
+            'store_id' => Store::factory(), 
+            
+            'category_id' => Category::inRandomOrder()->value('id') ?? 1, 
+            
+            'title' => fake()->words(4, true),
             'description' => fake()->paragraph(),
-            'price' => $price,
-            'old_price' => $price + fake()->numberBetween(100, 1000),
-            'image' => null, 
-            'stock' => fake()->numberBetween(10, 200),
-            'sold' => fake()->numberBetween(0, 500),
-            'rating' => fake()->randomFloat(1, 3.8, 5.0),
+            'price' => fake()->randomFloat(2, 50, 5000),
+            'stock' => fake()->numberBetween(10, 100),
+            'image' => null, // Images can be handled manually later
         ];
     }
 }
