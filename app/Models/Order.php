@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Casts;
 
 #[Table('orders')]
-#[Fillable(['user_id', 'total_price', 'status', 'tracking_number'])]
+#[Fillable(['user_id', 'total_price', 'status', 'tracking_number', 'shipping_address', 'payment_method'])]
 #[Casts(['total_price' => 'decimal:2'])]
 class Order extends Model
 {

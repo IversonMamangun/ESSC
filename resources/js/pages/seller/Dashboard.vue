@@ -98,25 +98,25 @@ const submitStore = () => {
             <div v-else class="flex flex-col gap-8">
                 
                 <div class="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100 flex items-center justify-between">
-    <div class="flex items-center gap-6">
-        <div class="w-16 h-16 bg-[#009933] text-white rounded-xl flex items-center justify-center text-2xl font-black shadow-sm">
-            {{ props.store.name.charAt(0) }}
-        </div>
-        <div>
-            <h2 class="text-xl font-black text-gray-800">{{ props.store.name }}</h2>
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold mt-1" :class="props.store.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
-                {{ props.store.is_active ? 'Active' : 'Inactive' }}
-            </span>
-        </div>
-    </div>
-    
-   <Link 
-    href="/seller/products/create" 
-    class="bg-[#009933] text-white px-6 py-3 rounded-xl font-bold hover:bg-green-700 transition-colors shadow-sm inline-flex items-center justify-center"
->
-    + Add New Product
-</Link>
-</div>
+                    <div class="flex items-center gap-6">
+                        <div class="w-16 h-16 bg-[#009933] text-white rounded-xl flex items-center justify-center text-2xl font-black shadow-sm">
+                            {{ props.store.name.charAt(0) }}
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-black text-gray-800">{{ props.store.name }}</h2>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold mt-1" :class="props.store.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'">
+                                {{ props.store.is_active ? 'Active' : 'Inactive' }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                <Link 
+                    href="/seller/products/create" 
+                    class="bg-[#009933] text-white px-6 py-3 rounded-xl font-bold hover:bg-green-700 transition-colors shadow-sm inline-flex items-center justify-center"
+                >
+                    + Add New Product
+                </Link>
+                </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white rounded-2xl p-6 shadow-sm border border-neutral-100">

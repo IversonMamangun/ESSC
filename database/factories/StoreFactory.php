@@ -2,19 +2,22 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 class StoreFactory extends Factory
 {
     public function definition(): array
     {
+        $name = fake()->unique()->company();
+
         return [
-            'name' => fake()->company(),
-            'location' => fake()->city(),
-            'logo' => null, // We will leave images null for now
-            'banner' => null,
-            'rating' => fake()->randomFloat(1, 3.5, 5.0), // Random rating between 3.5 and 5.0
-            'followers' => fake()->numberBetween(100, 10000),
+            'user_id' => User::factory(), 
+            'name' => $name,
+            'slug' => Str::slug($name),
+            'description' => fake()->paragraph(),
+            'is_active' => true,
         ];
     }
 }

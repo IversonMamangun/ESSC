@@ -11,6 +11,8 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->decimal('total_price', 10, 2);
+            $table->text('shipping_address');
+            $table->string('payment_method'); 
             $table->string('status')->default('pending'); // pending, paid, shipped, delivered
             $table->string('tracking_number')->nullable();
             $table->timestamps();
