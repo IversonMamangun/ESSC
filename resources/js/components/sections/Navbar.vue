@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { Link, router } from '@inertiajs/vue3' // Added 'router' here
+import { ref, onMounted, computed } from 'vue'
+import { Link, router, usePage } from '@inertiajs/vue3' // Added 'usePage'
 import { home, logout, login, register } from '@/routes';
 
 const isMenuOpen = ref(false)
 const activeLink = ref('Home')
 const isDarkMode = ref(false)
+
+// Access Inertia's page props to check if a user is logged in
+const page = usePage()
+const user = computed(() => page.props.auth?.user)
 
 onMounted(() => {
   if (
@@ -27,10 +31,8 @@ const setActive = (linkName: string, sectionId: string) => {
   isMenuOpen.value = false
   
   if (window.location.pathname !== '/') {
-
     router.visit('/', {
       onSuccess: () => {
-
         setTimeout(() => {
           const element = document.getElementById(sectionId)
           if (element) {
@@ -43,11 +45,9 @@ const setActive = (linkName: string, sectionId: string) => {
     return; 
   }
 
-
   const element = document.getElementById(sectionId)
   if (element) {
     const y = element.getBoundingClientRect().top + window.scrollY - 100 
-    
     window.scrollTo({ top: y, behavior: 'smooth' })
   } else {
     console.warn(`Could not find section with ID: ${sectionId}`); 
@@ -63,7 +63,6 @@ const toggleDarkMode = () => {
     document.documentElement.classList.remove('dark')
   }
 }
-
 
 const navLinks = [
   { name: 'Home', id: 'home' },
@@ -122,6 +121,16 @@ const navLinks = [
         
         <div class="hidden xl:flex items-center gap-3 mr-2">
           <Link 
+            v-if="user"
+            :href="logout()" 
+            method="post"
+            as="button"
+            class="text-sm font-medium bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 hover:shadow-md transition-all active:scale-95"
+          >
+            Log out
+          </Link>
+          <Link 
+            v-else
             :href="login()" 
             class="text-sm font-medium bg-[#009933] text-white px-4 py-2 rounded-lg hover:bg-green-700 hover:shadow-md transition-all active:scale-95"
           >
@@ -190,6 +199,16 @@ const navLinks = [
 
         <div class="p-4 pt-2 mt-2 border-t border-neutral-100 dark:border-neutral-800 flex flex-col gap-3">
           <Link 
+            v-if="user"
+            :href="logout()"
+            method="post"
+            as="button"
+            class="w-full rounded-xl bg-red-600 px-4 py-3 text-center text-sm font-bold text-white shadow-md active:scale-[0.98] transition-all block focus:outline-none"
+          >
+            Log out
+          </Link>
+          <Link 
+            v-else
             :href="login()"
             class="w-full rounded-xl bg-[#009933] px-4 py-3 text-center text-sm font-bold text-white shadow-md active:scale-[0.98] transition-all block focus:outline-none"
           >
