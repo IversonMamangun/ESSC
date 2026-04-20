@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Models\UserType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -40,8 +39,8 @@ class RegisteredUserController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'phone' => $request-phone,
-            'password' => Hash::make($request->password),
+            'phone' => $request->phone,
+            'password' => $request->password,
             'user_type_id' => $buyerRole->id,
         ]);
 
