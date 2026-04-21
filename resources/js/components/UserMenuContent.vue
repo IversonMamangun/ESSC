@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link, router } from '@inertiajs/vue3';
-import { LogOut, Settings } from 'lucide-vue-next';
+// 1. ADDED the 'Store' icon to your imports
+import { LogOut, Settings, Store } from 'lucide-vue-next';
 import {
     DropdownMenuGroup,
     DropdownMenuItem,
@@ -30,7 +31,15 @@ defineProps<Props>();
         </div>
     </DropdownMenuLabel>
     <DropdownMenuSeparator />
+    
     <DropdownMenuGroup>
+        <DropdownMenuItem :as-child="true">
+            <Link class="block w-full cursor-pointer" href="/seller/dashboard">
+                <Store class="mr-2 h-4 w-4" />
+                Seller Dashboard
+            </Link>
+        </DropdownMenuItem>
+
         <DropdownMenuItem :as-child="true">
             <Link class="block w-full cursor-pointer" :href="edit()" prefetch>
                 <Settings class="mr-2 h-4 w-4" />
@@ -38,7 +47,9 @@ defineProps<Props>();
             </Link>
         </DropdownMenuItem>
     </DropdownMenuGroup>
+
     <DropdownMenuSeparator />
+    
     <DropdownMenuItem :as-child="true">
         <Link
             class="block w-full cursor-pointer"
