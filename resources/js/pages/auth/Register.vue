@@ -12,6 +12,7 @@ import AuthBase from '@/layouts/AuthLayout.vue';
 const form = useForm({
     name: '',
     email: '',
+    phone: '',
     password: '',
     password_confirmation: '',
 });
@@ -63,12 +64,26 @@ const submit = () => {
                 </div>
 
                 <div class="grid gap-2">
+                    <Label for="phone">Phone Number</Label>
+                    <Input
+                        id="phone"
+                        type="text"
+                        v-model="form.phone"
+                        required
+                        :tabindex="3"
+                        autocomplete="tel"
+                        placeholder="09123456789"
+                    />
+                    <InputError :message="form.errors.phone" />
+                </div>
+
+                <div class="grid gap-2">
                     <Label for="password">Password</Label>
                     <PasswordInput
                         id="password"
                         v-model="form.password"
                         required
-                        :tabindex="3"
+                        :tabindex="4"
                         autocomplete="new-password"
                         placeholder="Create a password"
                     />
@@ -81,7 +96,7 @@ const submit = () => {
                         id="password_confirmation"
                         v-model="form.password_confirmation"
                         required
-                        :tabindex="4"
+                        :tabindex="5"
                         autocomplete="new-password"
                         placeholder="Confirm your password"
                     />
@@ -90,7 +105,7 @@ const submit = () => {
                 <Button
                     type="submit"
                     class="mt-2 w-full bg-[#009933] hover:bg-green-700 text-white transition-colors"
-                    :tabindex="5"
+                    :tabindex="6"
                     :disabled="form.processing"
                 >
                     <Spinner v-if="form.processing" class="mr-2" />
@@ -103,7 +118,7 @@ const submit = () => {
                 <TextLink
                     href="/login"
                     class="underline underline-offset-4 text-[#009933] hover:text-green-700 font-bold"
-                    :tabindex="6"
+                    :tabindex="7"
                 >
                     Log in
                 </TextLink>
