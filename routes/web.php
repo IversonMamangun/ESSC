@@ -14,29 +14,43 @@ Route::inertia('/', 'Welcome', [
 ])->name('home');
 
 Route::get('/store', [StoreController::class, 'index'])->name('store.index');
+Route::get('/shop/{id}', [StoreController::class, 'shopProfile'])->name('shop.show');
 Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::inertia('/dashboard', 'Dashboard')->name('dashboard');
-});
+// --- PUBLIC CART ROUTES ---
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+Route::patch('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
 
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
 });
 
-// Require login for cart and checkout
+// --- THE TRAFFIC COP DASHBOARD ---
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', function () {
+        $user = auth()->user();
+
+        if ($user->userType?->slug === 'buyer') {
+            return redirect()->route('store.index');
+        }
+
+        if ($user->userType?->slug === 'seller') {
+            return redirect()->route('seller.dashboard');
+        }
+
+        // 3. Fallback just in case
+        return inertia('Dashboard');
+    })->name('dashboard');
+});
+
+// --- PROTECTED ROUTES ---
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
     
-    // Cart Routes
-    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-    Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
-
-    Route::patch('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
-    Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
-    
-    // Checkout Routes
+    // Checkout Routes (Requires Login)
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 
@@ -48,5 +62,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/seller/products/create', [SellerController::class, 'createProduct'])->name('seller.products.create');
     Route::post('/seller/products', [SellerController::class, 'storeProduct'])->name('seller.products.store');
 });
+Route::middleware('guest')->group(function () {
+    // Existing Email/Password
+    Route::get('/login', [LoginController::class, 'create'])->name('login');
+    Route::post('/login', [LoginController::class, 'store'])->name('login.store');
 
+    // NEW: OTP Login Routes
+    Route::post('/login/otp', [LoginController::class, 'sendOtp'])->name('login.otp.send');
+    Route::get('/login/verify-otp', [LoginController::class, 'showVerifyOtp'])->name('login.otp.verify');
+    Route::post('/login/verify-otp', [LoginController::class, 'verifyOtp'])->name('login.otp.check');
+});
 require __DIR__.'/settings.php';

@@ -3,24 +3,39 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use Illuminate\Http\Request;
+use App\Models\Store;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class StoreController extends Controller
 {
-    public function index(): Response
+    public function index()
     {
-        // 1. Fetch Top Deals (e.g., get 16 random or latest products)
-        // In a real app, you might filter by a 'is_featured' column
-        $topDeals = Product::with('store')->take(16)->get();
+        // 1. ADDED: ->with('store')
+        $topDeals = Product::with('store')->inRandomOrder()->limit(8)->get();
 
-        // 2. Fetch Discover Items with Laravel's built-in pagination (20 per page)
-        $discoverItems = Product::with('store')->paginate(20);
+        // 2. ADDED: ->with('store')
+        $discoverItems = Product::with('store')->latest()->paginate(10);
 
-        // 3. Send the data to the Vue component
         return Inertia::render('store/Index', [
             'topDeals' => $topDeals,
             'discoverItems' => $discoverItems,
+        ]);
+    }
+    
+    public function shopProfile($id)
+    {
+        // 1. Find the store by its ID (You will need to import App\Models\Store at the top!)
+        $store = Store::findOrFail($id);
+
+        // 2. Fetch only the products that belong to this specific store
+        $products = Product::where('store_id', $store->id)
+            ->latest()
+            ->paginate(15);
+
+        return Inertia::render('store/ShopProfile', [
+            'store' => $store,
+            'products' => $products,
         ]);
     }
 }
