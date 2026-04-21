@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick, computed } from 'vue';
-import { Head, usePage } from '@inertiajs/vue3';
+import { ref, onMounted, nextTick } from 'vue';
+import { Head, router } from '@inertiajs/vue3'; // Added router here
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import AdCarousel from '@/components/AdCarousel.vue'; 
 import ProductCard from '@/components/ProductCard.vue';
 import Footer from '@/components/sections/Footer.vue';
 
 const props = defineProps<{
     topDeals: Array<any>;
-    discoverItems: any; // Assuming this comes as a Laravel Pagination object
+    discoverItems: any; 
 }>();
 
 const showAllDeals = ref(false);
@@ -49,18 +48,15 @@ onMounted(() => {
     initCarousel();
 });
 
-// Using Laravel paginated data
-// const currentPage = ref(props.discoverItems.current_page);
-// const totalPages = ref(props.discoverItems.last_page);
-// const items = ref(props.discoverItems.data);
+// Laravel paginated data setup
 const currentPage = ref(props.discoverItems?.current_page || 1);
 const totalPages = ref(props.discoverItems?.last_page || 1);
 const items = ref(props.discoverItems?.data || []);
 
-
+// Active pagination logic
 const changePage = (page: number) => {
-    // In a real app, use Inertia router.get() here to fetch the next page from Laravel
-    // router.get('/store', { page: page }, { preserveState: true, preserveScroll: true });
+    if (page === currentPage.value) return;
+    router.get('/store', { page: page }, { preserveState: true, preserveScroll: true });
 };
 </script>
 
@@ -117,11 +113,23 @@ const changePage = (page: number) => {
                 </div>
             </div>
             
+            <div v-if="totalPages > 1" class="mt-12 flex items-center justify-center gap-2">
+                <button 
+                    v-for="page in totalPages" 
+                    :key="page"
+                    @click="changePage(page)"
+                    :class="[
+                        'px-4 py-2 rounded-md text-sm font-bold transition-colors',
+                        currentPage === page 
+                            ? 'bg-[#009933] text-white shadow-sm' 
+                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ]"
+                >
+                    {{ page }}
+                </button>
             </div>
+
+        </div>
     </section>
     <Footer />
 </template>
-
-<style scoped>
-/* Scoped styles remain unchanged */
-</style>

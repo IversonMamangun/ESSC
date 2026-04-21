@@ -13,12 +13,8 @@ use Illuminate\Http\RedirectResponse;
 
 class CheckoutController extends Controller
 {
-    /**
-     * Display the checkout page with totals for selected items.
-     */
-    public function index(Request $request): Response|\Illuminate\Http\RedirectResponse
+    public function index(Request $request): Response|RedirectResponse
     {
-        
         $cart = $request->session()->get('cart', []);
         $selectedIds = $request->query('selected_ids', []);
 
@@ -26,13 +22,12 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', 'No items selected for checkout.');
         }
 
-        // Fetch ONLY the products the user checked in the cart
         $products = Product::whereIn('id', $selectedIds)->get();
         $subtotal = 0;
         $items = [];
 
         foreach ($products as $product) {
-            if (!isset($cart[$product->id])) continue; // Safety check
+            if (!isset($cart[$product->id])) continue; 
 
             $qty = $cart[$product->id]['quantity'];
             $subtotal += $product->price * $qty;
@@ -57,9 +52,8 @@ class CheckoutController extends Controller
                 'items' => $items,
             ],
             'selectedIds' => $selectedIds,
-            // Pass the logged-in user's data to pre-fill the name
             'user' => [
-                'name' => Auth::user()->name,
+                'name' => Auth::user()->name ?? '',
                 'phone' => Auth::user()->phone,
                 'address' => Auth::user()->address,
                 'city' => Auth::user()->city,
@@ -69,12 +63,8 @@ class CheckoutController extends Controller
         ]);
     }
 
-    /**
-     * Process the order.
-     */
     public function store(Request $request): RedirectResponse
     {
-        // 1. Validate form (No email required here!)
         $request->validate([
             'selected_ids' => 'required|array',
             'fullName' => 'required|string|max:255',
@@ -91,7 +81,6 @@ class CheckoutController extends Controller
 
         $products = Product::whereIn('id', $selectedIds)->get();
 
-        // 2. SECURITY CHECK: Verify stock
         foreach ($products as $product) {
             $qty = $cart[$product->id]['quantity'];
             if ($product->stock < $qty) {
@@ -101,7 +90,6 @@ class CheckoutController extends Controller
             }
         }
 
-        // 3. DB Transaction
         DB::transaction(function () use ($cart, $request, $products, $selectedIds) {
             $lockedProducts = Product::whereIn('id', $selectedIds)->lockForUpdate()->get();
             $subtotal = 0;
@@ -123,10 +111,9 @@ class CheckoutController extends Controller
             $shipping = 150.00;
             $total = $subtotal + $tax + $shipping;
 
-            // Automatically grab the email from the logged-in Auth user
-            $userEmail = Auth::user()->email;
+            // SAFTEY CHECK: Handle users who registered via OTP and don't have an email yet
+            $userEmail = Auth::user()->email ?? 'No Email Provided';
 
-            // Combine the address cleanly
             $fullShippingAddress = sprintf(
                 "%s | %s | %s, %s, %s %s (Account: %s)",
                 $request->fullName,
@@ -135,10 +122,9 @@ class CheckoutController extends Controller
                 $request->city,
                 $request->province,
                 $request->zip,
-                $userEmail // Inserted purely on the backend
+                $userEmail 
             );
 
-            // 4. Create Order
             $order = Order::create([
                 'user_id' => Auth::id(),
                 'total_price' => $total,
@@ -151,7 +137,6 @@ class CheckoutController extends Controller
             $order->products()->attach($pivotData);
         });
 
-        // 5. Remove ONLY the purchased items from the cart session
         foreach ($selectedIds as $id) {
             unset($cart[$id]);
         }
