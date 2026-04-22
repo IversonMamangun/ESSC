@@ -232,7 +232,7 @@ const submitOrder = () => {
 
         </div>
 
-        <div v-if="showProfileModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
+        <div v-if="showProfileModal" class="fixed inset-0 z-100 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4">
             <div class="bg-white rounded-3xl p-8 max-w-sm w-full shadow-2xl transform transition-all">
                 <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <span class="text-3xl">⚠️</span>

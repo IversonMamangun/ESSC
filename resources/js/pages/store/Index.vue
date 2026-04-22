@@ -70,7 +70,7 @@ const changePage = (page: number) => {
     <section class="flex w-full justify-center p-4">
         <div class="relative flex w-full max-w-7xl items-center justify-center">
             <img src="/assets/store/online-store.jpg" alt="Our Capabilities Background" class="h-32 w-full rounded-2xl object-cover shadow-sm" />
-            <h1 class="absolute text-5xl md:text-7xl font-black tracking-normal text-[#009933] [text-shadow:2px_2px_0_#fff,_-1px_-1px_0_#fff,_1px_-1px_0_#fff,_-1px_1px_0_#fff,_1px_1px_0_#fff] drop-shadow-2xl">
+            <h1 class="absolute text-5xl md:text-7xl font-black tracking-normal text-[#009933] [text-shadow:2px_2px_0_#fff,-1px_-1px_0_#fff,1px_-1px_0_#fff,-1px_1px_0_#fff,1px_1px_0_#fff] drop-shadow-2xl">
                 ONLINE STORE
             </h1>
         </div>

@@ -15,10 +15,8 @@ const props = defineProps<{
     }>;
 }>();
 
-// Track which product IDs are currently checked
 const selectedItems = ref<number[]>([]);
 
-// Select or unselect all items at once
 const toggleSelectAll = (event: Event) => {
     const isChecked = (event.target as HTMLInputElement).checked;
     if (isChecked) {
@@ -28,7 +26,6 @@ const toggleSelectAll = (event: Event) => {
     }
 };
 
-// Dynamically calculate totals based ONLY on selected items
 const selectedProducts = computed(() => 
     props.cartItems.filter(item => selectedItems.value.includes(item.id))
 );
@@ -40,7 +37,6 @@ const subtotal = computed(() =>
 const delivery = computed(() => selectedProducts.value.length > 0 ? 150 : 0);
 const total = computed(() => subtotal.value + delivery.value);
 
-// Send only the checked items to the checkout page
 const proceedToCheckout = () => {
     if (selectedItems.value.length === 0) return;
     
@@ -57,7 +53,7 @@ const updateQuantity = (productId: number, currentQty: number, change: number) =
 
 const removeItem = (productId: number) => {
     if (confirm('Are you sure you want to remove this item?')) {
-        // Also remove it from the selected array if it is deleted
+
         selectedItems.value = selectedItems.value.filter(id => id !== productId);
         router.delete(`/cart/${productId}`, { preserveScroll: true });
     }
