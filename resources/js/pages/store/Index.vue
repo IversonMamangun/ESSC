@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import { Head, router } from '@inertiajs/vue3'; 
 import { ref, onMounted, nextTick } from 'vue';
-import { Head, router } from '@inertiajs/vue3'; // Added router here
-import Navbar from '@/components/sections/Navbar.vue';
-import TopBar from '@/components/sections/TopBar.vue';
 import ProductCard from '@/components/ProductCard.vue';
 import Footer from '@/components/sections/Footer.vue';
+import Navbar from '@/components/sections/Navbar.vue';
+import TopBar from '@/components/sections/TopBar.vue';
 
 const props = defineProps<{
     topDeals: Array<any>;
@@ -55,7 +55,10 @@ const items = ref(props.discoverItems?.data || []);
 
 // Active pagination logic
 const changePage = (page: number) => {
-    if (page === currentPage.value) return;
+    if (page === currentPage.value) {
+        return;
+    }
+    
     router.get('/store', { page: page }, { preserveState: true, preserveScroll: true });
 };
 </script>

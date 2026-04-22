@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
+import { Store, Star, MapPin } from 'lucide-vue-next'; 
+import { ref, computed } from 'vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import { Store, Star, MapPin } from 'lucide-vue-next'; 
 
 const props = defineProps<{
     product: any;
@@ -17,24 +17,37 @@ const quantity = ref(1);
 // Smart Image Resolver
 const activeImage = computed(() => {
     const img = props.product?.images?.[0];
-    if (!img) return '/assets/store/online-store.jpg'; 
-    if (img.startsWith('http') || img.startsWith('/assets') || img.startsWith('/storage/')) return img;
+
+    if (!img) {
+        return '/assets/store/online-store.jpg'; 
+    }
+
+    if (img.startsWith('http') || img.startsWith('/assets') || img.startsWith('/storage/')) {
+        return img;
+    }
+
     return '/storage/' + img;
 });
 
 const increaseQuantity = () => {
-    if (quantity.value < props.product.stock) quantity.value++;
+    if (quantity.value < props.product.stock) {
+        quantity.value++;
+    }
 };
 
 const decreaseQuantity = () => {
-    if (quantity.value > 1) quantity.value--;
+    if (quantity.value > 1) {
+        quantity.value--;
+    }
 };
 
 const handleAddToCart = () => {
     if (!user.value) {
         router.visit('/login'); 
+
         return;
     }
+
     router.post('/cart', {
         product_id: props.product.id,
         quantity: quantity.value
@@ -44,8 +57,10 @@ const handleAddToCart = () => {
 const handleBuyNow = () => {
     if (!user.value) {
         router.visit('/login'); 
+
         return;
     }
+    
     router.visit(`/checkout?direct=${props.product.id}&qty=${quantity.value}`);
 };
 </script>

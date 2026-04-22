@@ -19,6 +19,7 @@ const selectedItems = ref<number[]>([]);
 
 const toggleSelectAll = (event: Event) => {
     const isChecked = (event.target as HTMLInputElement).checked;
+
     if (isChecked) {
         selectedItems.value = props.cartItems.map(item => item.id);
     } else {
@@ -38,8 +39,10 @@ const delivery = computed(() => selectedProducts.value.length > 0 ? 150 : 0);
 const total = computed(() => subtotal.value + delivery.value);
 
 const proceedToCheckout = () => {
-    if (selectedItems.value.length === 0) return;
-    
+    if (selectedItems.value.length === 0) {
+        return;
+    }
+
     router.get('/checkout', { 
         selected_ids: selectedItems.value 
     });
@@ -47,7 +50,11 @@ const proceedToCheckout = () => {
 
 const updateQuantity = (productId: number, currentQty: number, change: number) => {
     const newQty = currentQty + change;
-    if (newQty < 1) return;
+
+    if (newQty < 1) {
+        return;
+    }
+
     router.patch(`/cart/${productId}`, { quantity: newQty }, { preserveScroll: true });
 };
 

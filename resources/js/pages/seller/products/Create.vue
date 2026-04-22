@@ -23,6 +23,7 @@ const form = useForm({
 // Handle the file selection and attach it to the form
 const handleImageUpload = (event: Event) => {
     const target = event.target as HTMLInputElement;
+    
     if (target.files && target.files.length > 0) {
         form.image = target.files[0];
     }
