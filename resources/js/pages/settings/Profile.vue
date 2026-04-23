@@ -14,6 +14,17 @@ import { edit } from '@/routes/profile';
 import { send } from '@/routes/verification';
 import type { BreadcrumbItem } from '@/types';
 
+interface User {
+    name: string;
+    email: string;
+    phone?: string;
+    address?: string;
+    city?: string;
+    province?: string;
+    zip?: string;
+    email_verified_at?: string | null;
+}
+
 type Props = {
     mustVerifyEmail: boolean;
     status?: string;
@@ -29,7 +40,8 @@ const breadcrumbItems: BreadcrumbItem[] = [
 ];
 
 const page = usePage();
-const user = computed(() => page.props.auth.user);
+
+const user = computed(() => page.props.auth.user as User);
 </script>
 
 <template>
