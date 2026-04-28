@@ -10,7 +10,6 @@ use App\Services\MoviderService;
 
 class RegisterController extends Controller
 {
-    // 1. Handles POST /register/initiate AND POST /register/resend
     public function initiate(Request $request, MoviderService $movider)
     {
         $request->validate([
@@ -20,10 +19,8 @@ class RegisterController extends Controller
         // Generate a 6-digit OTP
         $otp = rand(100000, 999999);
 
-        // Store OTP in cache for 5 minutes, tied to the phone number
         Cache::put('otp_' . $request->phone, $otp, now()->addMinutes(5));
 
-        // Send via Movider
         $sent = $movider->sendOTP($request->phone, $otp);
 
         if (!$sent) {
@@ -33,7 +30,6 @@ class RegisterController extends Controller
         return response()->json(['message' => 'OTP sent successfully']);
     }
 
-    // 2. Handles POST /register/verify
     public function verify(Request $request)
     {
         $request->validate([
@@ -43,18 +39,14 @@ class RegisterController extends Controller
 
         $cachedOtp = Cache::get('otp_' . $request->phone);
 
-        // Check if OTP exists and matches
         if (!$cachedOtp || (string) $cachedOtp !== (string) $request->otp) {
             return response()->json(['message' => 'Invalid or expired OTP.'], 400);
         }
 
-        // OTP is valid! Delete it so it can't be reused
         Cache::forget('otp_' . $request->phone);
 
-        // Generate a secure verification token to allow the user to proceed to Step 3 (Password)
         $token = Str::random(60);
         
-        // Store token for 15 minutes
         Cache::put('reg_token_' . $request->phone, $token, now()->addMinutes(15));
 
         return response()->json([
@@ -63,7 +55,6 @@ class RegisterController extends Controller
         ]);
     }
 
-    // 3. Handles POST /register/complete
     public function complete(Request $request)
     {
         $request->validate([

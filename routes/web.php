@@ -37,7 +37,7 @@ Route::middleware('guest')->group(function () {
     Route::post('/login/verify-otp', [LoginController::class, 'verifyOtp'])->name('login.otp.check');
 
     // OTP Registration Routes (Connecting to the Vue 3 component)
-    Route::inertia('/register', 'Auth/Register')->name('register'); // Renders your Vue file
+    Route::inertia('/register', 'auth/Register')->name('register');
     Route::post('/register/initiate', [RegisterController::class, 'initiate'])->name('register.initiate');
     Route::post('/register/verify', [RegisterController::class, 'verify'])->name('register.verify');
     Route::post('/register/resend', [RegisterController::class, 'initiate'])->name('register.resend'); // Reuses initiate method
