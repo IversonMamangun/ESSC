@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController; // Added missing import
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProductController;
@@ -23,9 +24,24 @@ Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
 Route::patch('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
 
+// --- GUEST ROUTES (Login & Registration) ---
 Route::middleware('guest')->group(function () {
+    
+    // Standard Login
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
+
+    // OTP Login Routes
+    Route::post('/login/otp', [LoginController::class, 'sendOtp'])->name('login.otp.send');
+    Route::get('/login/verify-otp', [LoginController::class, 'showVerifyOtp'])->name('login.otp.verify');
+    Route::post('/login/verify-otp', [LoginController::class, 'verifyOtp'])->name('login.otp.check');
+
+    // OTP Registration Routes (Connecting to the Vue 3 component)
+    Route::inertia('/register', 'Auth/Register')->name('register'); // Renders your Vue file
+    Route::post('/register/initiate', [RegisterController::class, 'initiate'])->name('register.initiate');
+    Route::post('/register/verify', [RegisterController::class, 'verify'])->name('register.verify');
+    Route::post('/register/resend', [RegisterController::class, 'initiate'])->name('register.resend'); // Reuses initiate method
+    Route::post('/register/complete', [RegisterController::class, 'complete'])->name('register.complete');
 });
 
 // --- THE TRAFFIC COP DASHBOARD ---
@@ -41,7 +57,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return redirect()->route('seller.dashboard');
         }
 
-        // 3. Fallback just in case
+        // Fallback just in case
         return inertia('Dashboard');
     })->name('dashboard');
 });
@@ -62,14 +78,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/seller/products/create', [SellerController::class, 'createProduct'])->name('seller.products.create');
     Route::post('/seller/products', [SellerController::class, 'storeProduct'])->name('seller.products.store');
 });
-Route::middleware('guest')->group(function () {
-    // Existing Email/Password
-    Route::get('/login', [LoginController::class, 'create'])->name('login');
-    Route::post('/login', [LoginController::class, 'store'])->name('login.store');
 
-    // NEW: OTP Login Routes
-    Route::post('/login/otp', [LoginController::class, 'sendOtp'])->name('login.otp.send');
-    Route::get('/login/verify-otp', [LoginController::class, 'showVerifyOtp'])->name('login.otp.verify');
-    Route::post('/login/verify-otp', [LoginController::class, 'verifyOtp'])->name('login.otp.check');
-});
 require __DIR__.'/settings.php';
