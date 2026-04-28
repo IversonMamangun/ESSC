@@ -128,6 +128,7 @@ const verifyOtp = async () => {
             form.setError('otp', data.message || 'Invalid OTP.');
             return;
         }
+
         form.verification_token = data.verification_token; 
         currentStep.value = 3;
     } catch {
@@ -137,9 +138,35 @@ const verifyOtp = async () => {
     }
 };
 
+const resendOtp = async () => {
+    globalError.value = '';
+    isLoading.value = true;
+    try {
+        const response = await fetch('/register/resend', {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify({ phone: form.phone })
+        });
+        const data = await response.json();
+        if (!response.ok) {
+            globalError.value = data.message || 'Failed to resend OTP.';
+            return;
+        }
+        startTimer(); 
+        otpDigits.value = ['', '', '', '', '', ''];
+        form.otp = '';
+        nextTick(() => otpRefs.value[0]?.focus());
+    } catch {
+        globalError.value = 'Failed to resend OTP.';
+    } finally {
+        isLoading.value = false;
+    }
+};
+
 const createAccount = async () => {
     form.clearErrors();
     isLoading.value = true;
+
     try {
         const response = await fetch('/register/complete', {
             method: 'POST',
@@ -151,11 +178,13 @@ const createAccount = async () => {
                 verification_token: form.verification_token
             })
         });
+
         if (!response.ok) {
             const data = await response.json();
             globalError.value = data.message || 'Failed to create account.';
             return;
         }
+
         currentStep.value = 4;
     } catch {
         globalError.value = 'An error occurred.';
@@ -170,22 +199,25 @@ const createAccount = async () => {
 
     <div class="min-h-screen relative flex items-center justify-center px-4 py-10 bg-gray-50 overflow-hidden">
         
-    <div class="absolute top-0 left-0 w-full h-[35vh] bg-[#009933] rounded-b-[40%] shadow-lg z-0 scale-x-110"></div>
-        <div class="relative z-10 w-full max-w-4xl bg-white shadow-2xl rounded-2xl overflow-hidden flex flex-col md:flex-row min-h-[550px]">
+        <div class="absolute top-0 left-0 w-full h-[35vh] bg-[#009933] rounded-b-[40%] shadow-lg z-0 scale-x-110"></div>
+        
+        <div class="relative z-10 w-full max-w-4xl bg-white shadow-2xl rounded-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px]">
             
-            <div class="hidden md:block md:w-1/2 bg-gray-100">
-                <img src="/assets/registration-banner.jpg" alt="Banner" class="w-full h-full object-cover">
+            <div class="hidden md:block md:w-1/2 bg-gray-100 relative">
+                <img src="/assets/register_img.jpg" alt="Banner" class="absolute inset-0 w-full h-full object-cover">
             </div>
 
-            <div class="w-full md:w-1/2 p-8 sm:p-12 flex flex-col justify-center">
+            <div class="w-full md:w-1/2 p-8 sm:p-12 flex flex-col">
                 
-                <div v-if="currentStep < 4">
-                    <h2 class="text-3xl font-extrabold text-gray-800 mb-2">Create an Account</h2>
+               <div v-if="currentStep < 4" class="text-center shrink-0">
+                    <h2 class="text-3xl font-extrabold text-[#009933] mb-2 border border-[#009933] px-10 rounded-2xl py-3 inline-block">
+                        Create an Account
+                    </h2>
                     
                     <div class="flex space-x-2 my-6">
                         <div v-for="step in 3" :key="step"
-                             class="h-1.5 flex-1 rounded-full transition-all duration-500"
-                             :class="currentStep >= step ? 'bg-[#009933]' : 'bg-gray-200'">
+                            class="h-1.5 flex-1 rounded-full transition-all duration-500"
+                            :class="currentStep >= step ? 'bg-[#009933]' : 'bg-gray-200'">
                         </div>
                     </div>
 
@@ -194,81 +226,111 @@ const createAccount = async () => {
                     </div>
                 </div>
 
-                <div v-if="currentStep === 1" class="space-y-6 animate-in fade-in duration-500">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Mobile Number</label>
-                        <input 
-                            v-model="form.phone" 
-                            type="tel" 
-                            maxlength="11" 
-                            placeholder="09123456789" 
-                            @input="form.phone = form.phone.replace(/[^0-9]/g, '')"
-                            class="w-full h-12 px-4 rounded-xl border-2 border-gray-100 focus:border-[#009933] outline-none transition-all bg-gray-50 focus:bg-white"
-                        >
-                        <InputError :message="form.errors.phone" class="mt-1" />
-                    </div>
-
-                    <button @click="registerNow" :disabled="isLoading" class="w-full h-12 bg-[#009933] hover:bg-green-700 text-white font-bold rounded-xl transition-all shadow-md active:scale-95">
-                        <span v-if="isLoading">Processing...</span>
-                        <span v-else>Next</span>
-                    </button>
-
-                    <div class="text-center">
-                        <Link href="/login" class="text-sm font-bold text-[#009933] hover:underline">Log in</Link>
-                    </div>
-                </div>
-
-                <div v-if="currentStep === 2" class="space-y-6 animate-in fade-in duration-500">
-                    <p class="text-sm text-gray-500 text-center">Enter verification code sent to <br><span class="font-bold text-gray-800">{{ form.phone }}</span></p>
+                <div class="flex-grow flex flex-col">
                     
-                    <div class="flex justify-between gap-2">
-                        <input 
-                            v-for="(digit, index) in otpDigits" :key="index"
-                            :ref="el => { if(el) otpRefs[index] = el as HTMLInputElement }"
-                            v-model="otpDigits[index]"
-                            @input="handleOtpInput($event, index)"
-                            @keydown.delete="handleOtpDelete($event, index)"
-                            type="text" maxlength="1"
-                            class="w-10 h-12 sm:w-12 sm:h-14 text-center text-2xl font-bold text-[#009933] border-2 border-gray-100 rounded-xl focus:border-[#009933] outline-none"
-                        >
+                    <div v-if="currentStep === 1" class="flex-grow flex flex-col animate-in fade-in duration-500">
+                        
+                        <div class="flex-grow flex flex-col justify-center">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Mobile Number</label>
+                                
+                                <div class="flex items-center w-full h-12 rounded-xl border border-[#009933] bg-white overflow-hidden shadow-sm">
+                                    <div class="px-4 h-full flex items-center justify-center bg-gray-50 border-r border-[#009933] text-[#009933] font-bold">
+                                        +63
+                                    </div>
+                                    <input 
+                                        v-model="form.phone" 
+                                        type="tel" 
+                                        maxlength="10" 
+                                        placeholder="9123456789" 
+                                        @input="form.phone = form.phone.replace(/[^0-9]/g, '')"
+                                        class="w-full h-full px-3 outline-none text-gray-800 bg-transparent"
+                                    >
+                                </div>
+                                <InputError :message="form.errors.phone" class="mt-1" />
+                            </div>
+                        </div>
+
+                        <div class="mt-auto pt-8 shrink-0 space-y-4">
+                            <button @click="registerNow" :disabled="isLoading" class="w-full h-12 bg-[#009933] hover:bg-green-700 text-white font-bold rounded-xl transition-all shadow-md active:scale-95">
+                                <span v-if="isLoading">Processing...</span>
+                                <span v-else>Next</span>
+                            </button>
+                            <div class="text-center">
+                                <Link href="/login" class="text-sm font-bold text-[#009933] hover:underline">Log in</Link>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="text-center text-xs">
-                        <span v-if="countdown > 0" class="text-gray-400">Resend in {{ formattedTime }}</span>
-                        <button v-else @click="resendOtp" class="text-[#009933] font-bold">Resend Code</button>
+                    <div v-if="currentStep === 2" class="flex-grow flex flex-col animate-in fade-in duration-500">
+                        
+                        <div class="flex-grow flex flex-col justify-center space-y-6">
+                            <p class="text-sm text-gray-500 text-center">Enter verification code sent to <br><span class="font-bold text-gray-800">+63 {{ form.phone }}</span></p>
+                            
+                            <div class="flex justify-between gap-2">
+                                <input 
+                                    v-for="(digit, index) in otpDigits" :key="index"
+                                    :ref="el => { if(el) otpRefs[index] = el as HTMLInputElement }"
+                                    v-model="otpDigits[index]"
+                                    @input="handleOtpInput($event, index)"
+                                    @keydown.delete="handleOtpDelete($event, index)"
+                                    type="text" maxlength="1"
+                                    class="w-10 h-12 sm:w-12 sm:h-14 text-center text-2xl font-bold text-[#009933] border-2 border-gray-100 rounded-xl focus:border-[#009933] outline-none"
+                                >
+                            </div>
+
+                            <div class="text-center text-xs">
+                                <span v-if="countdown > 0" class="text-gray-400">Resend in {{ formattedTime }}</span>
+                                <button v-else @click="resendOtp" class="text-[#009933] font-bold hover:underline">Resend Code</button>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto pt-8 shrink-0">
+                            <button @click="verifyOtp" :disabled="form.otp.length < 6 || isLoading" class="w-full h-12 bg-[#009933] hover:bg-green-700 text-white font-bold rounded-xl shadow-md transition-all">
+                                <span v-if="isLoading">Verifying...</span>
+                                <span v-else>Next</span>
+                            </button>
+                        </div>
                     </div>
 
-                    <button @click="verifyOtp" :disabled="form.otp.length < 6 || isLoading" class="w-full h-12 bg-[#009933] text-white font-bold rounded-xl shadow-md">
-                        Next
-                    </button>
+                    <div v-if="currentStep === 3" class="flex-grow flex flex-col animate-in fade-in duration-500">
+                        
+                        <div class="flex-grow flex flex-col justify-center space-y-5">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Set Password</label>
+                                <input :type="showPassword ? 'text' : 'password'" v-model="form.password" class="w-full h-12 px-4 border-2 border-gray-100 rounded-xl focus:border-[#009933] outline-none">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Retype Password</label>
+                                <input :type="showPassword ? 'text' : 'password'" v-model="form.password_confirmation" class="w-full h-12 px-4 border-2 border-gray-100 rounded-xl focus:border-[#009933] outline-none">
+                            </div>
+                        </div>
+
+                        <div class="mt-auto pt-8 shrink-0">
+                            <button @click="createAccount" :disabled="isLoading" class="w-full h-12 bg-[#009933] hover:bg-green-700 text-white font-bold rounded-xl shadow-md transition-all">
+                                <span v-if="isLoading">Creating Account...</span>
+                                <span v-else>Complete Registration</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <div v-if="currentStep === 3" class="space-y-5 animate-in fade-in duration-500">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Set Password</label>
-                        <input :type="showPassword ? 'text' : 'password'" v-model="form.password" class="w-full h-12 px-4 border-2 border-gray-100 rounded-xl focus:border-[#009933] outline-none">
+                <div v-if="currentStep === 4" class="h-full flex flex-col items-center justify-center animate-in zoom-in duration-500">
+                    <div class="flex-grow flex flex-col items-center justify-center w-full">
+                        <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-6 border-2 border-green-100">
+                            <svg class="w-12 h-12 text-[#009933]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                            </svg>
+                        </div>
+                        <h2 class="text-3xl font-black text-gray-800 mb-2">Success!</h2>
+                        <p class="text-gray-500 text-center">Your account is ready.</p>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Retype Password</label>
-                        <input :type="showPassword ? 'text' : 'password'" v-model="form.password_confirmation" class="w-full h-12 px-4 border-2 border-gray-100 rounded-xl focus:border-[#009933] outline-none">
+                    
+                    <div class="mt-auto w-full pt-8 shrink-0">
+                        <Link href="/login" class="w-full h-12 flex items-center justify-center bg-[#009933] hover:bg-green-700 text-white font-bold rounded-xl shadow-lg transition-all">
+                            Log in
+                        </Link>
                     </div>
-
-                    <button @click="createAccount" :disabled="isLoading" class="w-full h-12 bg-[#009933] text-white font-bold rounded-xl shadow-md">
-                        Complete Registration
-                    </button>
-                </div>
-
-                <div v-if="currentStep === 4" class="text-center flex flex-col items-center animate-in zoom-in duration-500">
-                    <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-6">
-                        <svg class="w-12 h-12 text-[#009933]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                        </svg>
-                    </div>
-                    <h2 class="text-3xl font-black text-gray-800 mb-2">Success!</h2>
-                    <p class="text-gray-500 mb-8">Your account is ready.</p>
-                    <Link href="/login" class="w-full h-12 flex items-center justify-center bg-[#009933] text-white font-bold rounded-xl shadow-lg">
-                        Log in
-                    </Link>
                 </div>
 
             </div>
