@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue';
 import { useForm, Head, Link } from '@inertiajs/vue3';
+import { ref, computed, nextTick } from 'vue';
 import InputError from '@/components/InputError.vue';
 
 // 1. Form State
@@ -39,6 +39,7 @@ const startTimer = () => {
 const formattedTime = computed(() => {
     const m = String(Math.floor(countdown.value / 60)).padStart(2, '0');
     const s = String(countdown.value % 60).padStart(2, '0');
+
     return `${m}:${s}`;
 });
 
@@ -73,6 +74,7 @@ const handleOtpDelete = (event: KeyboardEvent, index: number) => {
 const getHeaders = () => {
     const match = document.cookie.match(new RegExp('(^| )XSRF-TOKEN=([^;]+)'));
     const token = match ? decodeURIComponent(match[2]) : '';
+    
     return {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
@@ -101,6 +103,7 @@ const registerNow = async () => {
             } else {
                 globalError.value = data.message || 'Failed to send OTP.';
             }
+            
             return;
         }
         
@@ -117,6 +120,7 @@ const registerNow = async () => {
 const verifyOtp = async () => {
     form.clearErrors();
     isLoading.value = true;
+
     try {
         const response = await fetch('/register/verify', {
             method: 'POST',
@@ -124,8 +128,10 @@ const verifyOtp = async () => {
             body: JSON.stringify({ phone: form.phone, otp: form.otp })
         });
         const data = await response.json();
+
         if (!response.ok) {
             form.setError('otp', data.message || 'Invalid OTP.');
+
             return;
         }
 
@@ -141,6 +147,7 @@ const verifyOtp = async () => {
 const resendOtp = async () => {
     globalError.value = '';
     isLoading.value = true;
+
     try {
         const response = await fetch('/register/resend', {
             method: 'POST',
@@ -148,10 +155,13 @@ const resendOtp = async () => {
             body: JSON.stringify({ phone: form.phone })
         });
         const data = await response.json();
+
         if (!response.ok) {
             globalError.value = data.message || 'Failed to resend OTP.';
+
             return;
         }
+
         startTimer(); 
         otpDigits.value = ['', '', '', '', '', ''];
         form.otp = '';
@@ -182,6 +192,7 @@ const createAccount = async () => {
         if (!response.ok) {
             const data = await response.json();
             globalError.value = data.message || 'Failed to create account.';
+
             return;
         }
 
@@ -201,7 +212,7 @@ const createAccount = async () => {
         
         <div class="absolute top-0 left-0 w-full h-[35vh] bg-[#009933] rounded-b-[40%] shadow-lg z-0 scale-x-110"></div>
         
-        <div class="relative z-10 w-full max-w-4xl bg-white shadow-2xl rounded-2xl overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+        <div class="relative z-10 w-full max-w-4xl bg-white shadow-2xl rounded-2xl overflow-hidden flex flex-col md:flex-row min-h-150">
             
             <div class="hidden md:block md:w-1/2 bg-gray-100 relative">
                 <img src="/assets/register_img.jpg" alt="Banner" class="absolute inset-0 w-full h-full object-cover">
@@ -226,11 +237,11 @@ const createAccount = async () => {
                     </div>
                 </div>
 
-                <div class="flex-grow flex flex-col">
+                <div class="grow flex flex-col">
                     
-                    <div v-if="currentStep === 1" class="flex-grow flex flex-col animate-in fade-in duration-500">
+                    <div v-if="currentStep === 1" class="grow flex flex-col animate-in fade-in duration-500">
                         
-                        <div class="flex-grow flex flex-col justify-center">
+                        <div class="grow flex flex-col justify-center">
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Mobile Number</label>
                                 
@@ -262,9 +273,9 @@ const createAccount = async () => {
                         </div>
                     </div>
 
-                    <div v-if="currentStep === 2" class="flex-grow flex flex-col animate-in fade-in duration-500">
+                    <div v-if="currentStep === 2" class="grow flex flex-col animate-in fade-in duration-500">
                         
-                        <div class="flex-grow flex flex-col justify-center space-y-6">
+                        <div class="grow flex flex-col justify-center space-y-6">
                             <p class="text-sm text-gray-500 text-center">Enter verification code sent to <br><span class="font-bold text-gray-800">+63 {{ form.phone }}</span></p>
                             
                             <div class="flex justify-between gap-2">
@@ -293,9 +304,9 @@ const createAccount = async () => {
                         </div>
                     </div>
 
-                    <div v-if="currentStep === 3" class="flex-grow flex flex-col animate-in fade-in duration-500">
+                    <div v-if="currentStep === 3" class="grow flex flex-col animate-in fade-in duration-500">
                         
-                        <div class="flex-grow flex flex-col justify-center space-y-5">
+                        <div class="grow flex flex-col justify-center space-y-5">
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Set Password</label>
                                 <input :type="showPassword ? 'text' : 'password'" v-model="form.password" class="w-full h-12 px-4 border-2 border-gray-100 rounded-xl focus:border-[#009933] outline-none">
@@ -316,7 +327,7 @@ const createAccount = async () => {
                 </div>
 
                 <div v-if="currentStep === 4" class="h-full flex flex-col items-center justify-center animate-in zoom-in duration-500">
-                    <div class="flex-grow flex flex-col items-center justify-center w-full">
+                    <div class="grow flex flex-col items-center justify-center w-full">
                         <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-6 border-2 border-green-100">
                             <svg class="w-12 h-12 text-[#009933]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
