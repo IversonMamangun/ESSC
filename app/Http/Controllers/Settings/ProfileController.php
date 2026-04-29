@@ -58,4 +58,10 @@ class ProfileController extends Controller
 
         return redirect('/');
     }
+    public function setup(Request $request): Response
+{
+    return Inertia::render('settings/ProfileSetup', [
+        'status' => session('status'),
+    ]);
+}
 }
