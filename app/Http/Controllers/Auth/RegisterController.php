@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash; 
+use App\Models\User; 
 use App\Services\MoviderService;
 
 class RegisterController extends Controller
@@ -16,7 +18,6 @@ class RegisterController extends Controller
             'phone' => ['required', 'string', 'max:11', 'unique:users,phone'],
         ]);
 
-        // Generate a 6-digit OTP
         $otp = rand(100000, 999999);
 
         Cache::put('otp_' . $request->phone, $otp, now()->addMinutes(5));
@@ -69,13 +70,12 @@ class RegisterController extends Controller
             return response()->json(['message' => 'Session expired. Please restart registration.'], 403);
         }
 
-        // Create the user in the database
-        // User::create([
-        //     'phone' => $request->phone,
-        //     'password' => Hash::make($request->password),
-        // ]);
+        User::create([
+            'phone' => $request->phone,
+            'password' => Hash::make($request->password),
+            'user_type_id' => 2,
+        ]);
 
-        // Clear the token
         Cache::forget('reg_token_' . $request->phone);
 
         return response()->json(['message' => 'Account created successfully']);
