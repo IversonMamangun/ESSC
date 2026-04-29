@@ -10,11 +10,11 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable(); // Might be null until they complete profile
-            $table->string('phone')->unique();  // OTP requires a unique phone number
-            $table->string('email')->unique()->nullable(); // Email is no longer required
+            $table->string('name')->nullable(); 
+            $table->string('phone')->unique()->nullable();  
+            $table->string('email')->unique()->nullable(); 
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password')->nullable(); // Passwords are no longer required for OTP
+            $table->string('password')->nullable(); 
             $table->rememberToken();
             $table->timestamps();
         });
