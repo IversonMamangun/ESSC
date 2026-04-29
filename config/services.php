@@ -41,4 +41,9 @@ return [
         'sender_id' => env('MOVIDER_SENDER_ID', 'MOVIDER'), // Optional custom sender name
     ],
 
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI'),
+    ],
 ];

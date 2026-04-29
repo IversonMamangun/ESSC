@@ -21,7 +21,6 @@ class MoviderService
         ]);
 
         if ($response->failed()) {
-            // Log the error for debugging if the SMS fails
             Log::error('Movider SMS Failed', ['response' => $response->json()]);
             return false;
         }
