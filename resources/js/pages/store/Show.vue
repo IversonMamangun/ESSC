@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
-import { Store, Star, MapPin } from 'lucide-vue-next'; 
+import { 
+    Store, Star, MapPin, ShoppingCart, 
+    Zap, ChevronRight, ShieldCheck, 
+    Plus, Minus 
+} from 'lucide-vue-next'; 
 import { ref, computed } from 'vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
+import Footer from '@/components/sections/Footer.vue';
 
 const props = defineProps<{
     product: any;
@@ -44,7 +49,6 @@ const decreaseQuantity = () => {
 const handleAddToCart = () => {
     if (!user.value) {
         router.visit('/login'); 
-
         return;
     }
 
@@ -57,7 +61,6 @@ const handleAddToCart = () => {
 const handleBuyNow = () => {
     if (!user.value) {
         router.visit('/login'); 
-
         return;
     }
     
@@ -67,110 +70,128 @@ const handleBuyNow = () => {
 
 <template>
     <Head :title="`${props.product.title} - Store`" />
-    <TopBar />
-    <div class="sticky top-0 z-50 mt-8">
-        <Navbar />
-    </div>
+    <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
+        <TopBar />
+        <div class="sticky top-0 z-50 mt-8">
+            <Navbar />
+        </div>
 
-    <main class="flex w-full justify-center px-4 mt-6 mb-24">
-        <div class="w-full max-w-7xl bg-white rounded-2xl shadow-sm border border-neutral-100 p-6 md:p-8">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 mb-20">
             
-            <nav class="text-sm text-gray-500 mb-8 flex items-center gap-2">
-                <Link href="/" class="hover:text-[#009933]">Home</Link>
-                <span>›</span>
-                <Link href="/store" class="hover:text-[#009933]">Online Store</Link>
-                <span>›</span>
-                <span class="text-gray-800 font-medium truncate">{{ props.product.title }}</span>
+            <nav class="flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-8">
+                <Link href="/" class="hover:text-[#009933] transition-colors">Home</Link>
+                <ChevronRight class="w-4 h-4" />
+                <Link href="/store" class="hover:text-[#009933] transition-colors">Online Store</Link>
+                <ChevronRight class="w-4 h-4" />
+                <span class="text-zinc-900 dark:text-white truncate max-w-[200px] md:max-w-none">{{ props.product.title }}</span>
             </nav>
 
-            <div class="flex flex-col md:flex-row gap-8 lg:gap-12">
-                
-                <div class="w-full md:w-5/12 shrink-0">
-                    <div class="bg-gray-50 rounded-2xl overflow-hidden border border-gray-100 aspect-square relative shadow-sm">
-                        <img 
-                            :src="activeImage" 
-                            :alt="props.product.title" 
-                            class="absolute inset-0 w-full h-full object-cover" 
-                        />
-                    </div>
-                </div>
-
-                <div class="w-full md:w-7/12 flex flex-col">
-                    <h1 class="text-2xl md:text-4xl font-black text-gray-800 leading-tight">
-                        {{ props.product.title }}
-                    </h1>
+            <div class="bg-white dark:bg-zinc-900 rounded-[2rem] shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+                <div class="flex flex-col lg:flex-row">
                     
-                    <div class="flex items-center text-sm text-gray-500 mt-3 space-x-4">
-                        <div class="flex items-center text-amber-400">
-                            <Star class="w-4 h-4 fill-current" />
-                            <Star class="w-4 h-4 fill-current" />
-                            <Star class="w-4 h-4 fill-current" />
-                            <Star class="w-4 h-4 fill-current" />
-                            <Star class="w-4 h-4 fill-current" />
-                            <span class="ml-2 text-gray-600 font-medium">5.0</span>
-                        </div>
-                        <span>|</span>
-                        <span>0 Ratings</span>
-                        <span>|</span>
-                        <span>0 Sold</span>
-                    </div>
-
-                    <div class="bg-green-50 p-6 rounded-2xl mt-6 border border-green-100 shadow-sm">
-                        <div class="flex items-end gap-3">
-                            <span class="text-4xl font-black text-[#009933]">₱{{ props.product.price }}</span>
+                    <div class="lg:w-1/2 p-6 md:p-8 border-b lg:border-b-0 lg:border-r border-zinc-100 dark:border-zinc-800">
+                        <div class="aspect-square rounded-2xl overflow-hidden bg-zinc-50 dark:bg-zinc-800 relative group border border-zinc-100 dark:border-zinc-700">
+                            <img 
+                                :src="activeImage" 
+                                :alt="props.product.title" 
+                                class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+                            />
                         </div>
                     </div>
 
-                    <div v-if="props.product.storeId" class="mt-6 flex items-center justify-between bg-white border border-gray-100 shadow-sm p-4 rounded-xl">
-                        <div class="flex items-center gap-3">
-                            <div class="w-10 h-10 bg-green-50 text-[#009933] rounded-full flex items-center justify-center">
-                                <Store class="w-5 h-5" />
+                    <div class="lg:w-1/2 p-6 md:p-10 flex flex-col">
+                        <div class="mb-6">
+                            <span class="bg-green-100 dark:bg-green-900/30 text-[#009933] dark:text-green-400 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-green-200 dark:border-green-800/50 mb-4 inline-block">
+                                Official Product
+                            </span>
+                            <h1 class="text-2xl md:text-4xl font-black text-zinc-900 dark:text-white leading-tight">
+                                {{ props.product.title }}
+                            </h1>
+                            
+                            <div class="flex flex-wrap items-center gap-4 mt-4 text-sm">
+                                <div class="flex items-center gap-1 text-amber-400">
+                                    <Star v-for="i in 5" :key="i" class="w-4 h-4 fill-current" />
+                                    <span class="ml-1 text-zinc-900 dark:text-white font-black">{{ props.product.rating }}</span>
+                                </div>
+                                <div class="w-px h-3 bg-zinc-300 dark:bg-zinc-700"></div>
+                                <span class="text-zinc-500 dark:text-zinc-400 font-bold">{{ props.product.reviews }} Ratings</span>
+                                <div class="w-px h-3 bg-zinc-300 dark:bg-zinc-700"></div>
+                                <span class="text-zinc-500 dark:text-zinc-400 font-bold">{{ props.product.sold }} Sold</span>
                             </div>
-                            <div>
-                                <p class="font-bold text-gray-800">{{ props.product.storeName }}</p>
-                                <div class="flex items-center text-xs text-gray-500 mt-0.5">
-                                    <MapPin class="w-3 h-3 mr-1" /> Philippines
+                        </div>
+
+                        <div class="bg-zinc-50 dark:bg-zinc-800/50 p-6 rounded-3xl mb-8 border border-zinc-100 dark:border-zinc-800">
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-4xl md:text-5xl font-black text-[#009933] tracking-tighter">
+                                    ₱{{ props.product.price }}
+                                </span>
+                            </div>
+                            <div class="mt-4 flex items-center gap-2 text-xs text-[#009933] font-bold">
+                                <ShieldCheck class="w-4 h-4" />
+                                100% Authentic Guarantee
+                            </div>
+                        </div>
+
+                        <div v-if="props.product.storeId" class="flex items-center justify-between p-4 bg-white dark:bg-zinc-800 rounded-2xl border border-zinc-100 dark:border-zinc-700 shadow-sm mb-8">
+                            <div class="flex items-center gap-3">
+                                <div class="w-12 h-12 bg-green-50 dark:bg-green-900/20 text-[#009933] rounded-xl flex items-center justify-center font-black text-xl shadow-inner border border-green-100 dark:border-green-800">
+                                    <Store class="w-6 h-6" />
+                                </div>
+                                <div>
+                                    <p class="font-black text-zinc-900 dark:text-white">{{ props.product.storeName }}</p>
+                                    <div class="flex items-center text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                        <MapPin class="w-3 h-3 mr-1" /> {{ props.product.location }}
+                                    </div>
                                 </div>
                             </div>
+                            <Link 
+                                :href="`/shop/${props.product.storeId}`" 
+                                class="px-5 py-2 text-xs font-black uppercase tracking-widest text-[#009933] border-2 border-[#009933] rounded-xl hover:bg-[#009933] hover:text-white transition-all active:scale-95"
+                            >
+                                View Shop
+                            </Link>
                         </div>
-                        <Link 
-                            :href="`/shop/${props.product.storeId}`" 
-                            class="px-4 py-2 text-sm font-bold text-[#009933] border border-[#009933] rounded-lg hover:bg-[#009933] hover:text-white transition-colors"
-                        >
-                            View Shop
-                        </Link>
-                    </div>
 
-                    <div class="mt-8 flex items-center gap-6">
-                        <span class="text-sm text-gray-500 font-medium w-20">Quantity</span>
-                        <div class="flex items-center border border-gray-300 rounded-xl overflow-hidden shadow-sm">
-                            <button @click="decreaseQuantity" class="w-10 h-10 bg-gray-50 hover:bg-gray-100 flex items-center justify-center font-bold text-xl text-gray-600 transition-colors">-</button>
-                            <div class="w-14 h-10 flex items-center justify-center font-bold text-gray-800 border-x border-gray-300 bg-white">
-                                {{ quantity }}
+                        <div class="space-y-4 mb-10">
+                            <label class="text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-widest text-xs ml-1">Select Quantity</label>
+                            <div class="flex items-center gap-6">
+                                <div class="flex items-center bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-1 shadow-inner">
+                                    <button @click="decreaseQuantity" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 transition-all active:scale-90">
+                                        <Minus class="w-5 h-5" />
+                                    </button>
+                                    <div class="w-14 text-center font-black text-zinc-900 dark:text-white">{{ quantity }}</div>
+                                    <button @click="increaseQuantity" class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 transition-all active:scale-90">
+                                        <Plus class="w-5 h-5" />
+                                    </button>
+                                </div>
+                                <span class="text-xs font-bold text-zinc-400 dark:text-zinc-500">{{ props.product.stock }} pieces available</span>
                             </div>
-                            <button @click="increaseQuantity" class="w-10 h-10 bg-gray-50 hover:bg-gray-100 flex items-center justify-center font-bold text-xl text-gray-600 transition-colors">+</button>
                         </div>
-                        <span class="text-sm text-gray-500">{{ props.product.stock }} pieces available</span>
-                    </div>
 
-                    <div class="mt-8 flex gap-4">
-                        <button @click="handleAddToCart" class="flex-1 py-4 border-2 border-[#009933] bg-green-50 text-[#009933] rounded-xl font-bold text-lg hover:bg-green-100 transition-colors flex items-center justify-center gap-2 shadow-sm">
-                            🛒 Add to Cart
-                        </button>
-                        <button @click="handleBuyNow" class="flex-1 py-4 bg-[#009933] text-white rounded-xl font-bold text-lg hover:bg-green-700 transition-colors shadow-md hover:shadow-lg flex items-center justify-center">
-                            Buy Now
-                        </button>
+                        <div class="flex flex-col sm:flex-row gap-4 mt-auto">
+                            <button @click="handleAddToCart" class="flex-1 py-4 border-2 border-[#009933] text-[#009933] font-black uppercase tracking-widest rounded-2xl hover:bg-green-50 dark:hover:bg-green-900/10 transition-all flex items-center justify-center gap-3 active:scale-95 shadow-sm">
+                                <ShoppingCart class="w-5 h-5" /> Add To Cart
+                            </button>
+                            <button @click="handleBuyNow" class="flex-1 py-4 bg-[#009933] text-white font-black uppercase tracking-widest rounded-2xl hover:bg-green-700 transition-all shadow-lg shadow-green-900/20 flex items-center justify-center gap-3 active:scale-95">
+                                <Zap class="w-5 h-5 fill-current" /> Buy Now
+                            </button>
+                        </div>
                     </div>
-
                 </div>
             </div>
 
-            <div class="mt-16 pt-8 border-t border-gray-100">
-                <h2 class="text-xl font-black text-gray-800 mb-6 bg-gray-50 inline-block px-4 py-2 rounded-lg border border-gray-100">Product Description</h2>
-                <div class="text-gray-600 leading-relaxed max-w-4xl whitespace-pre-wrap text-lg">
+            <div class="mt-8 bg-white dark:bg-zinc-900 rounded-[2rem] p-8 md:p-12 shadow-sm border border-zinc-200 dark:border-zinc-800">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="h-8 w-1.5 bg-[#009933] rounded-full"></div>
+                    <h2 class="text-2xl font-black text-zinc-900 dark:text-white tracking-tight uppercase tracking-widest">Description</h2>
+                </div>
+                <div class="text-zinc-600 dark:text-zinc-300 leading-relaxed max-w-4xl whitespace-pre-wrap text-lg font-medium">
                     {{ props.product.description }}
                 </div>
             </div>
-        </div>
-    </main>
+            
+        </main>
+        
+        <Footer />
+    </div>
 </template>
