@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import { Head, useForm, Link } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Upload, Package, Info, Plus, X, Image as ImageIcon } from 'lucide-vue-next';
+import { ArrowLeft, Package, Plus, X, CheckCircle2 } from 'lucide-vue-next';
 
 defineProps<{
     categories: Array<{ id: number; name: string }>;
@@ -17,11 +17,9 @@ const form = useForm({
     price: '',
     stock: '',
     description: '',
-    // Changed to an array
     images: [] as File[],
 });
 
-// For multiple live previews
 const imagePreviews = ref<string[]>([]);
 
 const handleImageUpload = (event: Event) => {
@@ -34,7 +32,6 @@ const handleImageUpload = (event: Event) => {
             imagePreviews.value.push(URL.createObjectURL(file));
         });
     }
-    // Reset input so the same file can be picked again if deleted
     target.value = '';
 };
 
@@ -44,14 +41,13 @@ const removeImage = (index: number) => {
 };
 
 const submit = () => {
-    // Check if at least one image is uploaded
     if (form.images.length === 0) {
         alert("Please upload at least one image of your product.");
         return;
     }
 
     form.post('/seller/products', {
-        forceFormData: true, // Necessary for arrays of files
+        forceFormData: true, 
         preserveScroll: true,
     });
 };
@@ -119,44 +115,52 @@ const submit = () => {
 
                     <hr class="border-gray-100 dark:border-neutral-800" />
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="md:col-span-2">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        
+                        <div class="md:col-span-3">
                             <Label for="title" class="dark:text-neutral-300">Product Title</Label>
                             <Input id="title" v-model="form.title" class="mt-1.5 dark:bg-neutral-800 dark:border-neutral-700" placeholder="What are you selling?" required />
+                            <InputError :message="form.errors.title" class="mt-2" />
                         </div>
 
                         <div>
                             <Label for="category_id" class="dark:text-neutral-300">Category</Label>
-                            <select id="category_id" v-model="form.category_id" class="mt-1.5 w-full rounded-xl border border-input bg-background dark:bg-neutral-800 dark:border-neutral-700 px-3 h-10 text-sm dark:text-neutral-200" required>
+                            <select id="category_id" v-model="form.category_id" class="mt-1.5 w-full rounded-xl border border-input bg-background dark:bg-neutral-800 dark:border-neutral-700 px-3 h-10 text-sm dark:text-neutral-200 focus:ring-[#009933] focus:border-[#009933] outline-none" required>
                                 <option value="" disabled>Select a category</option>
                                 <option v-for="cat in categories" :key="cat.id" :value="cat.id">{{ cat.name }}</option>
                             </select>
+                            <InputError :message="form.errors.category_id" class="mt-2" />
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <Label for="price" class="dark:text-neutral-300">Price (₱)</Label>
-                                <Input id="price" type="number" v-model="form.price" class="mt-1.5 dark:bg-neutral-800 dark:border-neutral-700" placeholder="0.00" required />
-                            </div>
-                            <div>
-                                <Label for="stock" class="dark:text-neutral-300">Stock</Label>
-                                <Input id="stock" type="number" v-model="form.stock" class="mt-1.5 dark:bg-neutral-800 dark:border-neutral-700" placeholder="0" required />
-                            </div>
+                        <div>
+                            <Label for="price" class="dark:text-neutral-300">Price (₱)</Label>
+                            <Input id="price" type="number" step="0.01" min="0" v-model="form.price" class="mt-1.5 dark:bg-neutral-800 dark:border-neutral-700" placeholder="0.00" required />
+                            <InputError :message="form.errors.price" class="mt-2" />
                         </div>
 
-                        <div class="md:col-span-2">
+                        <div>
+                            <Label for="stock" class="dark:text-neutral-300">Available Stock</Label>
+                            <Input id="stock" type="number" min="0" v-model="form.stock" class="mt-1.5 dark:bg-neutral-800 dark:border-neutral-700" placeholder="0" required />
+                            <InputError :message="form.errors.stock" class="mt-2" />
+                        </div>
+
+                        <div class="md:col-span-3">
                             <Label for="description" class="dark:text-neutral-300">Description</Label>
-                            <textarea id="description" v-model="form.description" rows="4" class="mt-1.5 w-full rounded-xl border border-input bg-background dark:bg-neutral-800 dark:border-neutral-700 px-3 py-2 text-sm dark:text-neutral-200" placeholder="Provide details about your product..." required></textarea>
+                            <textarea id="description" v-model="form.description" rows="5" class="mt-1.5 w-full rounded-xl border border-input bg-background dark:bg-neutral-800 dark:border-neutral-700 px-3 py-2 text-sm dark:text-neutral-200 focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] outline-none transition-colors" placeholder="Provide details about your product..." required></textarea>
+                            <InputError :message="form.errors.description" class="mt-2" />
                         </div>
                     </div>
 
                     <div class="pt-6 border-t border-gray-100 dark:border-neutral-800 flex justify-end">
                         <Button 
                             type="submit" 
-                            class="w-full sm:w-auto bg-[#009933] hover:bg-green-700 text-white font-bold h-12 px-10 rounded-xl transition-all active:scale-95"
+                            class="w-full sm:w-auto bg-[#009933] hover:bg-green-700 text-white font-bold h-12 px-10 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2"
                             :disabled="form.processing"
                         >
-                            {{ form.processing ? 'Publishing...' : 'Publish Product' }}
+                            <span v-if="form.processing">Publishing...</span>
+                            <span v-else class="flex items-center gap-2">
+                                <CheckCircle2 class="w-5 h-5" /> Publish Product
+                            </span>
                         </Button>
                     </div>
 
