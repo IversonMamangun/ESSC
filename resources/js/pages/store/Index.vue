@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Head, router } from '@inertiajs/vue3'; 
-import { ref, onMounted, nextTick } from 'vue';
+import { Head, router, usePage, Link } from '@inertiajs/vue3';
+import { LayoutDashboard } from 'lucide-vue-next';
+import { ref, onMounted, nextTick, computed } from 'vue'; 
 import ProductCard from '@/components/ProductCard.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
@@ -11,21 +12,36 @@ const props = defineProps<{
     discoverItems: any; 
 }>();
 
+// --- AUTH CHECK LOGIC ---
+const page = usePage();
+const user = computed(() => page.props.auth.user);
+
+// Check if the user is a Seller or Admin
+const canAccessSellerCenter = computed(() => {
+    // Accessing the slug from the shared auth object
+    const role = user.value?.user_type?.slug;
+    
+    return role === 'seller' || role === 'admin';
+});
+
+// --- CAROUSEL & UI LOGIC ---
 const showAllDeals = ref(false);
 
 const initCarousel = () => {
     const $ = (window as any).$;
-    $('.top-deals-carousel').owlCarousel({
-        loop: false,
-        margin: 16,
-        nav: false,
-        dots: false,
-        responsive: {
-            0: { items: 2 },
-            768: { items: 3 },
-            1024: { items: 4 },
-        },
-    });
+    if ($('.top-deals-carousel').length) {
+        $('.top-deals-carousel').owlCarousel({
+            loop: false,
+            margin: 16,
+            nav: false,
+            dots: false,
+            responsive: {
+                0: { items: 2 },
+                768: { items: 3 },
+                1024: { items: 4 },
+            },
+        });
+    }
 };
 
 const destroyCarousel = () => {
@@ -48,17 +64,12 @@ onMounted(() => {
     initCarousel();
 });
 
-// Laravel paginated data setup
 const currentPage = ref(props.discoverItems?.current_page || 1);
 const totalPages = ref(props.discoverItems?.last_page || 1);
 const items = ref(props.discoverItems?.data || []);
 
-// Active pagination logic
 const changePage = (page: number) => {
-    if (page === currentPage.value) {
-        return;
-    }
-    
+    if (page === currentPage.value) return;
     router.get('/store', { page: page }, { preserveState: true, preserveScroll: true });
 };
 </script>
@@ -71,11 +82,25 @@ const changePage = (page: number) => {
     </div>
     
     <section class="flex w-full justify-center p-4">
-        <div class="relative flex w-full max-w-7xl items-center justify-center">
-            <img src="/assets/store/online-store.jpg" alt="Our Capabilities Background" class="h-32 w-full rounded-2xl object-cover shadow-sm" />
-            <h1 class="absolute text-5xl md:text-7xl font-black tracking-normal text-[#009933] [text-shadow:2px_2px_0_#fff,-1px_-1px_0_#fff,1px_-1px_0_#fff,-1px_1px_0_#fff,1px_1px_0_#fff] drop-shadow-2xl">
-                ONLINE STORE
-            </h1>
+        <div class="relative flex w-full max-w-7xl items-center justify-center group">
+            <img src="/assets/store/online-store.jpg" alt="Store Background" class="h-40 md:h-52 w-full rounded-2xl object-cover shadow-sm brightness-75 transition-all duration-500 group-hover:brightness-90" />
+            
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                <h1 class="absolute text-5xl md:text-7xl font-black tracking-normal text-[#009933] [text-shadow:2px_2px_0_#fff,-1px_-1px_0_#fff,1px_-1px_0_#fff,-1px_1px_0_#fff,1px_1px_0_#fff] drop-shadow-2xl mb-4">
+                    ONLINE STORE
+                </h1>
+
+                <div class="mt-20 md:mt-32">
+                    <Link 
+                        v-if="canAccessSellerCenter"
+                        href="/seller/dashboard" 
+                        class="flex items-center gap-2 bg-white text-[#009933] px-6 py-3 rounded-xl font-black shadow-xl hover:bg-[#009933] hover:text-white transition-all transform hover:scale-105 active:scale-95"
+                    >
+                        <LayoutDashboard class="w-5 h-5" />
+                        Go to Seller Center
+                    </Link>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -123,15 +148,12 @@ const changePage = (page: number) => {
                     @click="changePage(page)"
                     :class="[
                         'px-4 py-2 rounded-md text-sm font-bold transition-colors',
-                        currentPage === page 
-                            ? 'bg-[#009933] text-white shadow-sm' 
-                            : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        currentPage === page ? 'bg-[#009933] text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     ]"
                 >
                     {{ page }}
                 </button>
             </div>
-
         </div>
     </section>
     <Footer />
