@@ -12,23 +12,21 @@ const props = defineProps<{
     discoverItems: any; 
 }>();
 
-// --- AUTH CHECK LOGIC ---
 const page = usePage();
 const user = computed(() => page.props.auth.user);
 
-// Check if the user is a Seller or Admin
 const canAccessSellerCenter = computed(() => {
-    // Accessing the slug from the shared auth object
+
     const role = user.value?.user_type?.slug;
     
     return role === 'seller' || role === 'admin';
 });
 
-// --- CAROUSEL & UI LOGIC ---
 const showAllDeals = ref(false);
 
 const initCarousel = () => {
     const $ = (window as any).$;
+    
     if ($('.top-deals-carousel').length) {
         $('.top-deals-carousel').owlCarousel({
             loop: false,
@@ -69,7 +67,10 @@ const totalPages = ref(props.discoverItems?.last_page || 1);
 const items = ref(props.discoverItems?.data || []);
 
 const changePage = (page: number) => {
-    if (page === currentPage.value) return;
+    if (page === currentPage.value) {
+        return;
+    }
+
     router.get('/store', { page: page }, { preserveState: true, preserveScroll: true });
 };
 </script>

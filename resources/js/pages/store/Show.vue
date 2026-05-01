@@ -6,9 +6,9 @@ import {
     Plus, Minus 
 } from 'lucide-vue-next'; 
 import { ref, computed } from 'vue';
+import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import Footer from '@/components/sections/Footer.vue';
 
 const props = defineProps<{
     product: any;
@@ -49,6 +49,7 @@ const decreaseQuantity = () => {
 const handleAddToCart = () => {
     if (!user.value) {
         router.visit('/login'); 
+
         return;
     }
 
@@ -61,6 +62,7 @@ const handleAddToCart = () => {
 const handleBuyNow = () => {
     if (!user.value) {
         router.visit('/login'); 
+        
         return;
     }
     
