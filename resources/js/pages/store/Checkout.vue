@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { Head, useForm, Link, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
-import Navbar from '@/components/sections/Navbar.vue';
-import TopBar from '@/components/sections/TopBar.vue';
 import { 
     MapPin, CreditCard, AlertCircle, 
     ChevronLeft, CheckCircle2, ShieldCheck
 } from 'lucide-vue-next';
+import { computed } from 'vue';
+import Navbar from '@/components/sections/Navbar.vue';
+import TopBar from '@/components/sections/TopBar.vue';
+
 
 const props = defineProps<{
     orderSummary: {
@@ -39,7 +40,10 @@ const isProfileComplete = computed(() => {
 });
 
 const submitOrder = () => {
-    if (!isProfileComplete.value) return; // Failsafe
+    if (!isProfileComplete.value) {
+        return; // Failsafe
+    }
+    
     form.post('/checkout');
 };
 </script>

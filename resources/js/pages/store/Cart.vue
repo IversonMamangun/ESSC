@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
-import Navbar from '@/components/sections/Navbar.vue';
-import TopBar from '@/components/sections/TopBar.vue';
 import { 
     ShoppingCart, Store, Trash2, 
     Minus, Plus, ShoppingBag, ArrowRight 
 } from 'lucide-vue-next';
+import { ref, computed } from 'vue';
+import Navbar from '@/components/sections/Navbar.vue';
+import TopBar from '@/components/sections/TopBar.vue';
+
 
 const props = defineProps<{
     cartItems: Array<{
@@ -23,6 +24,7 @@ const selectedItems = ref<number[]>([]);
 
 const toggleSelectAll = (event: Event) => {
     const isChecked = (event.target as HTMLInputElement).checked;
+
     if (isChecked) {
         selectedItems.value = props.cartItems.map(item => item.id);
     } else {
@@ -42,13 +44,20 @@ const delivery = computed(() => selectedProducts.value.length > 0 ? 150 : 0);
 const total = computed(() => subtotal.value + delivery.value);
 
 const proceedToCheckout = () => {
-    if (selectedItems.value.length === 0) return;
+    if (selectedItems.value.length === 0) {
+        return;
+    }
+
     router.get('/checkout', { selected_ids: selectedItems.value });
 };
 
 const updateQuantity = (productId: number, currentQty: number, change: number) => {
     const newQty = currentQty + change;
-    if (newQty < 1) return;
+    
+    if (newQty < 1) {
+        return;
+    }
+
     router.patch(`/cart/${productId}`, { quantity: newQty }, { preserveScroll: true });
 };
 
