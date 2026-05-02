@@ -9,6 +9,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SellerController;
+use App\Http\Controllers\BuyerController; // Added BuyerController
 use App\Http\Controllers\Auth\GoogleAuthController;
 
 Route::inertia('/', 'Welcome', [
@@ -40,11 +41,11 @@ Route::middleware('guest')->group(function () {
     Route::get('/login/verify-otp', [LoginController::class, 'showVerifyOtp'])->name('login.otp.verify');
     Route::post('/login/verify-otp', [LoginController::class, 'verifyOtp'])->name('login.otp.check');
 
-    // OTP Registration Routes (Connecting to the Vue 3 component)
+    // OTP Registration Routes
     Route::inertia('/register', 'auth/Register')->name('register');
     Route::post('/register/initiate', [RegisterController::class, 'initiate'])->name('register.initiate');
     Route::post('/register/verify', [RegisterController::class, 'verify'])->name('register.verify');
-    Route::post('/register/resend', [RegisterController::class, 'initiate'])->name('register.resend'); // Reuses initiate method
+    Route::post('/register/resend', [RegisterController::class, 'initiate'])->name('register.resend'); 
     Route::post('/register/complete', [RegisterController::class, 'complete'])->name('register.complete');
 });
 
@@ -70,15 +71,24 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
     
-    // Checkout Routes (Requires Login)
+    // --- BUYER / CUSTOMER ROUTES ---
+    Route::get('/purchases', [BuyerController::class, 'purchases'])->name('buyer.purchases');
+    
+    Route::get('/account', [BuyerController::class, 'account'])->name('buyer.account');
+    Route::post('/account/profile', [BuyerController::class, 'updateProfile'])->name('buyer.profile.update');
+    
+    Route::get('/account/address', [BuyerController::class, 'address'])->name('buyer.address');
+    Route::post('/account/address', [BuyerController::class, 'updateAddress'])->name('buyer.address.update');
+
+    // --- CHECKOUT ROUTES ---
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
 
-    // Seller Dashboard Routes
+    // --- SELLER DASHBOARD ROUTES ---
     Route::get('/seller/dashboard', [SellerController::class, 'index'])->name('seller.dashboard');
     Route::post('/seller/store', [SellerController::class, 'store'])->name('seller.store.create');
 
-    // Product Management for Sellers
+    // --- PRODUCT MANAGEMENT FOR SELLERS ---
     Route::get('/seller/products/create', [SellerController::class, 'createProduct'])->name('seller.products.create');
     Route::post('/seller/products', [SellerController::class, 'storeProduct'])->name('seller.products.store');
 });
