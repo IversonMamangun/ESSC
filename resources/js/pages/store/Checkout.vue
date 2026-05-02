@@ -7,7 +7,7 @@ import {
 import { computed } from 'vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-
+import Footer from '@/components/sections/Footer.vue';
 
 const props = defineProps<{
     orderSummary: {
@@ -103,15 +103,16 @@ const submitOrder = () => {
                                     </span>
                                 </div>
                                 
-                                <Link href="/settings/profile" class="text-sm font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 uppercase tracking-wide shrink-0">
+                                <Link href="/account/address" class="text-sm font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 uppercase tracking-wide shrink-0">
                                     Change
                                 </Link>
                             </div>
 
                             <div v-else class="py-4 flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-800/50">
                                 <p class="text-zinc-500 dark:text-zinc-400 text-sm font-medium mb-3">You need a delivery address to place an order.</p>
+                                
                                 <Link 
-                                    href="/settings/profile" 
+                                    href="/account/address" 
                                     class="flex items-center gap-2 px-6 py-2.5 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 rounded-lg font-bold text-sm shadow-md hover:bg-zinc-800 dark:hover:bg-zinc-100 transition-colors"
                                 >
                                     + Add Delivery Address
