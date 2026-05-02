@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Head, router, usePage, Link } from '@inertiajs/vue3';
-import { LayoutDashboard } from 'lucide-vue-next';
 import { ref, onMounted, nextTick, computed } from 'vue'; 
 import ProductCard from '@/components/ProductCard.vue';
 import Footer from '@/components/sections/Footer.vue';
@@ -11,16 +10,6 @@ const props = defineProps<{
     topDeals: Array<any>;
     discoverItems: any; 
 }>();
-
-const page = usePage();
-const user = computed(() => page.props.auth.user);
-
-const canAccessSellerCenter = computed(() => {
-
-    const role = user.value?.user_type?.slug;
-    
-    return role === 'seller' || role === 'admin';
-});
 
 const showAllDeals = ref(false);
 
@@ -70,7 +59,6 @@ const changePage = (page: number) => {
     if (page === currentPage.value) {
         return;
     }
-
     router.get('/store', { page: page }, { preserveState: true, preserveScroll: true });
 };
 </script>
@@ -90,17 +78,6 @@ const changePage = (page: number) => {
                 <h1 class="absolute text-5xl md:text-7xl font-black tracking-normal text-[#009933] [text-shadow:2px_2px_0_#fff,-1px_-1px_0_#fff,1px_-1px_0_#fff,-1px_1px_0_#fff,1px_1px_0_#fff] drop-shadow-2xl mb-4">
                     ONLINE STORE
                 </h1>
-
-                <div class="mt-20 md:mt-32">
-                    <Link 
-                        v-if="canAccessSellerCenter"
-                        href="/seller/dashboard" 
-                        class="flex items-center gap-2 bg-white text-[#009933] px-6 py-3 rounded-xl font-black shadow-xl hover:bg-[#009933] hover:text-white transition-all transform hover:scale-105 active:scale-95"
-                    >
-                        <LayoutDashboard class="w-5 h-5" />
-                        Go to Seller Center
-                    </Link>
-                </div>
             </div>
         </div>
     </section>
