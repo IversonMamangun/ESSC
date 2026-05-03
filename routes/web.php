@@ -78,8 +78,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/account/profile', [BuyerController::class, 'updateProfile'])->name('buyer.profile.update');
     
     Route::get('/account/address', [BuyerController::class, 'address'])->name('buyer.address');
-    Route::post('/account/address', [BuyerController::class, 'updateAddress'])->name('buyer.address.update');
-
+    Route::post('/account/address', [BuyerController::class, 'storeAddress'])->name('buyer.address.store');
     // --- CHECKOUT ROUTES ---
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
