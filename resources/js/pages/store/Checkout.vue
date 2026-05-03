@@ -1,13 +1,26 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue';
 import { Head, useForm, Link, usePage } from '@inertiajs/vue3';
 import { 
     MapPin, CreditCard, AlertCircle, 
-    ChevronLeft, CheckCircle2, ShieldCheck
+    ChevronLeft, CheckCircle2, ShieldCheck, X, Building2, Phone
 } from 'lucide-vue-next';
-import { computed } from 'vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import Footer from '@/components/sections/Footer.vue';
+
+// Define the Address Type
+interface AddressType {
+    id: number;
+    label: string;
+    recipient_name: string;
+    phone: string;
+    address: string;
+    city: string;
+    province: string;
+    zip: string;
+    is_default: boolean;
+}
 
 const props = defineProps<{
     orderSummary: {
@@ -18,33 +31,39 @@ const props = defineProps<{
         items: Array<{ name: string; qty: number; price: number }>;
     };
     selectedIds: number[];
-    user: {
-        name: string;
-        phone: string | null;
-        address: string | null;
-        city: string | null;
-        province: string | null;
-        zip: string | null;
-    };
+    addresses: AddressType[]; // We now receive an array of addresses from the controller
 }>();
 
-// The form is now much cleaner since we don't send address text inputs anymore!
+// Automatically find the default address, or fallback to the very first one they created
+const defaultAddress = computed(() => {
+    return props.addresses.find(a => a.is_default) || props.addresses[0] || null;
+});
+
 const form = useForm({
     selected_ids: props.selectedIds,
     paymentMethod: 'cod',
+    address_id: defaultAddress.value?.id || null, // Attach the chosen address ID to the order
 });
 
-// Check if they have the required delivery info in the database
-const isProfileComplete = computed(() => {
-    return props.user.phone && props.user.address && props.user.city && props.user.province;
+// Get the actual object of the currently selected address for display purposes
+const selectedAddress = computed(() => {
+    return props.addresses.find(a => a.id === form.address_id) || null;
 });
+
+// Failsafe: check if they have selected an address
+const hasAddress = computed(() => !!selectedAddress.value);
 
 const submitOrder = () => {
-    if (!isProfileComplete.value) {
-        return; // Failsafe
-    }
-    
+    if (!hasAddress.value) return; 
     form.post('/checkout');
+};
+
+// Address Selection Modal Logic
+const isAddressModalOpen = ref(false);
+
+const selectAddress = (id: number) => {
+    form.address_id = id;
+    isAddressModalOpen.value = false;
 };
 </script>
 
@@ -81,7 +100,7 @@ const submitOrder = () => {
                     </div>
 
                     <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden relative">
-                        <div class="h-1 w-full bg-[repeating-linear-gradient(45deg,#009933,#009933_10px,transparent_10px,transparent_20px)] dark:bg-[repeating-linear-gradient(45deg,#009933,#009933_10px,#18181b_10px,#18181b_20px)] opacity-70"></div>
+                        <div class="h-1 w-full bg-[repeating-linear-gradient(45deg,#009933,#009933_10px,transparent_10px,transparent_20px)] opacity-70"></div>
 
                         <div class="p-6 md:p-8">
                             <div class="flex items-center gap-2 mb-4">
@@ -89,23 +108,25 @@ const submitOrder = () => {
                                 <h2 class="text-lg font-bold text-zinc-800 dark:text-zinc-100">Delivery Address</h2>
                             </div>
                             
-                            <div v-if="isProfileComplete" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div v-if="hasAddress" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                 <div class="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-zinc-800 dark:text-zinc-200">
                                     <div class="font-bold text-base whitespace-nowrap">
-                                        {{ user.name }} <span class="text-zinc-500 dark:text-zinc-400 font-medium ml-1">({{ user.phone }})</span>
+                                        {{ selectedAddress.recipient_name }} <span class="text-zinc-500 dark:text-zinc-400 font-medium ml-1">({{ selectedAddress.phone }})</span>
                                     </div>
                                     <div class="hidden sm:block w-px h-4 bg-zinc-300 dark:bg-zinc-700"></div>
                                     <div class="text-sm font-medium">
-                                        {{ user.address }}, {{ user.city }}, {{ user.province }}, {{ user.zip }}
+                                        <span class="font-bold uppercase tracking-wider text-xs mr-2 text-[#009933]">[{{ selectedAddress.label }}]</span>
+                                        {{ selectedAddress.address }}, {{ selectedAddress.city }}, {{ selectedAddress.province }}, {{ selectedAddress.zip }}
                                     </div>
-                                    <span class="border border-[#009933] text-[#009933] text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded-sm w-max">
+                                    
+                                    <span v-if="selectedAddress.is_default" class="border border-[#009933] text-[#009933] text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded-sm w-max">
                                         Default
                                     </span>
                                 </div>
                                 
-                                <Link href="/account/address" class="text-sm font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 uppercase tracking-wide shrink-0">
+                                <button @click="isAddressModalOpen = true" type="button" class="text-sm font-bold text-blue-600 hover:text-blue-700 dark:text-blue-400 uppercase tracking-wide shrink-0">
                                     Change
-                                </Link>
+                                </button>
                             </div>
 
                             <div v-else class="py-4 flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-800/50">
@@ -191,11 +212,11 @@ const submitOrder = () => {
                         
                         <button 
                             @click="submitOrder"
-                            :disabled="form.processing || !isProfileComplete"
+                            :disabled="form.processing || !hasAddress"
                             class="w-full bg-[#009933] text-white py-5 rounded-2xl font-black text-lg hover:bg-green-700 transition-all shadow-lg shadow-green-900/10 active:scale-[0.98] flex items-center justify-center gap-3 disabled:bg-zinc-400 disabled:cursor-not-allowed uppercase tracking-wide"
                         >
                             <span v-if="form.processing">Processing...</span>
-                            <span v-else-if="!isProfileComplete">Address Required</span>
+                            <span v-else-if="!hasAddress">Address Required</span>
                             <span v-else>Confirm & Pay Now</span>
                         </button>
                         
@@ -209,6 +230,58 @@ const submitOrder = () => {
             </div>
         </main>
         <Footer />
+
+        <transition enter-active-class="transition ease-out duration-200" enter-from-class="opacity-0" enter-to-class="opacity-100" leave-active-class="transition ease-in duration-200" leave-from-class="opacity-100" leave-to-class="opacity-0">
+            <div v-if="isAddressModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+                <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="isAddressModalOpen = false"></div>
+                
+                <div class="relative w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+                    
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-800">
+                        <h2 class="text-xl font-black text-zinc-900 dark:text-white">Select Delivery Address</h2>
+                        <button @click="isAddressModalOpen = false" class="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-colors">
+                            <X class="w-5 h-5" />
+                        </button>
+                    </div>
+
+                    <div class="p-6 overflow-y-auto custom-scrollbar flex flex-col gap-4">
+                        
+                        <div v-for="address in props.addresses" :key="address.id" 
+                            @click="selectAddress(address.id)"
+                            class="relative p-5 rounded-2xl border-2 cursor-pointer transition-all"
+                            :class="form.address_id === address.id ? 'border-[#009933] bg-green-50/50 dark:bg-green-900/10' : 'border-zinc-100 dark:border-zinc-800 hover:border-zinc-200 dark:hover:border-zinc-700'"
+                        >
+                            <div v-if="form.address_id === address.id" class="absolute top-4 right-4">
+                                <CheckCircle2 class="w-6 h-6 text-[#009933]" />
+                            </div>
+
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="text-xs font-bold uppercase tracking-wider text-zinc-500 flex items-center gap-1.5">
+                                    <Building2 v-if="address.label === 'Office'" class="w-3.5 h-3.5" />
+                                    <MapPin v-else class="w-3.5 h-3.5" />
+                                    {{ address.label }}
+                                </span>
+                                <span v-if="address.is_default" class="bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-[10px] uppercase font-black px-2 py-0.5 rounded">Default</span>
+                            </div>
+                            
+                            <h3 class="font-bold text-zinc-900 dark:text-white mb-1">{{ address.recipient_name }} <span class="text-zinc-500 font-normal ml-1">({{ address.phone }})</span></h3>
+                            <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                                {{ address.address }}, {{ address.city }}, {{ address.province }} {{ address.zip }}
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="p-6 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900">
+                        <Link href="/account/address" class="w-full py-3 border-2 border-dashed border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 font-bold rounded-xl flex items-center justify-center gap-2 hover:bg-white dark:hover:bg-zinc-800 hover:border-[#009933] hover:text-[#009933] transition-colors">
+                            Manage Addresses
+                        </Link>
+                    </div>
+
+                </div>
+            </div>
+        </transition>
+
     </div>
 </template>
 
