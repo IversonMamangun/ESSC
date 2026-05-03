@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Order;
+use App\Models\Address; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -42,6 +43,8 @@ class CheckoutController extends Controller
         $tax = $subtotal * 0.12; 
         $shipping = 150.00; 
         $total = $subtotal + $tax + $shipping;
+        
+        $user = Auth::user();
 
         return Inertia::render('store/Checkout', [
             'orderSummary' => [
@@ -52,14 +55,8 @@ class CheckoutController extends Controller
                 'items' => $items,
             ],
             'selectedIds' => $selectedIds,
-            'user' => [
-                'name' => Auth::user()->name ?? '',
-                'phone' => Auth::user()->phone,
-                'address' => Auth::user()->address,
-                'city' => Auth::user()->city,
-                'province' => Auth::user()->province,
-                'zip' => Auth::user()->zip,
-            ]
+            
+            'addresses' => $user->addresses()->orderByDesc('is_default')->latest()->get(),
         ]);
     }
 
@@ -67,14 +64,13 @@ class CheckoutController extends Controller
     {
         $request->validate([
             'selected_ids' => 'required|array',
-            'fullName' => 'required|string|max:255',
-            'phone' => 'required|string|max:50',
-            'address' => 'required|string|max:255',
-            'city' => 'required|string|max:255',
-            'province' => 'required|string|max:255',
-            'zip' => 'required|string|max:20',
+            'address_id' => 'required|exists:addresses,id',
             'paymentMethod' => 'required|string|in:credit_card,gcash,cod',
         ]);
+
+        $user = Auth::user();
+        
+        $address = $user->addresses()->findOrFail($request->address_id);
 
         $cart = $request->session()->get('cart', []);
         $selectedIds = $request->selected_ids;
@@ -90,7 +86,7 @@ class CheckoutController extends Controller
             }
         }
 
-        DB::transaction(function () use ($cart, $request, $products, $selectedIds) {
+        DB::transaction(function () use ($cart, $request, $products, $selectedIds, $address, $user) {
             $lockedProducts = Product::whereIn('id', $selectedIds)->lockForUpdate()->get();
             $subtotal = 0;
             $pivotData = [];
@@ -111,22 +107,22 @@ class CheckoutController extends Controller
             $shipping = 150.00;
             $total = $subtotal + $tax + $shipping;
 
-            // SAFTEY CHECK: Handle users who registered via OTP and don't have an email yet
-            $userEmail = Auth::user()->email ?? 'No Email Provided';
+            $userEmail = $user->email ?? 'No Email Provided';
 
             $fullShippingAddress = sprintf(
-                "%s | %s | %s, %s, %s %s (Account: %s)",
-                $request->fullName,
-                $request->phone,
-                $request->address,
-                $request->city,
-                $request->province,
-                $request->zip,
+                "[%s] %s | %s | %s, %s, %s %s (Account: %s)",
+                $address->label,
+                $address->recipient_name,
+                $address->phone,
+                $address->address,
+                $address->city,
+                $address->province,
+                $address->zip,
                 $userEmail 
             );
 
             $order = Order::create([
-                'user_id' => Auth::id(),
+                'user_id' => $user->id,
                 'total_price' => $total,
                 'shipping_address' => $fullShippingAddress,
                 'payment_method' => $request->paymentMethod,
