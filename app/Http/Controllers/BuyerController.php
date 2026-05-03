@@ -8,6 +8,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\RedirectResponse;
 use App\Models\Order;
+use App\Models\Address; // <-- Don't forget this new import!
 
 class BuyerController extends Controller
 {
@@ -113,27 +114,47 @@ class BuyerController extends Controller
      */
     public function address(): Response
     {
+        $user = Auth::user();
+
         return Inertia::render('user/Address', [
-            'user' => Auth::user()->only('name', 'avatar', 'address', 'city', 'province', 'zip'),
+            // Pass the user's name/avatar for the sidebar
+            'user' => $user->only('name', 'avatar'),
+            
+            // Pass ALL addresses belonging to this user. 
+            // orderByDesc('is_default') forces the default address to always show up at the very top!
+            'addresses' => $user->addresses()->orderByDesc('is_default')->latest()->get(),
         ]); 
     }
 
     /**
-     * Update the user's delivery address
+     * Store a new delivery address
      */
-    public function updateAddress(Request $request): RedirectResponse
+    public function storeAddress(Request $request): RedirectResponse
     {
         $user = Auth::user();
 
-        $request->validate([
-            'address' => 'nullable|string|max:255',
-            'city' => 'nullable|string|max:255',
-            'province' => 'nullable|string|max:255',
-            'zip' => 'nullable|string|max:20',
+        $validated = $request->validate([
+            'label' => 'required|string|max:50',
+            'recipient_name' => 'required|string|max:255',
+            'phone' => 'required|string|max:20',
+            'address' => 'required|string|max:255',
+            'city' => 'required|string|max:255',
+            'province' => 'required|string|max:255',
+            'zip' => 'required|string|max:20',
+            'is_default' => 'boolean',
         ]);
 
-        $user->update($request->only('address', 'city', 'province', 'zip'));
+        if ($request->is_default) {
+            $user->addresses()->update(['is_default' => false]);
+        } 
+        // Or, if this is their very first address, force it to be the default automatically
+        elseif ($user->addresses()->count() === 0) {
+            $validated['is_default'] = true;
+        }
 
-        return back()->with('success', 'Address updated successfully.');
+        // Save it to the addresses table, linked to this user
+        $user->addresses()->create($validated);
+
+        return back()->with('success', 'New address added successfully.');
     }
 }
