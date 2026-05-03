@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Models\Address;
 
 #[Table('users')]
 #[Hidden(['password', 'remember_token'])]
@@ -54,7 +55,12 @@ class User extends Authenticatable
     }
 
     public function store()
-{
-    return $this->hasOne(Store::class);
-}
+    {
+        return $this->hasOne(Store::class);
+    }
+
+    public function addresses()
+    {
+        return $this->hasMany(Address::class);
+    }
 }
