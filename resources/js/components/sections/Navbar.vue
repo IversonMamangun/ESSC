@@ -2,14 +2,13 @@
 import { ref, onMounted, computed } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3' 
 import { home, logout, login, register } from '@/routes';
-import { User, Package, LogOut, ShoppingCart } from 'lucide-vue-next';
+import { User, Package, LogOut, ShoppingCart, LayoutDashboard } from 'lucide-vue-next';
 
 const isMenuOpen = ref(false)
 const activeLink = ref('Home')
 const isDarkMode = ref(false)
 const isDropdownOpen = ref(false)
 
-// Access Inertia's page props to check if a user is logged in
 const page = usePage()
 const user = computed(() => page.props.auth?.user)
 
@@ -157,6 +156,13 @@ const navLinks = [
                   <Package class="w-4 h-4 text-[#009933]" /> My Purchases
                 </Link>
                 
+                <template v-if="user.user_type?.slug === 'seller' || user.user_type?.slug === 'admin'">
+                  <div class="h-px bg-neutral-100 dark:bg-neutral-800 my-2"></div>
+                  <Link href="/seller/dashboard" class="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-neutral-700 dark:text-gray-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:text-blue-600 transition-colors">
+                    <LayoutDashboard class="w-4 h-4 text-blue-600" /> Seller Dashboard
+                  </Link>
+                </template>
+
                 <div class="h-px bg-neutral-100 dark:bg-neutral-800 my-2"></div>
                 
                 <Link :href="logout()" method="post" as="button" class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 text-left transition-colors">
@@ -240,6 +246,10 @@ const navLinks = [
               
               <Link v-if="user.user_type?.slug === 'buyer' || !user.user_type" href="/purchases" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-[#009933] bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-900 hover:bg-green-100 transition-colors">
                 <Package class="w-5 h-5" /> My Purchases
+              </Link>
+
+              <Link v-if="user.user_type?.slug === 'seller' || user.user_type?.slug === 'admin'" href="/seller/dashboard" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-blue-600 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900 hover:bg-blue-100 transition-colors">
+                <LayoutDashboard class="w-5 h-5" /> Seller Dashboard
               </Link>
 
               <Link :href="logout()" method="post" as="button" class="w-full rounded-xl bg-red-600 px-4 py-3 text-center text-sm font-bold text-white shadow-md active:scale-[0.98] transition-all block focus:outline-none mt-2">
