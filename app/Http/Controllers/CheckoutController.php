@@ -55,7 +55,6 @@ class CheckoutController extends Controller
                 'items' => $items,
             ],
             'selectedIds' => $selectedIds,
-            
             'addresses' => $user->addresses()->orderByDesc('is_default')->latest()->get(),
         ]);
     }
@@ -86,7 +85,10 @@ class CheckoutController extends Controller
             }
         }
 
-        DB::transaction(function () use ($cart, $request, $products, $selectedIds, $address, $user) {
+        // Variable to hold the tracking number generated inside the transaction
+        $trackingNumber = null;
+
+        DB::transaction(function () use ($cart, $request, $products, $selectedIds, $address, $user, &$trackingNumber) {
             $lockedProducts = Product::whereIn('id', $selectedIds)->lockForUpdate()->get();
             $subtotal = 0;
             $pivotData = [];
@@ -131,6 +133,9 @@ class CheckoutController extends Controller
             ]);
 
             $order->products()->attach($pivotData);
+
+            // Assign the newly generated tracking number to our outside variable
+            $trackingNumber = $order->tracking_number;
         });
 
         foreach ($selectedIds as $id) {
@@ -138,6 +143,28 @@ class CheckoutController extends Controller
         }
         $request->session()->put('cart', $cart);
 
-        return redirect()->route('store.index')->with('success', 'Order placed successfully!');
+        // Redirect directly to the success page, passing the tracking number in the URL
+        return redirect()->route('checkout.success', ['tracking' => $trackingNumber]);
+    }
+
+    /**
+     * Show the Order Success / Payment Confirmation Page
+     */
+    public function success($tracking): Response
+    {
+        // Find the order by its tracking number securely
+        $order = Order::where('tracking_number', $tracking)
+            ->where('user_id', Auth::id()) 
+            ->firstOrFail();
+
+        return Inertia::render('store/OrderSuccess', [
+            'order' => [
+                'tracking_number' => $order->tracking_number,
+                'total_price' => (float) $order->total_price,
+                'payment_method' => $order->payment_method,
+                'status' => $order->status,
+                'created_at' => $order->created_at->format('F j, Y, g:i a'),
+            ]
+        ]);
     }
 }
