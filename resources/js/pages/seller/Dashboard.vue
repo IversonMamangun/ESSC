@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, useForm, Link } from '@inertiajs/vue3';
+import { Head, useForm, Link, router } from '@inertiajs/vue3';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import { 
@@ -7,7 +7,6 @@ import {
     Plus, Edit, Trash2, ExternalLink 
 } from 'lucide-vue-next';
 
-// 1. We added the 'products' array to the interface so Vue accepts the data
 interface Product {
     id: number;
     title: string;
@@ -26,7 +25,7 @@ const props = defineProps<{
         is_active: boolean;
         logo?: string;
     } | null;
-    products: Product[]; // Now catching the products from the controller!
+    products: Product[]; 
 }>();
 
 const form = useForm({
@@ -38,9 +37,17 @@ const submitStore = () => {
     form.post('/seller/store');
 };
 
-// Formatting helper for currency
 const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(price);
+};
+
+// --- DELETE LOGIC ---
+const deleteProduct = (id: number) => {
+    if (confirm('Are you sure you want to delete this product? This cannot be undone.')) {
+        router.delete(`/seller/products/${id}`, {
+            preserveScroll: true,
+        });
+    }
 };
 </script>
 
@@ -209,9 +216,9 @@ const formatPrice = (price: number) => {
                                     
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-4">
-                                            <div class="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 overflow-hidden shrink-0">
+                                            <div class="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 overflow-hidden shrink-0 flex items-center justify-center">
                                                 <img v-if="product.image" :src="'/storage/' + product.image" class="w-full h-full object-cover" />
-                                                <Package v-else class="w-6 h-6 text-zinc-400 m-auto mt-3" />
+                                                <Package v-else class="w-6 h-6 text-zinc-400" />
                                             </div>
                                             <div class="font-bold text-zinc-900 dark:text-white max-w-[200px] truncate">
                                                 {{ product.title }}
@@ -237,12 +244,15 @@ const formatPrice = (price: number) => {
 
                                     <td class="px-6 py-4 text-right">
                                         <div class="flex justify-end gap-3">
-                                            <button class="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors">
+                                            
+                                            <Link :href="`/seller/products/${product.id}/edit`" class="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors inline-block">
                                                 <Edit class="w-4 h-4" />
-                                            </button>
-                                            <button class="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
+                                            </Link>
+
+                                            <button @click="deleteProduct(product.id)" type="button" class="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors">
                                                 <Trash2 class="w-4 h-4" />
                                             </button>
+
                                         </div>
                                     </td>
 
