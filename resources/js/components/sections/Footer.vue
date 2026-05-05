@@ -10,7 +10,7 @@ const currentYear = computed(() => new Date().getFullYear());
             
             <div class="grid grid-cols-1 gap-10 text-white sm:grid-cols-2 lg:grid-cols-5 lg:gap-8">
                 
-                <div class="flex flex-col items-start sm:col-span-2 lg:col-span-2 pr-4">
+                <div class="flex flex-col items-center text-center lg:items-start lg:text-left sm:col-span-2 lg:col-span-2 lg:pr-4">
                     <img 
                         src="/assets/logos/down logo.png" 
                         class="h-16 md:h-20 object-contain mb-6" 
@@ -23,7 +23,7 @@ const currentYear = computed(() => new Date().getFullYear());
                     </h2>
                 </div>
 
-                <div class="flex flex-col">
+                <div class="flex flex-col items-center text-center lg:items-start lg:text-left">
                     <h5 class="mb-4 text-lg font-bold tracking-wide">Quick Links</h5>
                     <ul class="space-y-3 text-sm font-medium md:text-base text-green-100">
                         <li><a href="#home" class="transition-all hover:text-white hover:underline">Home</a></li>
@@ -32,7 +32,7 @@ const currentYear = computed(() => new Date().getFullYear());
                     </ul>
                 </div>
 
-                <div class="flex flex-col">
+                <div class="flex flex-col items-center text-center lg:items-start lg:text-left">
                     <h5 class="mb-4 text-lg font-bold tracking-wide">Explore</h5>
                     <ul class="space-y-3 text-sm font-medium md:text-base text-green-100">
                         <li><a href="#industries" class="transition-all hover:text-white hover:underline">Industries Served</a></li>
@@ -41,7 +41,7 @@ const currentYear = computed(() => new Date().getFullYear());
                     </ul>
                 </div>
 
-                <div class="flex flex-col">
+                <div class="flex flex-col items-center text-center lg:items-start lg:text-left">
                     <h5 class="mb-4 text-lg font-bold tracking-wide">Connect</h5>
                     <ul class="space-y-3 text-sm font-medium md:text-base text-green-100">
                         <li><a href="#news" class="transition-all hover:text-white hover:underline">News & Updates</a></li>
