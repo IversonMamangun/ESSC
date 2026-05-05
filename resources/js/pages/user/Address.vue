@@ -6,7 +6,6 @@ import TopBar from '@/components/sections/TopBar.vue';
 import Footer from '@/components/sections/Footer.vue';
 import { User, MapPin, Package, ChevronRight, CheckCircle2, Plus, X, Phone, Building2 } from 'lucide-vue-next';
 
-// Define the structure of our new Address data
 interface AddressType {
     id: number;
     label: string;
@@ -27,10 +26,8 @@ const props = defineProps<{
     addresses: AddressType[];
 }>();
 
-// Modal State
 const isModalOpen = ref(false);
 
-// The form for creating a new address
 const form = useForm({
     label: 'Home',
     recipient_name: props.user.name || '',
@@ -42,13 +39,11 @@ const form = useForm({
     is_default: false,
 });
 
-const openModal = () => {
-    isModalOpen.value = true;
-};
+const openModal = () => isModalOpen.value = true;
 
 const closeModal = () => {
     isModalOpen.value = false;
-    form.reset(); // Clear the form when closing
+    form.reset();
     form.clearErrors();
 };
 
@@ -79,7 +74,6 @@ const submitAddress = () => {
                         </div>
                         <div class="min-w-0">
                             <p class="font-black text-zinc-900 dark:text-white leading-tight truncate">{{ props.user.name || 'User' }}</p>
-                            <span class="text-xs text-zinc-500 font-bold flex items-center gap-1 mt-0.5">Edit Profile <ChevronRight class="w-3 h-3" /></span>
                         </div>
                     </div>
 
@@ -97,7 +91,7 @@ const submitAddress = () => {
                 </div>
 
                 <div class="flex-1 min-w-0">
-                    <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800 p-6 md:p-10">
+                    <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800 p-6 md:p-10 transition-colors">
                         
                         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 pb-6 border-b border-zinc-100 dark:border-zinc-800">
                             <div>
@@ -114,8 +108,8 @@ const submitAddress = () => {
                         </div>
 
                         <div v-if="props.addresses.length === 0" class="py-12 flex flex-col items-center justify-center text-center">
-                            <div class="w-20 h-20 bg-zinc-50 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4">
-                                <MapPin class="w-8 h-8 text-zinc-300 dark:text-zinc-600" />
+                            <div class="w-20 h-20 bg-zinc-50 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4 border border-zinc-100 dark:border-zinc-700">
+                                <MapPin class="w-8 h-8 text-zinc-300 dark:text-zinc-500" />
                             </div>
                             <h3 class="text-lg font-black text-zinc-800 dark:text-zinc-200 mb-2">No addresses yet</h3>
                             <p class="text-zinc-500 dark:text-zinc-400 max-w-sm">Add a delivery address so you can start shopping and checking out quickly.</p>
@@ -125,7 +119,7 @@ const submitAddress = () => {
                             
                             <div v-for="address in props.addresses" :key="address.id" 
                                 class="relative p-6 rounded-2xl border-2 transition-all"
-                                :class="address.is_default ? 'border-[#009933] bg-green-50/30 dark:bg-green-900/5' : 'border-zinc-100 dark:border-zinc-800 hover:border-zinc-200 dark:hover:border-zinc-700'"
+                                :class="address.is_default ? 'border-[#009933] bg-green-50/30 dark:bg-green-900/10' : 'border-zinc-100 dark:border-zinc-800 hover:border-zinc-200 dark:hover:border-zinc-700 bg-white dark:bg-zinc-900'"
                             >
                                 <div v-if="address.is_default" class="absolute top-4 right-4 bg-[#009933] text-white text-[10px] uppercase font-black tracking-wider px-2.5 py-1 rounded-md shadow-sm flex items-center gap-1">
                                     <CheckCircle2 class="w-3 h-3" /> Default
@@ -162,28 +156,28 @@ const submitAddress = () => {
             <div v-if="isModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
                 <div class="absolute inset-0 bg-black/60 backdrop-blur-sm" @click="closeModal"></div>
                 
-                <div class="relative w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+                <div class="relative w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col border border-zinc-200 dark:border-zinc-800">
                     
-                    <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-800">
+                    <div class="flex items-center justify-between px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900">
                         <h2 class="text-xl font-black text-zinc-900 dark:text-white">Add New Address</h2>
                         <button @click="closeModal" class="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full transition-colors">
                             <X class="w-5 h-5" />
                         </button>
                     </div>
 
-                    <div class="p-6 overflow-y-auto custom-scrollbar">
+                    <div class="p-6 overflow-y-auto custom-scrollbar bg-white dark:bg-zinc-900">
                         <form @submit.prevent="submitAddress" class="space-y-6">
                             
                             <div>
                                 <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-3">Address Label</label>
                                 <div class="flex gap-4">
                                     <label class="flex-1 relative flex items-center justify-center gap-2 p-3 border-2 rounded-xl cursor-pointer transition-all" 
-                                        :class="form.label === 'Home' ? 'border-[#009933] bg-green-50/50 dark:bg-green-900/10 text-[#009933]' : 'border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800'">
+                                        :class="form.label === 'Home' ? 'border-[#009933] bg-green-50/50 dark:bg-green-900/10 text-[#009933]' : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800'">
                                         <input type="radio" v-model="form.label" value="Home" class="hidden">
                                         <MapPin class="w-4 h-4" /> <span class="font-bold text-sm">Home</span>
                                     </label>
                                     <label class="flex-1 relative flex items-center justify-center gap-2 p-3 border-2 rounded-xl cursor-pointer transition-all" 
-                                        :class="form.label === 'Office' ? 'border-[#009933] bg-green-50/50 dark:bg-green-900/10 text-[#009933]' : 'border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800'">
+                                        :class="form.label === 'Office' ? 'border-[#009933] bg-green-50/50 dark:bg-green-900/10 text-[#009933]' : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800'">
                                         <input type="radio" v-model="form.label" value="Office" class="hidden">
                                         <Building2 class="w-4 h-4" /> <span class="font-bold text-sm">Office</span>
                                     </label>
@@ -193,38 +187,38 @@ const submitAddress = () => {
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Recipient Name</label>
-                                    <input type="text" v-model="form.recipient_name" required class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 outline-none focus:border-[#009933] dark:text-white transition-colors">
+                                    <input type="text" v-model="form.recipient_name" required class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] text-zinc-900 dark:text-white transition-all">
                                     <span v-if="form.errors.recipient_name" class="text-red-500 text-xs font-bold mt-1 block">{{ form.errors.recipient_name }}</span>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Phone Number</label>
-                                    <input type="text" v-model="form.phone" required class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 outline-none focus:border-[#009933] dark:text-white transition-colors">
+                                    <input type="text" v-model="form.phone" required class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] text-zinc-900 dark:text-white transition-all">
                                     <span v-if="form.errors.phone" class="text-red-500 text-xs font-bold mt-1 block">{{ form.errors.phone }}</span>
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Street Name, Building, House No.</label>
-                                <input type="text" v-model="form.address" required class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 outline-none focus:border-[#009933] dark:text-white transition-colors">
+                                <input type="text" v-model="form.address" required class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] text-zinc-900 dark:text-white transition-all">
                                 <span v-if="form.errors.address" class="text-red-500 text-xs font-bold mt-1 block">{{ form.errors.address }}</span>
                             </div>
                             
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <div>
                                     <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">City / Municipality</label>
-                                    <input type="text" v-model="form.city" required class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 outline-none focus:border-[#009933] dark:text-white transition-colors">
+                                    <input type="text" v-model="form.city" required class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] text-zinc-900 dark:text-white transition-all">
                                     <span v-if="form.errors.city" class="text-red-500 text-xs font-bold mt-1 block">{{ form.errors.city }}</span>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Province</label>
-                                    <input type="text" v-model="form.province" required class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 outline-none focus:border-[#009933] dark:text-white transition-colors">
+                                    <input type="text" v-model="form.province" required class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] text-zinc-900 dark:text-white transition-all">
                                     <span v-if="form.errors.province" class="text-red-500 text-xs font-bold mt-1 block">{{ form.errors.province }}</span>
                                 </div>
                             </div>
 
                             <div>
                                 <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Postal / Zip Code</label>
-                                <input type="text" v-model="form.zip" required class="w-full sm:w-1/2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 outline-none focus:border-[#009933] dark:text-white transition-colors">
+                                <input type="text" v-model="form.zip" required class="w-full sm:w-1/2 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] text-zinc-900 dark:text-white transition-all">
                                 <span v-if="form.errors.zip" class="text-red-500 text-xs font-bold mt-1 block">{{ form.errors.zip }}</span>
                             </div>
 
