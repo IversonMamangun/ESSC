@@ -8,7 +8,7 @@ const currentYear = computed(() => new Date().getFullYear());
     <footer class="w-full bg-[#009933] mt-4">
         <div class="mx-auto flex w-full max-w-7xl flex-col p-6 md:p-10 lg:p-12">
             
-            <div class="grid grid-cols-1 gap-10 text-white sm:grid-cols-2 lg:grid-cols-5 lg:gap-8 border-b border-green-700 pb-10 mb-6">
+            <div class="grid grid-cols-1 gap-10 text-white sm:grid-cols-2 lg:grid-cols-5 lg:gap-8">
                 
                 <div class="flex flex-col items-start sm:col-span-2 lg:col-span-2 pr-4">
                     <img 
