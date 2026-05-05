@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Store;
+use App\Models\Order; // <-- Make sure Order is imported!
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
@@ -15,30 +16,38 @@ use Illuminate\Support\Str;
 
 class SellerController extends Controller
 {
-    /**
-     * Show the Seller Dashboard
-     */
     public function index(): Response
     {
         $store = Auth::user()->store;
         
         $products = [];
+        $orders = [];
+        
         if ($store) {
             $products = Product::where('store_id', $store->id)
                 ->with('category') 
                 ->latest()
                 ->get();
+                
+            // Fetch orders that contain products from THIS seller's store
+            $orders = Order::whereHas('products', function($query) use ($store) {
+                $query->where('store_id', $store->id);
+            })
+            ->with(['user', 'products' => function($query) use ($store) {
+                // Only load the products in the order that belong to this seller
+                $query->where('store_id', $store->id); 
+            }])
+            ->latest()
+            ->get();
         }
 
         return Inertia::render('seller/Dashboard', [
             'store' => $store,
             'products' => $products,
+            'orders' => $orders,
         ]);
     }
 
-    /**
-     * Handle the "Open My Store" form.
-     */
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
@@ -57,9 +66,6 @@ class SellerController extends Controller
         return redirect()->route('seller.dashboard')->with('success', 'Congratulations! Your store is now open.');
     }
 
-    /**
-     * Show the form to create a new product.
-     */
     public function createProduct(): Response|RedirectResponse
     {
         $store = Auth::user()->store;
@@ -68,16 +74,11 @@ class SellerController extends Controller
             return redirect()->route('seller.dashboard')->with('error', 'You must set up your store before adding products.');
         }
 
-        $categories = Category::all();
-
         return Inertia::render('seller/products/Create', [
-            'categories' => $categories,
+            'categories' => Category::all(),
         ]);
     }
 
-    /**
-     * Store the newly created product in the database.
-     */
     public function storeProduct(Request $request): RedirectResponse
     {
         $request->validate([
@@ -91,7 +92,6 @@ class SellerController extends Controller
         ]);
 
         $store = Auth::user()->store;
-
         $mainImagePath = null;
         
         if ($request->hasFile('images')) {
@@ -172,5 +172,27 @@ class SellerController extends Controller
         $product->delete();
 
         return redirect()->back()->with('success', 'Product deleted successfully.');
+    }
+
+    /**
+     * NEW: Update the status of a specific order
+     */
+    public function updateOrderStatus(Request $request, Order $order): RedirectResponse
+    {
+        $store = Auth::user()->store;
+        
+        // Security: Make sure this seller actually has products in this order
+        $hasProducts = $order->products()->where('store_id', $store->id)->exists();
+        if (!$store || !$hasProducts) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $request->validate([
+            'status' => 'required|string|in:To Ship,To Receive,Completed,Cancelled'
+        ]);
+
+        $order->update(['status' => $request->status]);
+
+        return redirect()->back()->with('success', "Order status updated to: {$request->status}");
     }
 }
