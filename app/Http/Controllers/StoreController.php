@@ -3,19 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use Illuminate\Http\Request;
 use App\Models\Store;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class StoreController extends Controller
 {
-    public function index()
+    /**
+     * Display the main store homepage / index.
+     */
+    public function index(): Response
     {
-        // 1. ADDED: ->with('store')
-        $topDeals = Product::with('store')->inRandomOrder()->limit(8)->get();
+        $topDeals = Product::with('store')
+            ->inRandomOrder()
+            ->limit(8)
+            ->get();
 
-        // 2. ADDED: ->with('store')
-        $discoverItems = Product::with('store')->latest()->paginate(10);
+        $discoverItems = Product::with('store')
+            ->latest()
+            ->paginate(10);
 
         return Inertia::render('store/Index', [
             'topDeals' => $topDeals,
@@ -23,12 +30,10 @@ class StoreController extends Controller
         ]);
     }
     
-    public function shopProfile($id)
+    public function shopProfile(int $id): Response
     {
-        // 1. Find the store by its ID (You will need to import App\Models\Store at the top!)
         $store = Store::findOrFail($id);
 
-        // 2. Fetch only the products that belong to this specific store
         $products = Product::where('store_id', $store->id)
             ->latest()
             ->paginate(15);
