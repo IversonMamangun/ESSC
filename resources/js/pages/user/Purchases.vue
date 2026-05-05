@@ -10,7 +10,6 @@ import {
     Store, Search, ChevronRight, MessageCircle
 } from 'lucide-vue-next';
 
-// Define the shape of our order data
 interface OrderItem {
     id: number;
     title: string;
@@ -20,7 +19,7 @@ interface OrderItem {
 }
 
 interface Order {
-    id: string; // e.g., "ORD-12345"
+    id: string;
     store_name: string;
     status: 'To Pay' | 'To Ship' | 'To Receive' | 'Completed' | 'Cancelled';
     total_amount: number;
@@ -33,17 +32,14 @@ const props = defineProps<{
     orders: Order[];
 }>();
 
-// Tab Management
 const tabs = ['All', 'To Pay', 'To Ship', 'To Receive', 'Completed', 'Cancelled'];
 const activeTab = ref('All');
 
-// Filter orders based on the active tab
 const filteredOrders = computed(() => {
     if (activeTab.value === 'All') return props.orders;
     return props.orders.filter(order => order.status === activeTab.value);
 });
 
-// Helper for status colors
 const getStatusColor = (status: string) => {
     switch(status) {
         case 'To Pay': return 'text-amber-500';
@@ -98,7 +94,7 @@ const formatPrice = (price: number) => {
 
                 <div class="flex-1 min-w-0">
                     
-                    <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden mb-6">
+                    <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden mb-6 transition-colors">
                         <div class="flex overflow-x-auto custom-scrollbar">
                             <button 
                                 v-for="tab in tabs" 
@@ -119,12 +115,12 @@ const formatPrice = (price: number) => {
                         <input 
                             type="text" 
                             placeholder="Search by Order ID or Product Name" 
-                            class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl py-3.5 pl-12 pr-4 outline-none focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] text-sm dark:text-white transition-all shadow-sm"
+                            class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl py-3.5 pl-12 pr-4 outline-none focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] text-sm text-zinc-900 dark:text-white transition-all shadow-sm"
                         >
                     </div>
 
-                    <div v-if="filteredOrders.length === 0" class="bg-white dark:bg-zinc-900 rounded-3xl p-16 text-center shadow-sm border border-zinc-200 dark:border-zinc-800">
-                        <div class="w-24 h-24 bg-zinc-50 dark:bg-zinc-800/50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <div v-if="filteredOrders.length === 0" class="bg-white dark:bg-zinc-900 rounded-3xl p-16 text-center shadow-sm border border-zinc-200 dark:border-zinc-800 transition-colors">
+                        <div class="w-24 h-24 bg-zinc-50 dark:bg-zinc-800/50 rounded-full flex items-center justify-center mx-auto mb-6 border border-zinc-100 dark:border-zinc-800">
                             <Package class="w-10 h-10 text-zinc-300 dark:text-zinc-600" />
                         </div>
                         <h3 class="text-xl font-black text-zinc-800 dark:text-white mb-2">No orders yet</h3>
@@ -135,13 +131,13 @@ const formatPrice = (price: number) => {
                         <div 
                             v-for="order in filteredOrders" 
                             :key="order.id" 
-                            class="bg-white dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden"
+                            class="bg-white dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden transition-colors"
                         >
                             <div class="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-4">
                                 <div class="flex items-center gap-2">
                                     <Store class="w-4 h-4 text-zinc-400" />
                                     <span class="font-black text-zinc-800 dark:text-zinc-100">{{ order.store_name }}</span>
-                                    <Link :href="`/shop/${order.store_name}`" class="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-[10px] uppercase font-bold rounded flex items-center gap-1 hover:bg-zinc-200 transition-colors">
+                                    <Link :href="`/shop/${order.store_name}`" class="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-[10px] uppercase font-bold rounded flex items-center gap-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
                                         View Shop <ChevronRight class="w-3 h-3" />
                                     </Link>
                                 </div>
@@ -183,7 +179,7 @@ const formatPrice = (price: number) => {
                                 </div>
                                 <div class="flex flex-col items-end gap-4">
                                     <div class="flex items-center gap-2">
-                                        <span class="text-sm text-zinc-600 dark:text-zinc-400">Order Total:</span>
+                                        <span class="text-sm text-zinc-600 dark:text-zinc-400 font-medium">Order Total:</span>
                                         <span class="text-2xl font-black text-[#009933]">{{ formatPrice(order.total_amount) }}</span>
                                     </div>
                                     <div class="flex items-center gap-3">
