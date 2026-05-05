@@ -23,15 +23,14 @@ Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.s
 // --- PUBLIC CART ROUTES ---
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+Route::post('/cart/buy-now', [CartController::class, 'buyNow'])->name('cart.buyNow'); // <-- ADDED
 Route::patch('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
 
 Route::middleware('guest')->group(function () {
-    
     Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
     Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
 
-    // Standard Login
     Route::get('/login', [LoginController::class, 'create'])->name('login');
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
 
@@ -46,29 +45,25 @@ Route::middleware('guest')->group(function () {
     Route::post('/register/complete', [RegisterController::class, 'complete'])->name('register.complete');
 });
 
-// --- THE TRAFFIC COP DASHBOARD ---
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         $user = auth()->user();
-
         if ($user->userType?->slug === 'buyer') {
             return redirect()->route('store.index');
         }
-
         if ($user->userType?->slug === 'seller') {
             return redirect()->route('seller.dashboard');
         }
-
         return inertia('Dashboard');
     })->name('dashboard');
 });
 
-// --- PROTECTED ROUTES ---
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
     
-    // --- BUYER / CUSTOMER ROUTES ---
+    // --- BUYER ROUTES ---
     Route::get('/purchases', [BuyerController::class, 'purchases'])->name('buyer.purchases');
+    Route::patch('/buyer/orders/{order}/complete', [BuyerController::class, 'completeOrder'])->name('buyer.orders.complete');
     
     Route::get('/account', [BuyerController::class, 'account'])->name('buyer.account');
     Route::post('/account/profile', [BuyerController::class, 'updateProfile'])->name('buyer.profile.update');
@@ -81,17 +76,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/checkout/success/{tracking}', [CheckoutController::class, 'success'])->name('checkout.success');
 
-    // --- SELLER DASHBOARD ROUTES ---
+    // --- SELLER ROUTES ---
     Route::get('/seller/dashboard', [SellerController::class, 'index'])->name('seller.dashboard');
     Route::post('/seller/store', [SellerController::class, 'store'])->name('seller.store.create');
+    Route::patch('/seller/orders/{order}/status', [SellerController::class, 'updateOrderStatus'])->name('seller.orders.status');
 
-    // --- PRODUCT MANAGEMENT FOR SELLERS ---
     Route::get('/seller/products/create', [SellerController::class, 'createProduct'])->name('seller.products.create');
     Route::post('/seller/products', [SellerController::class, 'storeProduct'])->name('seller.products.store');
     Route::get('/seller/products/{product}/edit', [SellerController::class, 'editProduct'])->name('seller.products.edit');
-    
     Route::post('/seller/products/{product}', [SellerController::class, 'updateProduct'])->name('seller.products.update');
-    
     Route::delete('/seller/products/{product}', [SellerController::class, 'destroyProduct'])->name('seller.products.destroy');
 });
 
