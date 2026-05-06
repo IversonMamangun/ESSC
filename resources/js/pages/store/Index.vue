@@ -5,6 +5,7 @@ import ProductCard from '@/components/ProductCard.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
+import Pagination from '@/components/Pagination.vue'; // Your new component
 
 const props = defineProps<{
     topDeals: Array<any>;
@@ -50,89 +51,74 @@ const toggleDeals = async () => {
 onMounted(() => {
     initCarousel();
 });
-
-const currentPage = ref(props.discoverItems?.current_page || 1);
-const totalPages = ref(props.discoverItems?.last_page || 1);
-const items = ref(props.discoverItems?.data || []);
-
-const changePage = (page: number) => {
-    if (page === currentPage.value) {
-        return;
-    }
-    router.get('/store', { page: page }, { preserveState: true, preserveScroll: true });
-};
 </script>
 
 <template>
     <Head title="Store" />
-    <TopBar />
-    <div class="sticky top-0 z-50 mt-8">
-        <Navbar />
-    </div>
     
-    <section class="flex w-full justify-center p-4">
-        <div class="relative flex w-full max-w-7xl items-center justify-center group">
-            <img src="/assets/store/online-store.jpg" alt="Store Background" class="h-40 md:h-52 w-full rounded-2xl object-cover shadow-sm brightness-75 transition-all duration-500 group-hover:brightness-90" />
-            
-            <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
-                <h1 class="absolute text-5xl md:text-7xl font-black tracking-normal text-[#009933] [text-shadow:2px_2px_0_#fff,-1px_-1px_0_#fff,1px_-1px_0_#fff,-1px_1px_0_#fff,1px_1px_0_#fff] drop-shadow-2xl mb-4">
-                    ONLINE STORE
-                </h1>
-            </div>
+    <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300 flex flex-col">
+        <TopBar />
+        <div class="sticky top-0 z-50 mt-8">
+            <Navbar />
         </div>
-    </section>
-
-    <section class="flex w-full justify-center px-4 mt-8">
-        <div class="w-full max-w-7xl bg-white rounded-2xl p-6 shadow-sm border border-neutral-100">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-2xl font-black text-[#009966]">Top Deals</h2>
-                <button @click="toggleDeals" class="text-[#009933] font-bold hover:underline text-sm focus:outline-none">
-                    {{ showAllDeals ? 'Hide' : 'See all' }}
-                </button>
-            </div>
-            
-            <div :class="{ 'hidden': showAllDeals }">
-                <div class="owl-carousel top-deals-carousel owl-theme">
-                    <div v-for="product in props.topDeals" :key="'carousel-' + product.id">
-                        <ProductCard :product="product" />
+        
+        <main class="flex-grow pb-20">
+            <section class="flex w-full justify-center p-4">
+                <div class="relative flex w-full max-w-7xl items-center justify-center group rounded-3xl overflow-hidden border border-zinc-200 dark:border-zinc-800 shadow-sm">
+                    <img src="/assets/store/online-store.jpg" alt="Store Background" class="h-40 md:h-52 w-full object-cover brightness-75 dark:brightness-50 transition-all duration-500 group-hover:brightness-90 dark:group-hover:brightness-75" />
+                    
+                    <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                        <h1 class="absolute text-5xl md:text-7xl font-black tracking-normal text-[#009933] [text-shadow:2px_2px_0_#fff,-1px_-1px_0_#fff,1px_-1px_0_#fff,-1px_1px_0_#fff,1px_1px_0_#fff] dark:[text-shadow:2px_2px_0_#18181b,-1px_-1px_0_#18181b,1px_-1px_0_#18181b,-1px_1px_0_#18181b,1px_1px_0_#18181b] drop-shadow-2xl mb-4 transition-all">
+                            ONLINE STORE
+                        </h1>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div v-if="showAllDeals" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-4">
-                <div v-for="product in props.topDeals" :key="'grid-' + product.id">
-                    <ProductCard :product="product" />
+            <section class="flex w-full justify-center px-4 mt-8">
+                <div class="w-full max-w-7xl bg-white dark:bg-zinc-900 rounded-3xl p-6 md:p-8 shadow-sm border border-zinc-200 dark:border-zinc-800 transition-colors">
+                    <div class="flex items-center justify-between mb-6 border-b border-zinc-100 dark:border-zinc-800 pb-4">
+                        <h2 class="text-2xl font-black text-zinc-900 dark:text-white">Top Deals</h2>
+                        <button @click="toggleDeals" class="text-[#009933] font-bold hover:underline text-sm focus:outline-none bg-green-50 dark:bg-green-900/20 px-4 py-2 rounded-lg transition-colors">
+                            {{ showAllDeals ? 'Hide' : 'See all' }}
+                        </button>
+                    </div>
+                    
+                    <div :class="{ 'hidden': showAllDeals }">
+                        <div class="owl-carousel top-deals-carousel owl-theme">
+                            <div v-for="product in props.topDeals" :key="'carousel-' + product.id">
+                                <ProductCard :product="product" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="showAllDeals" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-4">
+                        <div v-for="product in props.topDeals" :key="'grid-' + product.id">
+                            <ProductCard :product="product" />
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </section>
-    
-    <section id="discover-section" class="flex w-full justify-center px-4 mt-8 mb-20">
-        <div class="w-full max-w-7xl p-4 bg-white rounded-2xl">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-black text-[#009966] tracking-wide">Discover</h2>
-            </div>
+            </section>
             
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-                <div v-for="product in items" :key="'discover-' + product.id">
-                    <ProductCard :product="product" />
+            <section id="discover-section" class="flex w-full justify-center px-4 mt-8">
+                <div class="w-full max-w-7xl bg-white dark:bg-zinc-900 rounded-3xl p-6 md:p-8 shadow-sm border border-zinc-200 dark:border-zinc-800 transition-colors">
+                    <div class="mb-8 border-b border-zinc-100 dark:border-zinc-800 pb-4">
+                        <h2 class="text-2xl font-black text-zinc-900 dark:text-white">Discover</h2>
+                        <p class="text-zinc-500 dark:text-zinc-400 mt-1">Explore our latest arrivals and catalog</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                        <div v-for="product in discoverItems.data" :key="'discover-' + product.id">
+                            <ProductCard :product="product" />
+                        </div>
+                    </div>
+                    
+                    <Pagination :links="discoverItems.links" />
+
                 </div>
-            </div>
-            
-            <div v-if="totalPages > 1" class="mt-12 flex items-center justify-center gap-2">
-                <button 
-                    v-for="page in totalPages" 
-                    :key="page"
-                    @click="changePage(page)"
-                    :class="[
-                        'px-4 py-2 rounded-md text-sm font-bold transition-colors',
-                        currentPage === page ? 'bg-[#009933] text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    ]"
-                >
-                    {{ page }}
-                </button>
-            </div>
-        </div>
-    </section>
-    <Footer />
+            </section>
+        </main>
+
+        <Footer />
+    </div>
 </template>
