@@ -8,43 +8,34 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\RedirectResponse;
 use App\Models\Order;
-use App\Models\Address; // <-- Don't forget this new import!
+use App\Models\Address; 
 
 class BuyerController extends Controller
 {
-    /**
-     * Display the My Purchases dashboard.
-     */
     public function purchases(): Response
     {
         $user = Auth::user();
 
-        // Fetch the user's orders, including the products and the store they belong to
         $rawOrders = Order::where('user_id', $user->id)
-            ->with(['products.store']) // Loads the pivot table and store data
+            ->with(['products.store']) 
             ->latest()
             ->get();
 
-        // Map the database data to match the exact format Vue is expecting
         $formattedOrders = $rawOrders->map(function ($order) {
-            
-            // Get the store name from the first product (assuming 1 store per order for now)
             $storeName = $order->products->first()->store->name ?? 'ESSC Marketplace';
             
-            // Calculate total if not stored directly on the orders table
             $totalAmount = $order->total_amount ?? $order->products->sum(function($product) {
                 return $product->pivot->quantity * $product->pivot->price_at_time;
             });
 
             return [
-                'id' => 'ORD-' . str_pad($order->id, 5, '0', STR_PAD_LEFT), // e.g., ORD-00012
+                'id' => 'ORD-' . str_pad($order->id, 5, '0', STR_PAD_LEFT), 
                 'store_name' => $storeName,
                 'status' => $order->status ?? 'To Pay', 
                 'total_amount' => $totalAmount,
                 'created_at' => $order->created_at->format('M d, Y'),
                 'items' => $order->products->map(function ($product) {
                     
-                    // Smart Image Resolver
                     $image = '/assets/store/online-store.jpg';
                     if (!empty($product->images)) {
                         $firstImage = $product->images[0];
@@ -72,9 +63,6 @@ class BuyerController extends Controller
         ]);
     }
 
-    /**
-     * Display the My Account settings page
-     */
     public function account(): Response
     {
         return Inertia::render('user/Account', [
@@ -82,9 +70,6 @@ class BuyerController extends Controller
         ]); 
     }
 
-    /**
-     * Update the user's basic profile and avatar
-     */
     public function updateProfile(Request $request): RedirectResponse
     {
         $user = Auth::user();
@@ -109,26 +94,16 @@ class BuyerController extends Controller
         return back()->with('success', 'Profile updated successfully.');
     }
 
-    /**
-     * Display the Address settings page
-     */
     public function address(): Response
     {
         $user = Auth::user();
 
         return Inertia::render('user/Address', [
-            // Pass the user's name/avatar for the sidebar
             'user' => $user->only('name', 'avatar'),
-            
-            // Pass ALL addresses belonging to this user. 
-            // orderByDesc('is_default') forces the default address to always show up at the very top!
             'addresses' => $user->addresses()->orderByDesc('is_default')->latest()->get(),
         ]); 
     }
 
-    /**
-     * Store a new delivery address
-     */
     public function storeAddress(Request $request): RedirectResponse
     {
         $user = Auth::user();
@@ -147,14 +122,38 @@ class BuyerController extends Controller
         if ($request->is_default) {
             $user->addresses()->update(['is_default' => false]);
         } 
-        // Or, if this is their very first address, force it to be the default automatically
         elseif ($user->addresses()->count() === 0) {
             $validated['is_default'] = true;
         }
 
-        // Save it to the addresses table, linked to this user
         $user->addresses()->create($validated);
 
         return back()->with('success', 'New address added successfully.');
+    }
+
+    public function cancelOrder(Request $request, Order $order): \Illuminate\Http\RedirectResponse
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        if (!in_array($order->status, ['pending', 'To Pay'])) {
+            return back()->with('error', 'This order is already being processed and cannot be cancelled.');
+        }
+
+        $order->update(['status' => 'Cancelled']);
+
+        return back()->with('success', 'Order cancelled successfully.');
+    }
+
+    public function completeOrder(Request $request, Order $order): \Illuminate\Http\RedirectResponse
+    {
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $order->update(['status' => 'Completed']);
+
+        return back()->with('success', 'Order received and marked as complete!');
     }
 }
