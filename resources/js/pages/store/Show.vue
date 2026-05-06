@@ -19,40 +19,26 @@ const user = computed(() => page.props.auth.user);
 
 const quantity = ref(1);
 
-// Smart Image Resolver
 const activeImage = computed(() => {
     const img = props.product?.images?.[0];
-
-    if (!img) {
-        return '/assets/store/online-store.jpg'; 
-    }
-
-    if (img.startsWith('http') || img.startsWith('/assets') || img.startsWith('/storage/')) {
-        return img;
-    }
-
+    if (!img) return '/assets/store/online-store.jpg'; 
+    if (img.startsWith('http') || img.startsWith('/assets') || img.startsWith('/storage/')) return img;
     return '/storage/' + img;
 });
 
 const increaseQuantity = () => {
-    if (quantity.value < props.product.stock) {
-        quantity.value++;
-    }
+    if (quantity.value < props.product.stock) quantity.value++;
 };
 
 const decreaseQuantity = () => {
-    if (quantity.value > 1) {
-        quantity.value--;
-    }
+    if (quantity.value > 1) quantity.value--;
 };
 
 const handleAddToCart = () => {
     if (!user.value) {
         router.visit('/login'); 
-
         return;
     }
-
     router.post('/cart', {
         product_id: props.product.id,
         quantity: quantity.value
@@ -62,11 +48,13 @@ const handleAddToCart = () => {
 const handleBuyNow = () => {
     if (!user.value) {
         router.visit('/login'); 
-        
         return;
     }
-    
-    router.visit(`/checkout?direct=${props.product.id}&qty=${quantity.value}`);
+    // Changed to a POST request pointing to our new Buy Now route
+    router.post('/cart/buy-now', {
+        product_id: props.product.id,
+        quantity: quantity.value
+    });
 };
 </script>
 
@@ -113,12 +101,12 @@ const handleBuyNow = () => {
                             <div class="flex flex-wrap items-center gap-4 mt-4 text-sm">
                                 <div class="flex items-center gap-1 text-amber-400">
                                     <Star v-for="i in 5" :key="i" class="w-4 h-4 fill-current" />
-                                    <span class="ml-1 text-zinc-900 dark:text-white font-black">{{ props.product.rating }}</span>
+                                    <span class="ml-1 text-zinc-900 dark:text-white font-black">{{ props.product.rating || '5.0' }}</span>
                                 </div>
                                 <div class="w-px h-3 bg-zinc-300 dark:bg-zinc-700"></div>
-                                <span class="text-zinc-500 dark:text-zinc-400 font-bold">{{ props.product.reviews }} Ratings</span>
+                                <span class="text-zinc-500 dark:text-zinc-400 font-bold">{{ props.product.reviews || '0' }} Ratings</span>
                                 <div class="w-px h-3 bg-zinc-300 dark:bg-zinc-700"></div>
-                                <span class="text-zinc-500 dark:text-zinc-400 font-bold">{{ props.product.sold }} Sold</span>
+                                <span class="text-zinc-500 dark:text-zinc-400 font-bold">{{ props.product.sold || '0' }} Sold</span>
                             </div>
                         </div>
 
@@ -142,7 +130,7 @@ const handleBuyNow = () => {
                                 <div>
                                     <p class="font-black text-zinc-900 dark:text-white">{{ props.product.storeName }}</p>
                                     <div class="flex items-center text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                                        <MapPin class="w-3 h-3 mr-1" /> {{ props.product.location }}
+                                        <MapPin class="w-3 h-3 mr-1" /> {{ props.product.location || 'Local' }}
                                     </div>
                                 </div>
                             </div>
