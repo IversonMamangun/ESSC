@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { ref, computed } from 'vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
@@ -21,7 +21,7 @@ interface OrderItem {
 interface Order {
     id: string;
     store_name: string;
-    status: 'To Pay' | 'To Ship' | 'To Receive' | 'Completed' | 'Cancelled';
+    status: 'To Pay' | 'To Ship' | 'To Receive' | 'Completed' | 'Cancelled' | 'pending';
     total_amount: number;
     items: OrderItem[];
     created_at: string;
@@ -37,12 +37,18 @@ const activeTab = ref('All');
 
 const filteredOrders = computed(() => {
     if (activeTab.value === 'All') return props.orders;
-    return props.orders.filter(order => order.status === activeTab.value);
+    
+    // Map backend 'pending' to 'To Pay' for frontend filtering
+    return props.orders.filter(order => {
+        if (activeTab.value === 'To Pay' && order.status === 'pending') return true;
+        return order.status === activeTab.value;
+    });
 });
 
 const getStatusColor = (status: string) => {
     switch(status) {
-        case 'To Pay': return 'text-amber-500';
+        case 'To Pay': 
+        case 'pending': return 'text-amber-500';
         case 'To Ship': return 'text-blue-500';
         case 'To Receive': return 'text-indigo-500';
         case 'Completed': return 'text-[#009933]';
@@ -54,6 +60,26 @@ const getStatusColor = (status: string) => {
 const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(price);
 };
+
+const cancelOrder = (orderId: string | number) => {
+    // Strip "ORD-" prefix if it exists before sending to backend
+    const id = String(orderId).replace('ORD-', '');
+    if (confirm('Are you sure you want to cancel this order? This cannot be undone.')) {
+        router.patch(`/buyer/orders/${id}/cancel`, {}, { 
+            preserveScroll: true 
+        });
+    }
+};
+
+const completeOrder = (orderId: string | number) => {
+    const id = String(orderId).replace('ORD-', '');
+    if (confirm('Have you received the item in good condition?')) {
+        router.patch(`/buyer/orders/${id}/complete`, {}, { 
+            preserveScroll: true 
+        });
+    }
+};
+
 </script>
 
 <template>
@@ -142,12 +168,12 @@ const formatPrice = (price: number) => {
                                     </Link>
                                 </div>
                                 <div class="flex items-center gap-3 text-sm font-black uppercase tracking-wider" :class="getStatusColor(order.status)">
-                                    <Clock v-if="order.status === 'To Pay'" class="w-4 h-4" />
+                                    <Clock v-if="order.status === 'To Pay' || order.status === 'pending'" class="w-4 h-4" />
                                     <Package v-else-if="order.status === 'To Ship'" class="w-4 h-4" />
                                     <Truck v-else-if="order.status === 'To Receive'" class="w-4 h-4" />
                                     <CheckCircle2 v-else-if="order.status === 'Completed'" class="w-4 h-4" />
                                     <XCircle v-else-if="order.status === 'Cancelled'" class="w-4 h-4" />
-                                    {{ order.status }}
+                                    {{ order.status === 'pending' ? 'To Pay' : order.status }}
                                 </div>
                             </div>
 
@@ -182,23 +208,36 @@ const formatPrice = (price: number) => {
                                         <span class="text-sm text-zinc-600 dark:text-zinc-400 font-medium">Order Total:</span>
                                         <span class="text-2xl font-black text-[#009933]">{{ formatPrice(order.total_amount) }}</span>
                                     </div>
+                                    
                                     <div class="flex items-center gap-3">
                                         <button class="px-5 py-2 rounded-xl text-zinc-600 dark:text-zinc-300 font-bold border border-zinc-300 dark:border-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-sm flex items-center gap-2">
                                             <MessageCircle class="w-4 h-4" /> Contact Seller
                                         </button>
+                                        
+                                        <button 
+                                            v-if="order.status === 'pending' || order.status === 'To Pay'"
+                                            @click="cancelOrder(order.id)"
+                                            class="px-5 py-2 rounded-xl text-red-600 dark:text-red-400 font-bold border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-sm active:scale-95"
+                                        >
+                                            Cancel Order
+                                        </button>
+
                                         <button 
                                             v-if="order.status === 'Completed' || order.status === 'Cancelled'"
                                             class="px-5 py-2 rounded-xl bg-[#009933] text-white font-bold hover:bg-green-700 transition-colors shadow-md text-sm active:scale-95"
                                         >
                                             Buy Again
                                         </button>
+                                        
                                         <button 
                                             v-if="order.status === 'To Receive'"
+                                            @click="completeOrder(order.id)"
                                             class="px-5 py-2 rounded-xl bg-[#009933] text-white font-bold hover:bg-green-700 transition-colors shadow-md text-sm active:scale-95"
                                         >
                                             Order Received
                                         </button>
                                     </div>
+
                                 </div>
                             </div>
                         </div>
