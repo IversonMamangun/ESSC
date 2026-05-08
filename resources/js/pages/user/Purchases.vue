@@ -84,13 +84,15 @@ const completeOrder = (orderId: string | number) => {
 
 <template>
     <Head title="My Purchases" />
-    <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
+    
+    <!-- REMOVED bg-zinc-50 dark:bg-zinc-950 to use your default app background -->
+    <div class="min-h-screen transition-colors duration-300 flex flex-col">
         <TopBar />
         <div class="sticky top-0 z-50 mt-8">
             <Navbar />
         </div>
 
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12">
             <div class="flex flex-col lg:flex-row gap-8">
                 
                 <div class="w-full lg:w-64 shrink-0">
@@ -120,7 +122,8 @@ const completeOrder = (orderId: string | number) => {
 
                 <div class="flex-1 min-w-0">
                     
-                    <div class="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden mb-6 transition-colors">
+                    <!-- Adjusted backgrounds to stand out from default bg -->
+                    <div class="bg-zinc-50 dark:bg-zinc-900 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden mb-6 transition-colors">
                         <div class="flex overflow-x-auto custom-scrollbar">
                             <button 
                                 v-for="tab in tabs" 
@@ -141,12 +144,12 @@ const completeOrder = (orderId: string | number) => {
                         <input 
                             type="text" 
                             placeholder="Search by Order ID or Product Name" 
-                            class="w-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl py-3.5 pl-12 pr-4 outline-none focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] text-sm text-zinc-900 dark:text-white transition-all shadow-sm"
+                            class="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl py-3.5 pl-12 pr-4 outline-none focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] text-sm text-zinc-900 dark:text-white transition-all shadow-sm"
                         >
                     </div>
 
-                    <div v-if="filteredOrders.length === 0" class="bg-white dark:bg-zinc-900 rounded-3xl p-16 text-center shadow-sm border border-zinc-200 dark:border-zinc-800 transition-colors">
-                        <div class="w-24 h-24 bg-zinc-50 dark:bg-zinc-800/50 rounded-full flex items-center justify-center mx-auto mb-6 border border-zinc-100 dark:border-zinc-800">
+                    <div v-if="filteredOrders.length === 0" class="bg-zinc-50 dark:bg-zinc-900 rounded-3xl p-16 text-center shadow-sm border border-zinc-200 dark:border-zinc-800 transition-colors">
+                        <div class="w-24 h-24 bg-white dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-6 border border-zinc-200 dark:border-zinc-700 shadow-sm">
                             <Package class="w-10 h-10 text-zinc-300 dark:text-zinc-600" />
                         </div>
                         <h3 class="text-xl font-black text-zinc-800 dark:text-white mb-2">No orders yet</h3>
@@ -157,13 +160,13 @@ const completeOrder = (orderId: string | number) => {
                         <div 
                             v-for="order in filteredOrders" 
                             :key="order.id" 
-                            class="bg-white dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden transition-colors"
+                            class="bg-zinc-50 dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden transition-colors"
                         >
-                            <div class="px-6 py-4 border-b border-zinc-100 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-4">
+                            <div class="px-6 py-4 border-b border-zinc-200 dark:border-zinc-800 flex flex-wrap items-center justify-between gap-4">
                                 <div class="flex items-center gap-2">
                                     <Store class="w-4 h-4 text-zinc-400" />
                                     <span class="font-black text-zinc-800 dark:text-zinc-100">{{ order.store_name }}</span>
-                                    <Link :href="`/shop/${order.store_name}`" class="px-2 py-0.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-[10px] uppercase font-bold rounded flex items-center gap-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors">
+                                    <Link :href="`/shop/${order.store_name}`" class="px-2 py-0.5 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 text-[10px] uppercase font-bold rounded flex items-center gap-1 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors">
                                         View Shop <ChevronRight class="w-3 h-3" />
                                     </Link>
                                 </div>
@@ -184,7 +187,7 @@ const completeOrder = (orderId: string | number) => {
                                     :href="`/product/${item.id}`"
                                     class="flex gap-4 group"
                                 >
-                                    <div class="w-20 h-20 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 overflow-hidden shrink-0">
+                                    <div class="w-20 h-20 rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 shadow-sm overflow-hidden shrink-0">
                                         <img :src="item.image" :alt="item.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
                                     </div>
                                     <div class="flex-1 flex flex-col sm:flex-row justify-between gap-2">
@@ -199,7 +202,7 @@ const completeOrder = (orderId: string | number) => {
                                 </Link>
                             </div>
 
-                            <div class="px-6 py-5 bg-zinc-50 dark:bg-zinc-800/30 border-t border-zinc-100 dark:border-zinc-800 flex flex-col sm:flex-row items-end sm:items-center justify-between gap-4">
+                            <div class="px-6 py-5 bg-zinc-100/50 dark:bg-zinc-800/30 border-t border-zinc-200 dark:border-zinc-800 flex flex-col sm:flex-row items-end sm:items-center justify-between gap-4">
                                 <div class="text-sm text-zinc-500 dark:text-zinc-400">
                                     Order ID: <span class="font-bold text-zinc-800 dark:text-zinc-200">{{ order.id }}</span>
                                 </div>
@@ -210,14 +213,14 @@ const completeOrder = (orderId: string | number) => {
                                     </div>
                                     
                                     <div class="flex items-center gap-3">
-                                        <button class="px-5 py-2 rounded-xl text-zinc-600 dark:text-zinc-300 font-bold border border-zinc-300 dark:border-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-sm flex items-center gap-2">
+                                        <button class="px-5 py-2 rounded-xl bg-white dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 font-bold border border-zinc-300 dark:border-zinc-600 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors text-sm flex items-center gap-2 shadow-sm">
                                             <MessageCircle class="w-4 h-4" /> Contact Seller
                                         </button>
                                         
                                         <button 
                                             v-if="order.status === 'pending' || order.status === 'To Pay'"
                                             @click="cancelOrder(order.id)"
-                                            class="px-5 py-2 rounded-xl text-red-600 dark:text-red-400 font-bold border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-sm active:scale-95"
+                                            class="px-5 py-2 rounded-xl bg-white dark:bg-zinc-800 text-red-600 dark:text-red-400 font-bold border border-red-200 dark:border-red-900/50 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors text-sm active:scale-95 shadow-sm"
                                         >
                                             Cancel Order
                                         </button>
