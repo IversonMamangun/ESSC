@@ -36,7 +36,7 @@ const props = defineProps<{
         logo?: string;
     } | null;
     products: Product[]; 
-    orders: Order[]; // New prop from controller
+    orders: Order[];
 }>();
 
 const form = useForm({
@@ -56,8 +56,7 @@ const deleteProduct = (id: number) => {
     }
 };
 
-// --- NEW: Order Management Logic ---
-const activeTab = ref('products'); // 'products' or 'orders'
+const activeTab = ref('products');
 
 const pendingOrdersCount = computed(() => {
     return props.orders.filter(o => o.status === 'pending' || o.status === 'To Pay').length;
@@ -82,11 +81,12 @@ const getStatusColor = (status: string) => {
 <template>
     <Head title="Seller Dashboard" />
     
-    <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
+    <!-- REMOVED bg-zinc-50 dark:bg-zinc-950 to use your default app background -->
+    <div class="min-h-screen transition-colors duration-300 flex flex-col">
         <TopBar />
         <div class="sticky top-0 z-50 mt-8"><Navbar /></div>
 
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10">
             
             <div class="mb-8">
                 <h1 class="text-3xl font-black text-zinc-900 dark:text-white flex items-center gap-3">
@@ -95,17 +95,17 @@ const getStatusColor = (status: string) => {
                 <p class="text-zinc-500 dark:text-zinc-400 mt-1 font-medium">Manage your storefront, products, and orders.</p>
             </div>
 
-            <div v-if="!props.store" class="bg-white dark:bg-zinc-900 rounded-3xl p-8 shadow-sm border border-zinc-200 dark:border-zinc-800 flex flex-col md:flex-row gap-12 items-start">
+            <div v-if="!props.store" class="bg-zinc-50 dark:bg-zinc-900 rounded-3xl p-8 shadow-sm border border-zinc-200 dark:border-zinc-800 flex flex-col md:flex-row gap-12 items-start transition-colors">
                 <div class="w-full md:w-1/2">
                     <h2 class="text-2xl font-black text-[#009933] mb-4">Set Up Your Storefront</h2>
                     <form @submit.prevent="submitStore" class="space-y-5">
                         <div>
                             <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Store Name</label>
-                            <input type="text" v-model="form.name" required class="w-full rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-3.5 focus:border-[#009933] outline-none transition-colors dark:text-white">
+                            <input type="text" v-model="form.name" required class="w-full rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-3.5 focus:border-[#009933] outline-none transition-colors text-zinc-900 dark:text-white">
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-1.5">Store Description</label>
-                            <textarea v-model="form.description" required rows="4" class="w-full rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-3.5 focus:border-[#009933] outline-none transition-colors dark:text-white resize-none"></textarea>
+                            <textarea v-model="form.description" required rows="4" class="w-full rounded-xl bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 p-3.5 focus:border-[#009933] outline-none transition-colors text-zinc-900 dark:text-white resize-none"></textarea>
                         </div>
                         <button type="submit" :disabled="form.processing" class="w-full bg-[#009933] text-white py-4 rounded-xl font-black text-lg hover:bg-green-700 transition-colors shadow-md disabled:bg-zinc-400 mt-2">
                             Open My Store
@@ -116,7 +116,7 @@ const getStatusColor = (status: string) => {
 
             <div v-else class="flex flex-col gap-8">
                 
-                <div class="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-colors">
+                <div class="bg-zinc-50 dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-800 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-colors">
                     <div class="flex items-center gap-6">
                         <div class="w-16 h-16 bg-[#009933] text-white rounded-2xl flex items-center justify-center text-3xl font-black shadow-md overflow-hidden shrink-0">
                             <img v-if="props.store.logo" :src="'/storage/' + props.store.logo" class="w-full h-full object-cover" />
@@ -136,21 +136,21 @@ const getStatusColor = (status: string) => {
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-800 flex items-center gap-5">
+                    <div class="bg-zinc-50 dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-800 flex items-center gap-5 transition-colors">
                         <div class="p-4 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl"><Package class="w-8 h-8" /></div>
                         <div>
                             <h3 class="text-zinc-500 dark:text-zinc-400 font-bold text-sm">Total Products</h3>
                             <p class="text-3xl font-black text-zinc-900 dark:text-white">{{ props.products.length }}</p>
                         </div>
                     </div>
-                    <div class="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-800 flex items-center gap-5">
+                    <div class="bg-zinc-50 dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-800 flex items-center gap-5 transition-colors">
                         <div class="p-4 bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-400 rounded-2xl"><ShoppingBag class="w-8 h-8" /></div>
                         <div>
                             <h3 class="text-zinc-500 dark:text-zinc-400 font-bold text-sm">Pending Orders</h3>
                             <p class="text-3xl font-black text-zinc-900 dark:text-white">{{ pendingOrdersCount }}</p>
                         </div>
                     </div>
-                    <div class="bg-white dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-800 flex items-center gap-5">
+                    <div class="bg-zinc-50 dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-800 flex items-center gap-5 transition-colors">
                         <div class="p-4 bg-green-50 dark:bg-green-900/20 text-[#009933] rounded-2xl"><TrendingUp class="w-8 h-8" /></div>
                         <div>
                             <h3 class="text-zinc-500 dark:text-zinc-400 font-bold text-sm">Total Sales</h3>
@@ -159,9 +159,9 @@ const getStatusColor = (status: string) => {
                     </div>
                 </div>
 
-                <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden transition-colors">
+                <div class="bg-zinc-50 dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden transition-colors">
                     
-                    <div class="flex border-b border-zinc-200 dark:border-zinc-800">
+                    <div class="flex border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50">
                         <button @click="activeTab = 'products'" :class="activeTab === 'products' ? 'border-[#009933] text-[#009933] bg-green-50/50 dark:bg-green-900/10' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'" class="flex-1 py-4 text-center font-black border-b-2 transition-all">
                             Product Catalog
                         </button>
@@ -172,7 +172,7 @@ const getStatusColor = (status: string) => {
 
                     <div v-if="activeTab === 'products'">
                         <div v-if="props.products.length === 0" class="p-16 text-center">
-                            <div class="w-24 h-24 bg-zinc-50 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <div class="w-24 h-24 bg-white dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-zinc-200 dark:border-zinc-700">
                                 <Package class="w-10 h-10 text-zinc-400" />
                             </div>
                             <h3 class="text-xl font-bold text-zinc-800 dark:text-white mb-2">No products listed yet</h3>
@@ -180,7 +180,7 @@ const getStatusColor = (status: string) => {
 
                         <div v-else class="overflow-x-auto custom-scrollbar">
                             <table class="w-full text-left text-sm text-zinc-600 dark:text-zinc-300 whitespace-nowrap">
-                                <thead class="bg-zinc-50 dark:bg-zinc-800/50 text-zinc-800 dark:text-zinc-200 uppercase text-xs font-black tracking-wider border-b border-zinc-200 dark:border-zinc-800">
+                                <thead class="bg-white dark:bg-zinc-800/50 text-zinc-800 dark:text-zinc-200 uppercase text-xs font-black tracking-wider border-b border-zinc-200 dark:border-zinc-800">
                                     <tr>
                                         <th class="px-6 py-4">Product Info</th>
                                         <th class="px-6 py-4">Price</th>
@@ -188,11 +188,11 @@ const getStatusColor = (status: string) => {
                                         <th class="px-6 py-4 text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
-                                    <tr v-for="product in props.products" :key="product.id" class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
+                                    <tr v-for="product in props.products" :key="product.id" class="hover:bg-white dark:hover:bg-zinc-800/50 transition-colors">
                                         <td class="px-6 py-4">
                                             <div class="flex items-center gap-4">
-                                                <div class="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 overflow-hidden shrink-0">
+                                                <div class="w-12 h-12 rounded-xl bg-white dark:bg-zinc-800 overflow-hidden shrink-0 border border-zinc-200 dark:border-zinc-700 shadow-sm">
                                                     <img v-if="product.image" :src="'/storage/' + product.image" class="w-full h-full object-cover" />
                                                 </div>
                                                 <div class="font-bold text-zinc-900 dark:text-white max-w-[200px] truncate">{{ product.title }}</div>
@@ -218,7 +218,7 @@ const getStatusColor = (status: string) => {
 
                         <div v-else class="overflow-x-auto custom-scrollbar">
                             <table class="w-full text-left text-sm text-zinc-600 dark:text-zinc-300 whitespace-nowrap">
-                                <thead class="bg-zinc-50 dark:bg-zinc-800/50 text-zinc-800 dark:text-zinc-200 uppercase text-xs font-black tracking-wider border-b border-zinc-200 dark:border-zinc-800">
+                                <thead class="bg-white dark:bg-zinc-800/50 text-zinc-800 dark:text-zinc-200 uppercase text-xs font-black tracking-wider border-b border-zinc-200 dark:border-zinc-800">
                                     <tr>
                                         <th class="px-6 py-4">Order ID / Buyer</th>
                                         <th class="px-6 py-4">Items</th>
@@ -227,8 +227,8 @@ const getStatusColor = (status: string) => {
                                         <th class="px-6 py-4 text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-zinc-100 dark:divide-zinc-800">
-                                    <tr v-for="order in props.orders" :key="order.id" class="hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
+                                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
+                                    <tr v-for="order in props.orders" :key="order.id" class="hover:bg-white dark:hover:bg-zinc-800/50 transition-colors">
                                         <td class="px-6 py-4">
                                             <div class="font-bold text-zinc-900 dark:text-white">{{ order.tracking_number || `ORD-${order.id}` }}</div>
                                             <div class="text-xs text-zinc-500 mt-1">{{ order.user?.name || 'Guest Buyer' }}</div>
@@ -242,16 +242,16 @@ const getStatusColor = (status: string) => {
                                         </td>
                                         <td class="px-6 py-4 font-bold text-[#009933]">{{ formatPrice(order.total_price) }}</td>
                                         <td class="px-6 py-4">
-                                            <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider" :class="getStatusColor(order.status)">
+                                            <span class="px-2.5 py-1 rounded-md text-[10px] font-black uppercase tracking-wider shadow-sm" :class="getStatusColor(order.status)">
                                                 {{ order.status === 'pending' ? 'To Pay' : order.status }}
                                             </span>
                                         </td>
                                         <td class="px-6 py-4 text-right">
-                                            <button v-if="order.status === 'pending' || order.status === 'To Pay'" @click="updateOrderStatus(order.id, 'To Ship')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-700 active:scale-95 transition-all">
+                                            <button v-if="order.status === 'pending' || order.status === 'To Pay'" @click="updateOrderStatus(order.id, 'To Ship')" class="bg-blue-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-blue-700 active:scale-95 transition-all shadow-sm">
                                                 Prepare Shipment
                                             </button>
                                             
-                                            <button v-else-if="order.status === 'To Ship'" @click="updateOrderStatus(order.id, 'To Receive')" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 active:scale-95 transition-all">
+                                            <button v-else-if="order.status === 'To Ship'" @click="updateOrderStatus(order.id, 'To Receive')" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-indigo-700 active:scale-95 transition-all shadow-sm">
                                                 Mark as Shipped
                                             </button>
                                             
@@ -269,3 +269,10 @@ const getStatusColor = (status: string) => {
         </main>
     </div>
 </template>
+
+<style scoped>
+.custom-scrollbar::-webkit-scrollbar { height: 6px; }
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: #e4e4e7; border-radius: 10px; }
+.dark .custom-scrollbar::-webkit-scrollbar-thumb { background: #3f3f46; }
+</style>
