@@ -5,7 +5,7 @@ import ProductCard from '@/components/ProductCard.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import Pagination from '@/components/Pagination.vue'; // Your new component
+import Pagination from '@/components/Pagination.vue'; 
 
 const props = defineProps<{
     topDeals: Array<any>;
@@ -56,7 +56,8 @@ onMounted(() => {
 <template>
     <Head title="Store" />
     
-    <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300 flex flex-col">
+    <!-- REMOVED bg-zinc-50 dark:bg-zinc-950 so it uses your default app background -->
+    <div class="min-h-screen transition-colors duration-300 flex flex-col">
         <TopBar />
         <div class="sticky top-0 z-50 mt-8">
             <Navbar />
@@ -76,8 +77,9 @@ onMounted(() => {
             </section>
 
             <section class="flex w-full justify-center px-4 mt-8">
-                <div class="w-full max-w-7xl bg-white dark:bg-zinc-900 rounded-3xl p-6 md:p-8 shadow-sm border border-zinc-200 dark:border-zinc-800 transition-colors">
-                    <div class="flex items-center justify-between mb-6 border-b border-zinc-100 dark:border-zinc-800 pb-4">
+                <!-- Switched the card backgrounds so they stand out against your default background -->
+                <div class="w-full max-w-7xl bg-zinc-50 dark:bg-zinc-900 rounded-3xl p-6 md:p-8 shadow-sm border border-zinc-200 dark:border-zinc-800 transition-colors">
+                    <div class="flex items-center justify-between mb-6 border-b border-zinc-200 dark:border-zinc-800 pb-4">
                         <h2 class="text-2xl font-black text-zinc-900 dark:text-white">Top Deals</h2>
                         <button @click="toggleDeals" class="text-[#009933] font-bold hover:underline text-sm focus:outline-none bg-green-50 dark:bg-green-900/20 px-4 py-2 rounded-lg transition-colors">
                             {{ showAllDeals ? 'Hide' : 'See all' }}
@@ -101,8 +103,9 @@ onMounted(() => {
             </section>
             
             <section id="discover-section" class="flex w-full justify-center px-4 mt-8">
-                <div class="w-full max-w-7xl bg-white dark:bg-zinc-900 rounded-3xl p-6 md:p-8 shadow-sm border border-zinc-200 dark:border-zinc-800 transition-colors">
-                    <div class="mb-8 border-b border-zinc-100 dark:border-zinc-800 pb-4">
+                <!-- Switched the card backgrounds so they stand out against your default background -->
+                <div class="w-full max-w-7xl bg-zinc-50 dark:bg-zinc-900 rounded-3xl p-6 md:p-8 shadow-sm border border-zinc-200 dark:border-zinc-800 transition-colors">
+                    <div class="mb-8 border-b border-zinc-200 dark:border-zinc-800 pb-4">
                         <h2 class="text-2xl font-black text-zinc-900 dark:text-white">Discover</h2>
                         <p class="text-zinc-500 dark:text-zinc-400 mt-1">Explore our latest arrivals and catalog</p>
                     </div>
