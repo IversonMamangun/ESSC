@@ -46,11 +46,15 @@ const submitProfile = () => {
 
 <template>
     <Head title="My Profile" />
-    <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
+    
+    <!-- REMOVED bg-zinc-50 dark:bg-zinc-950 to use your default app background -->
+    <div class="min-h-screen transition-colors duration-300 flex flex-col">
         <TopBar />
-        <div class="sticky top-0 z-50 mt-8"><Navbar /></div>
+        <div class="sticky top-0 z-50 mt-8">
+            <Navbar />
+        </div>
 
-        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12">
             <div class="flex flex-col lg:flex-row gap-8">
                 
                 <div class="w-full lg:w-64 shrink-0">
@@ -78,8 +82,9 @@ const submitProfile = () => {
                 </div>
 
                 <div class="flex-1 min-w-0">
-                    <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800 p-6 md:p-10 transition-colors">
-                        <div class="mb-8 pb-6 border-b border-zinc-100 dark:border-zinc-800">
+                    <!-- Adjusted card background to stand out from default bg -->
+                    <div class="bg-zinc-50 dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800 p-6 md:p-10 transition-colors">
+                        <div class="mb-8 pb-6 border-b border-zinc-200 dark:border-zinc-800">
                             <h1 class="text-2xl font-black text-zinc-900 dark:text-white">My Profile</h1>
                             <p class="text-zinc-500 dark:text-zinc-400 mt-1">Manage your basic information</p>
                         </div>
@@ -88,15 +93,15 @@ const submitProfile = () => {
                             <div class="flex-1 space-y-6">
                                 <div>
                                     <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Full Name</label>
-                                    <input type="text" v-model="form.name" class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] transition-all">
+                                    <input type="text" v-model="form.name" class="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] transition-all">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Email Address</label>
-                                    <input type="email" v-model="form.email" class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] transition-all">
+                                    <input type="email" v-model="form.email" class="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] transition-all">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">Phone Number</label>
-                                    <input type="text" v-model="form.phone" class="w-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] transition-all">
+                                    <input type="text" v-model="form.phone" class="w-full bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-zinc-900 dark:text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] transition-all">
                                 </div>
 
                                 <button type="submit" :disabled="form.processing" class="mt-4 px-8 py-3.5 bg-[#009933] text-white font-black rounded-xl hover:bg-green-700 transition-all active:scale-95 shadow-md flex items-center gap-2">
@@ -105,7 +110,7 @@ const submitProfile = () => {
                                 <p v-if="form.recentlySuccessful" class="text-sm font-bold text-[#009933] mt-2">Saved successfully!</p>
                             </div>
 
-                            <div class="lg:w-1/3 flex flex-col items-center border-l border-zinc-100 dark:border-zinc-800 lg:pl-12">
+                            <div class="lg:w-1/3 flex flex-col items-center border-l border-zinc-200 dark:border-zinc-800 lg:pl-12">
                                 <div class="relative group cursor-pointer mb-6">
                                     <div class="w-32 h-32 rounded-full bg-zinc-100 dark:bg-zinc-800 border-4 border-white dark:border-zinc-900 shadow-lg overflow-hidden flex items-center justify-center">
                                         <img v-if="avatarPreview" :src="avatarPreview" class="w-full h-full object-cover" />
