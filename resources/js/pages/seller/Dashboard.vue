@@ -5,7 +5,7 @@ import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import { 
     Store, Package, TrendingUp, ShoppingBag, 
-    Plus, Edit, Trash2, ExternalLink, Clock, Truck, CheckCircle2 
+    Plus, Edit, Trash2, ExternalLink, Clock, Truck, CheckCircle2, AlertCircle
 } from 'lucide-vue-next';
 
 interface Product {
@@ -56,7 +56,17 @@ const deleteProduct = (id: number) => {
     }
 };
 
-const activeTab = ref('products');
+// --- NEW: Automated Inventory Splitting ---
+const activeTab = ref('products'); // 'products', 'sold', or 'orders'
+
+// Automatically filter products into Active and Sold Out
+const activeProducts = computed(() => {
+    return props.products.filter(p => p.stock > 0);
+});
+
+const soldOutProducts = computed(() => {
+    return props.products.filter(p => p.stock <= 0);
+});
 
 const pendingOrdersCount = computed(() => {
     return props.orders.filter(o => o.status === 'pending' || o.status === 'To Pay').length;
@@ -81,7 +91,6 @@ const getStatusColor = (status: string) => {
 <template>
     <Head title="Seller Dashboard" />
     
-    <!-- REMOVED bg-zinc-50 dark:bg-zinc-950 to use your default app background -->
     <div class="min-h-screen transition-colors duration-300 flex flex-col">
         <TopBar />
         <div class="sticky top-0 z-50 mt-8"><Navbar /></div>
@@ -139,8 +148,8 @@ const getStatusColor = (status: string) => {
                     <div class="bg-zinc-50 dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-800 flex items-center gap-5 transition-colors">
                         <div class="p-4 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-2xl"><Package class="w-8 h-8" /></div>
                         <div>
-                            <h3 class="text-zinc-500 dark:text-zinc-400 font-bold text-sm">Total Products</h3>
-                            <p class="text-3xl font-black text-zinc-900 dark:text-white">{{ props.products.length }}</p>
+                            <h3 class="text-zinc-500 dark:text-zinc-400 font-bold text-sm">Active Products</h3>
+                            <p class="text-3xl font-black text-zinc-900 dark:text-white">{{ activeProducts.length }}</p>
                         </div>
                     </div>
                     <div class="bg-zinc-50 dark:bg-zinc-900 rounded-3xl p-6 shadow-sm border border-zinc-200 dark:border-zinc-800 flex items-center gap-5 transition-colors">
@@ -162,20 +171,24 @@ const getStatusColor = (status: string) => {
                 <div class="bg-zinc-50 dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden transition-colors">
                     
                     <div class="flex border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/50">
-                        <button @click="activeTab = 'products'" :class="activeTab === 'products' ? 'border-[#009933] text-[#009933] bg-green-50/50 dark:bg-green-900/10' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'" class="flex-1 py-4 text-center font-black border-b-2 transition-all">
-                            Product Catalog
+                        <button @click="activeTab = 'products'" :class="activeTab === 'products' ? 'border-[#009933] text-[#009933] bg-green-50/50 dark:bg-green-900/10' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'" class="flex-1 py-4 text-center font-black border-b-2 transition-all flex items-center justify-center gap-2">
+                            Active Products <span class="bg-zinc-200 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs px-2 py-0.5 rounded-full">{{ activeProducts.length }}</span>
+                        </button>
+                        <button @click="activeTab = 'sold'" :class="activeTab === 'sold' ? 'border-red-500 text-red-600 bg-red-50/50 dark:bg-red-900/10' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'" class="flex-1 py-4 text-center font-black border-b-2 transition-all flex items-center justify-center gap-2">
+                            Sold Out <span v-if="soldOutProducts.length > 0" class="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-xs px-2 py-0.5 rounded-full">{{ soldOutProducts.length }}</span>
                         </button>
                         <button @click="activeTab = 'orders'" :class="activeTab === 'orders' ? 'border-[#009933] text-[#009933] bg-green-50/50 dark:bg-green-900/10' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'" class="flex-1 py-4 text-center font-black border-b-2 transition-all flex items-center justify-center gap-2">
                             Orders <span v-if="pendingOrdersCount > 0" class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">{{ pendingOrdersCount }}</span>
                         </button>
                     </div>
 
+                    <!-- ACTIVE PRODUCTS TAB -->
                     <div v-if="activeTab === 'products'">
-                        <div v-if="props.products.length === 0" class="p-16 text-center">
+                        <div v-if="activeProducts.length === 0" class="p-16 text-center">
                             <div class="w-24 h-24 bg-white dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-zinc-200 dark:border-zinc-700">
                                 <Package class="w-10 h-10 text-zinc-400" />
                             </div>
-                            <h3 class="text-xl font-bold text-zinc-800 dark:text-white mb-2">No products listed yet</h3>
+                            <h3 class="text-xl font-bold text-zinc-800 dark:text-white mb-2">No active products</h3>
                         </div>
 
                         <div v-else class="overflow-x-auto custom-scrollbar">
@@ -189,7 +202,7 @@ const getStatusColor = (status: string) => {
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
-                                    <tr v-for="product in props.products" :key="product.id" class="hover:bg-white dark:hover:bg-zinc-800/50 transition-colors">
+                                    <tr v-for="product in activeProducts" :key="product.id" class="hover:bg-white dark:hover:bg-zinc-800/50 transition-colors">
                                         <td class="px-6 py-4">
                                             <div class="flex items-center gap-4">
                                                 <div class="w-12 h-12 rounded-xl bg-white dark:bg-zinc-800 overflow-hidden shrink-0 border border-zinc-200 dark:border-zinc-700 shadow-sm">
@@ -210,6 +223,55 @@ const getStatusColor = (status: string) => {
                         </div>
                     </div>
 
+                    <!-- SOLD OUT / ARCHIVED TAB -->
+                    <div v-if="activeTab === 'sold'">
+                        <div v-if="soldOutProducts.length === 0" class="p-16 text-center">
+                            <div class="w-24 h-24 bg-white dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm border border-zinc-200 dark:border-zinc-700">
+                                <CheckCircle2 class="w-10 h-10 text-green-500" />
+                            </div>
+                            <h3 class="text-xl font-bold text-zinc-800 dark:text-white mb-2">Inventory looks good!</h3>
+                            <p class="text-zinc-500 dark:text-zinc-400">None of your products are currently sold out.</p>
+                        </div>
+
+                        <div v-else class="overflow-x-auto custom-scrollbar">
+                            <table class="w-full text-left text-sm text-zinc-600 dark:text-zinc-300 whitespace-nowrap">
+                                <thead class="bg-red-50 dark:bg-red-900/10 text-red-800 dark:text-red-300 uppercase text-xs font-black tracking-wider border-b border-zinc-200 dark:border-zinc-800">
+                                    <tr>
+                                        <th class="px-6 py-4">Product Info</th>
+                                        <th class="px-6 py-4">Price</th>
+                                        <th class="px-6 py-4">Status</th>
+                                        <th class="px-6 py-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
+                                    <tr v-for="product in soldOutProducts" :key="product.id" class="bg-zinc-100/50 dark:bg-zinc-800/30 transition-colors">
+                                        <td class="px-6 py-4 opacity-75">
+                                            <div class="flex items-center gap-4">
+                                                <div class="w-12 h-12 rounded-xl bg-white dark:bg-zinc-800 overflow-hidden shrink-0 border border-zinc-200 dark:border-zinc-700 shadow-sm grayscale">
+                                                    <img v-if="product.image" :src="'/storage/' + product.image" class="w-full h-full object-cover" />
+                                                </div>
+                                                <div class="font-bold text-zinc-900 dark:text-white max-w-[200px] truncate line-through decoration-zinc-400">{{ product.title }}</div>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 font-bold text-zinc-500">{{ formatPrice(product.price) }}</td>
+                                        <td class="px-6 py-4">
+                                            <span class="flex items-center gap-1.5 text-red-500 dark:text-red-400 font-black text-xs uppercase tracking-wider bg-red-100 dark:bg-red-900/30 px-3 py-1 rounded-full w-fit">
+                                                <AlertCircle class="w-3.5 h-3.5" /> Sold Out
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-right">
+                                            <Link :href="`/seller/products/${product.id}/edit`" class="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 px-4 py-2 text-zinc-700 dark:text-zinc-300 hover:text-[#009933] hover:border-[#009933] rounded-lg inline-block mr-2 font-bold text-xs transition-colors shadow-sm">
+                                                Restock
+                                            </Link>
+                                            <button @click="deleteProduct(product.id)" class="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"><Trash2 class="w-4 h-4" /></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- ORDERS TAB -->
                     <div v-if="activeTab === 'orders'">
                         <div v-if="props.orders.length === 0" class="p-16 text-center">
                             <h3 class="text-xl font-bold text-zinc-800 dark:text-white mb-2">No orders yet</h3>
