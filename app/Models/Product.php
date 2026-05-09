@@ -15,6 +15,17 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Product extends Model
 {
     use HasFactory;
+
+    // 1. Tell Laravel to ALWAYS include 'sold_count' when sending data to Vue
+    protected $appends = ['sold_count'];
+
+    // 2. Automatically calculate the total sold items based on the pivot table
+    public function getSoldCountAttribute(): int
+    {
+        // This looks at all orders for this product and sums up the 'quantity' from the pivot table
+        return (int) $this->orders()->sum('order_product.quantity');
+    }
+
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
