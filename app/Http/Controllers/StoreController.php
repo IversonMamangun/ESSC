@@ -16,11 +16,13 @@ class StoreController extends Controller
     public function index(): Response
     {
         $topDeals = Product::with('store')
+            ->where('stock', '>', 0)
             ->inRandomOrder()
             ->limit(8)
             ->get();
 
         $discoverItems = Product::with('store')
+            ->where('stock', '>', 0) 
             ->latest()
             ->paginate(10);
 
@@ -35,6 +37,7 @@ class StoreController extends Controller
         $store = Store::findOrFail($id);
 
         $products = Product::where('store_id', $store->id)
+            ->where('stock', '>', 0)
             ->latest()
             ->paginate(15);
 
