@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, useForm, Link } from '@inertiajs/vue3';
+import { ArrowLeft, Package, Plus, X, CheckCircle2 } from 'lucide-vue-next';
+import { ref } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Package, Plus, X, CheckCircle2 } from 'lucide-vue-next';
 
 defineProps<{
     categories: Array<{ id: number; name: string }>;
@@ -24,6 +24,7 @@ const imagePreviews = ref<string[]>([]);
 
 const handleImageUpload = (event: Event) => {
     const target = event.target as HTMLInputElement;
+
     if (target.files && target.files.length > 0) {
         const newFiles = Array.from(target.files);
         
@@ -32,6 +33,7 @@ const handleImageUpload = (event: Event) => {
             imagePreviews.value.push(URL.createObjectURL(file));
         });
     }
+
     target.value = '';
 };
 
@@ -43,6 +45,7 @@ const removeImage = (index: number) => {
 const submit = () => {
     if (form.images.length === 0) {
         alert("Please upload at least one image of your product.");
+        
         return;
     }
 
