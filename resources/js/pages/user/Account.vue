@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { User, MapPin, Package, Camera, ChevronRight, CheckCircle2 } from 'lucide-vue-next';
+import { ref } from 'vue';
+import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import Footer from '@/components/sections/Footer.vue';
-import { User, MapPin, Package, Camera, ChevronRight, CheckCircle2 } from 'lucide-vue-next';
 
 const props = defineProps<{
     user: {
@@ -29,6 +29,7 @@ const avatarPreview = ref<string | null>(
 
 const handleAvatarChange = (event: Event) => {
     const target = event.target as HTMLInputElement;
+    
     if (target.files && target.files.length > 0) {
         const file = target.files[0];
         form.avatar = file;

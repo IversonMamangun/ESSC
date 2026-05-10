@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Head, useForm, Link } from '@inertiajs/vue3';
 import { ChevronLeft, Save, Image as ImageIcon } from 'lucide-vue-next';
+import { ref } from 'vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import { ref } from 'vue';
 
 const props = defineProps<{
     product: {
@@ -33,6 +33,7 @@ const form = useForm({
 
 const handleImageUpload = (event: Event) => {
     const target = event.target as HTMLInputElement;
+    
     if (target.files && target.files[0]) {
         const file = target.files[0];
         form.image = file;
