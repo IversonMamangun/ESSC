@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { Head, useForm, Link, router } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
-import Navbar from '@/components/sections/Navbar.vue';
-import TopBar from '@/components/sections/TopBar.vue';
 import { 
     Store, Package, TrendingUp, ShoppingBag, 
     Plus, Edit, Trash2, ExternalLink, Clock, Truck, CheckCircle2, AlertCircle
 } from 'lucide-vue-next';
+import { ref, computed } from 'vue';
+import Navbar from '@/components/sections/Navbar.vue';
+import TopBar from '@/components/sections/TopBar.vue';
+
 
 interface Product {
     id: number;
@@ -80,10 +81,23 @@ const updateOrderStatus = (orderId: number, newStatus: string) => {
 
 const getStatusColor = (status: string) => {
     const s = status.toLowerCase();
-    if (s.includes('pay') || s.includes('pending')) return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400';
-    if (s.includes('ship')) return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
-    if (s.includes('receive')) return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400';
-    if (s.includes('complete')) return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+
+    if (s.includes('pay') || s.includes('pending')) {
+    return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400';
+    }
+
+    if (s.includes('ship')){
+     return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400';
+    }
+
+    if (s.includes('receive')) {
+    return 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-400';
+    }
+
+    if (s.includes('complete')) {
+        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400';
+    }
+
     return 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300';
 };
 </script>
