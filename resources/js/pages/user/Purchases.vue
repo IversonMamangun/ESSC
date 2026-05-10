@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { ref, computed } from 'vue';
-import Navbar from '@/components/sections/Navbar.vue';
-import TopBar from '@/components/sections/TopBar.vue';
-import Footer from '@/components/sections/Footer.vue';
 import { 
     User, MapPin, Package, Clock, 
     Truck, CheckCircle2, XCircle, 
     Store, Search, ChevronRight, MessageCircle
 } from 'lucide-vue-next';
+import { ref, computed } from 'vue';
+import Footer from '@/components/sections/Footer.vue';
+import Navbar from '@/components/sections/Navbar.vue';
+import TopBar from '@/components/sections/TopBar.vue';
+
 
 interface OrderItem {
     id: number;
@@ -36,11 +37,16 @@ const tabs = ['All', 'To Pay', 'To Ship', 'To Receive', 'Completed', 'Cancelled'
 const activeTab = ref('All');
 
 const filteredOrders = computed(() => {
-    if (activeTab.value === 'All') return props.orders;
-    
+    if (activeTab.value === 'All') {
+    return props.orders;
+    }
+
     // Map backend 'pending' to 'To Pay' for frontend filtering
     return props.orders.filter(order => {
-        if (activeTab.value === 'To Pay' && order.status === 'pending') return true;
+        if (activeTab.value === 'To Pay' && order.status === 'pending') {
+        return true;
+    }
+    
         return order.status === activeTab.value;
     });
 });
@@ -64,6 +70,7 @@ const formatPrice = (price: number) => {
 const cancelOrder = (orderId: string | number) => {
     // Strip "ORD-" prefix if it exists before sending to backend
     const id = String(orderId).replace('ORD-', '');
+
     if (confirm('Are you sure you want to cancel this order? This cannot be undone.')) {
         router.patch(`/buyer/orders/${id}/cancel`, {}, { 
             preserveScroll: true 
@@ -73,6 +80,7 @@ const cancelOrder = (orderId: string | number) => {
 
 const completeOrder = (orderId: string | number) => {
     const id = String(orderId).replace('ORD-', '');
+    
     if (confirm('Have you received the item in good condition?')) {
         router.patch(`/buyer/orders/${id}/complete`, {}, { 
             preserveScroll: true 

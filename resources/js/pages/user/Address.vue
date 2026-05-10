@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
+import { User, MapPin, Package, ChevronRight, CheckCircle2, Plus, X, Phone, Building2 } from 'lucide-vue-next';
+import { ref } from 'vue';
+import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import Footer from '@/components/sections/Footer.vue';
-import { User, MapPin, Package, ChevronRight, CheckCircle2, Plus, X, Phone, Building2 } from 'lucide-vue-next';
 
 interface AddressType {
     id: number;
