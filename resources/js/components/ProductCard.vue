@@ -42,8 +42,8 @@ const location = computed(() => props.product.store?.city ?? props.product.locat
                 />
             </div>
             
-            <div class="p-4 flex flex-col flex-grow">
-                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 line-clamp-2 leading-tight flex-grow group-hover:text-[#009933] transition-colors">
+            <div class="p-4 flex flex-col grow">
+                <h3 class="text-sm font-bold text-zinc-900 dark:text-zinc-100 line-clamp-2 leading-tight grow group-hover:text-[#009933] transition-colors">
                     {{ product.title }}
                 </h3>
                 

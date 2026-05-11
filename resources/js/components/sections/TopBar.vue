@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div class="bg-[#009933] text-white py-10 px-6 md:px-10 lg:px-16 flex flex-col lg:flex-row justify-between items-center gap-10">
+  <div class="bg-[#009933] text-white py-5 px-6 md:px-10 lg:px-16 flex flex-col lg:flex-row justify-between items-center gap-10">
     
     <h2 class="flex-1 text-xl md:text-2xl font-semibold text-center lg:text-left leading-snug">
       Powering Industries. Protecting Infrastructure. Supporting Growth.
@@ -14,7 +14,7 @@
         <img src="/assets/icons and vector/call icon.png" alt="Phone image">
         <div class="flex flex-col text-left">
           <p class="text-xs md:text-sm text-green-100 uppercase tracking-wider font-medium">Phone Number</p>
-          <span class="text-lg md:text-xl font-bold tracking-tight">0912-234-5678</span>
+          <span class="text-md md:text-xl font-bold tracking-tight">0912-234-5678</span>
         </div>
       </div>
 

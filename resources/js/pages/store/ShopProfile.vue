@@ -5,7 +5,7 @@ import ProductCard from '@/components/ProductCard.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import Pagination from '@/components/Pagination.vue'; // Standard Pagination Component
+import Pagination from '@/components/Pagination.vue'; 
 
 const props = defineProps<{
     store: any;
@@ -16,7 +16,8 @@ const props = defineProps<{
 <template>
     <Head :title="store.name" />
     
-    <div class="min-h-screen bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300 flex flex-col">
+    <!-- REMOVED bg-zinc-50 dark:bg-zinc-950 to use global background -->
+    <div class="min-h-screen transition-colors duration-300 flex flex-col">
         <TopBar />
         <div class="sticky top-0 z-50 mt-8">
             <Navbar />
@@ -24,7 +25,8 @@ const props = defineProps<{
 
         <main class="flex-grow pb-20">
             <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 md:mt-12 mb-8">
-                <div class="bg-white dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800 p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-8 transition-colors">
+                <!-- UPDATED: bg-white -> bg-zinc-50 -->
+                <div class="bg-zinc-50 dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800 p-6 md:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-8 transition-colors">
                     
                     <div class="flex flex-col md:flex-row md:items-center gap-6">
                         <div class="relative shrink-0 mx-auto md:mx-0">
@@ -93,7 +95,7 @@ const props = defineProps<{
                         </div>
                     </div>
 
-                    <div v-else class="text-center py-20 text-zinc-500 dark:text-zinc-400 bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-100 dark:border-zinc-800 shadow-sm transition-colors">
+                      <div v-else class="text-center py-20 text-zinc-500 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm transition-colors">
                         <Store class="w-12 h-12 mx-auto text-zinc-300 dark:text-zinc-600 mb-4" />
                         <p class="font-bold">This seller hasn't uploaded any products yet!</p>
                     </div>
