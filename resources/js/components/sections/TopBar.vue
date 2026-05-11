@@ -1,29 +1,36 @@
-<script lang="ts">
+<script lang="ts" setup>
 </script>
 
 <template>
-  <div class="bg-[#009933] text-white py-5 px-6 md:px-10 lg:px-16 flex flex-col lg:flex-row justify-between items-center gap-10">
+  <div class="w-full bg-[#009933] text-white py-3 sm:py-4 px-4 sm:px-6 lg:px-10 flex flex-col lg:flex-row justify-between items-center gap-4 lg:gap-8 overflow-hidden">
     
-    <h2 class="flex-1 text-xl md:text-2xl font-semibold text-center lg:text-left leading-snug">
+    <h2 class="w-full lg:flex-1 text-base sm:text-lg md:text-xl font-semibold text-center lg:text-left truncate">
       Powering Industries. Protecting Infrastructure. Supporting Growth.
     </h2>
 
-    <div class="flex flex-col sm:flex-row items-center gap-8 sm:gap-12 shrink-0">
+    <div class="flex flex-col sm:flex-row items-center gap-5 sm:gap-8 shrink-0">
       
-      <div class="flex items-center gap-4">
-        <img src="/assets/icons and vector/call icon.png" alt="Phone image">
+      <div class="flex items-center gap-3">
+        <img 
+          src="/assets/icons and vector/call icon.png" 
+          alt="Phone icon" 
+          class="w-8 h-8 md:w-9 md:h-9 object-contain shrink-0" 
+        />
         <div class="flex flex-col text-left">
-          <p class="text-xs md:text-sm text-green-100 uppercase tracking-wider font-medium">Phone Number</p>
-          <span class="text-md md:text-xl font-bold tracking-tight">0912-234-5678</span>
+          <span class="text-xs text-green-100 uppercase tracking-wider font-bold">Phone Number</span>
+          <span class="text-sm font-normal tracking-tight">0912-234-5678</span>
         </div>
       </div>
 
-      <div class="flex items-center gap-4">
-                <img src="/assets/icons and vector/email.png" alt="Phone image">
-
+      <div class="flex items-center gap-3">
+        <img 
+          src="/assets/icons and vector/email.png" 
+          alt="Email icon" 
+          class="w-8 h-8 md:w-9 md:h-9 object-contain shrink-0" 
+        />
         <div class="flex flex-col text-left">
-          <p class="text-xs md:text-sm text-green-100 uppercase tracking-wider font-medium">Email Address</p>
-          <span class="text-lg md:text-xl font-bold tracking-tight">info.esscsample@sample.com</span>
+          <span class="text-xs text-green-100 uppercase tracking-wider font-bold">Email Address</span>
+          <span class="text-sm font-normal tracking-tight">info.esscsample@sample.com</span>
         </div>
       </div>
 
