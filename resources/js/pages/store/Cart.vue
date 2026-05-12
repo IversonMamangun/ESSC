@@ -4,7 +4,7 @@ import {
     ShoppingCart, Store, Trash2, 
     Minus, Plus, ShoppingBag, ArrowRight 
 } from 'lucide-vue-next';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 
@@ -72,6 +72,12 @@ const removeItem = (productId: number) => {
 const formatPrice = (price: number) => {
     return new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(price);
 };
+
+
+onMounted(() => {
+    document.documentElement.classList.remove('dark');
+    
+});
 </script>
 
 <template>
