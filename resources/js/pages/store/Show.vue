@@ -5,7 +5,7 @@ import {
     Zap, ChevronRight, ShieldCheck, 
     Plus, Minus, Video
 } from 'lucide-vue-next'; 
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
@@ -19,19 +19,45 @@ const user = computed(() => page.props.auth.user);
 
 const quantity = ref(1);
 
-// Media Logic
+// --- FIXED IMAGE RESOLVER ---
 const activeImage = computed(() => {
-    const img = props.product?.image || props.product?.images?.[0];
+    // 1. Extract the raw string from the product object
+    const img = props.product?.image || props.product?.image_url || props.product?.images?.[0];
+    
+    // 2. Fallback if the database field is empty
     if (!img) return '/assets/store/online-store.jpg'; 
-    if (img.startsWith('http') || img.startsWith('/assets') || img.startsWith('/storage/')) return img;
-    return '/storage/' + img;
+    
+    // 3. Handle external URLs
+    if (img.startsWith('http')) return img;
+
+    // 4. Handle Seeded Assets (public/assets/products/...)
+    // This looks for 'assets/' anywhere in the string to avoid 403 errors
+    if (img.toLowerCase().includes('assets/')) {
+        const cleanPath = img.startsWith('/') ? img.substring(1) : img;
+        return '/' + cleanPath;
+    }
+    
+    // 5. Handle User Uploads (storage/app/public/...)
+    const storagePath = img.startsWith('/') ? img.substring(1) : img;
+    return '/storage/' + storagePath;
 });
 
+// --- FIXED VIDEO RESOLVER ---
 const hasVideo = computed(() => !!props.product?.video);
-const videoUrl = computed(() => props.product?.video ? '/storage/' + props.product.video : null);
+const videoUrl = computed(() => {
+    if (!hasVideo.value) return null;
+    const vid = props.product.video;
+    
+    if (vid.toLowerCase().includes('assets/')) {
+        return vid.startsWith('/') ? vid : '/' + vid;
+    }
+    return '/storage/' + (vid.startsWith('/') ? vid.substring(1) : vid);
+});
 
-// BULLETPROOF Discount Logic (Forces Math logic to avoid String comparison bugs)
+const isComingSoon = computed(() => parseFloat(props.product?.price) <= 0);
+
 const isDiscounted = computed(() => {
+    if (isComingSoon.value) return false;
     const price = parseFloat(props.product?.price);
     const discount = parseFloat(props.product?.discount_price);
     return discount && price && discount < price;
@@ -39,7 +65,6 @@ const isDiscounted = computed(() => {
 
 const currentPrice = computed(() => isDiscounted.value ? props.product.discount_price : props.product.price);
 
-// Computes the exact percentage off for the Red Badge!
 const discountPercentage = computed(() => {
     if (!isDiscounted.value) return 0;
     const price = parseFloat(props.product.price);
@@ -56,6 +81,7 @@ const decreaseQuantity = () => {
 };
 
 const handleAddToCart = () => {
+    if (isComingSoon.value) return; 
     if (!user.value) {
         router.visit('/login'); 
         return;
@@ -67,6 +93,7 @@ const handleAddToCart = () => {
 };
 
 const handleBuyNow = () => {
+    if (isComingSoon.value) return; 
     if (!user.value) {
         router.visit('/login'); 
         return;
@@ -76,6 +103,10 @@ const handleBuyNow = () => {
         quantity: quantity.value
     });
 };
+onMounted(() => {
+    document.documentElement.classList.remove('dark');
+    
+});
 </script>
 
 <template>
@@ -120,7 +151,7 @@ const handleBuyNow = () => {
                                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
                             />
                             
-                            <!-- UPDATED: Sale Badge now uses the computed discountPercentage -->
+                            <!-- Sale Badge -->
                             <div v-if="isDiscounted" class="absolute top-4 right-4 bg-red-600 text-white text-sm font-black px-3 py-1.5 rounded-xl shadow-lg tracking-wider">
                                 -{{ discountPercentage }}% OFF
                             </div>
@@ -150,15 +181,23 @@ const handleBuyNow = () => {
                             </div>
                         </div>
 
-                        <!-- Discounted Pricing Block -->
+                        <!-- Price Block / Coming Soon Label -->
                         <div class="bg-zinc-50 dark:bg-zinc-800/50 p-6 rounded-3xl mb-8 border border-zinc-200 dark:border-zinc-800 transition-colors">
-                            <div class="flex flex-wrap items-end gap-3">
-                                <span class="text-4xl md:text-5xl font-black text-[#009933] tracking-tighter">
-                                    ₱{{ currentPrice }}
-                                </span>
-                                
-                                <span v-if="isDiscounted" class="text-lg md:text-xl font-bold text-zinc-400 dark:text-zinc-500 line-through pb-1">
-                                    ₱{{ props.product.price }}
+                            <template v-if="!isComingSoon">
+                                <div class="flex flex-wrap items-end gap-3">
+                                    <span class="text-4xl md:text-5xl font-black text-[#009933] tracking-tighter">
+                                        ₱{{ currentPrice }}
+                                    </span>
+                                    
+                                    <span v-if="isDiscounted" class="text-lg md:text-xl font-bold text-zinc-400 dark:text-zinc-500 line-through pb-1">
+                                        ₱{{ props.product.price }}
+                                    </span>
+                                </div>
+                            </template>
+                            
+                            <div v-else class="flex items-center gap-3">
+                                <span class="text-3xl md:text-4xl font-black text-zinc-400 dark:text-zinc-500 uppercase tracking-tighter">
+                                    Coming Soon
                                 </span>
                             </div>
                             
@@ -181,14 +220,15 @@ const handleBuyNow = () => {
                                 </div>
                             </div>
                             <Link 
-                                :href="`/shop/${props.product.store_id}`" 
+                                :href="`/shop/${props.product.store?.id}`" 
                                 class="px-5 py-2 text-xs font-black uppercase tracking-widest text-[#009933] border-2 border-[#009933] rounded-xl hover:bg-[#009933] hover:text-white transition-all active:scale-95"
                             >
                                 View Shop
                             </Link>
                         </div>
 
-                        <div class="space-y-4 mb-10">
+                        <!-- Select Quantity (Hidden if Coming Soon) -->
+                        <div v-if="!isComingSoon" class="space-y-4 mb-10">
                             <label class="text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-widest text-xs ml-1">Select Quantity</label>
                             <div class="flex items-center gap-6">
                                 <div class="flex items-center bg-zinc-100 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-2xl p-1 shadow-inner transition-colors">
@@ -204,11 +244,22 @@ const handleBuyNow = () => {
                             </div>
                         </div>
 
+                        <!-- Action Buttons -->
                         <div class="flex flex-col sm:flex-row gap-4 mt-auto">
-                            <button @click="handleAddToCart" class="flex-1 py-4 border-2 border-[#009933] text-[#009933] font-black uppercase tracking-widest rounded-2xl hover:bg-green-50 dark:hover:bg-green-900/10 transition-all flex items-center justify-center gap-3 active:scale-95 shadow-sm">
+                            <button 
+                                @click="handleAddToCart" 
+                                :disabled="isComingSoon"
+                                class="flex-1 py-4 border-2 border-[#009933] text-[#009933] font-black uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-3 shadow-sm"
+                                :class="isComingSoon ? 'opacity-50 border-zinc-300 text-zinc-400 cursor-not-allowed' : 'hover:bg-green-50 dark:hover:bg-green-900/10 active:scale-95'"
+                            >
                                 <ShoppingCart class="w-5 h-5" /> Add To Cart
                             </button>
-                            <button @click="handleBuyNow" class="flex-1 py-4 bg-[#009933] text-white font-black uppercase tracking-widest rounded-2xl hover:bg-green-700 transition-all shadow-lg shadow-green-900/20 flex items-center justify-center gap-3 active:scale-95">
+                            <button 
+                                @click="handleBuyNow" 
+                                :disabled="isComingSoon"
+                                class="flex-1 py-4 text-white font-black uppercase tracking-widest rounded-2xl transition-all flex items-center justify-center gap-3"
+                                :class="isComingSoon ? 'bg-zinc-300 cursor-not-allowed' : 'bg-[#009933] hover:bg-green-700 shadow-lg shadow-green-900/20 active:scale-95'"
+                            >
                                 <Zap class="w-5 h-5 fill-current" /> Buy Now
                             </button>
                         </div>
@@ -216,6 +267,7 @@ const handleBuyNow = () => {
                 </div>
             </div>
 
+            <!-- Description -->
             <div class="mt-8 bg-white dark:bg-zinc-900 rounded-[2rem] p-8 md:p-12 shadow-sm border border-zinc-200 dark:border-zinc-800 transition-colors">
                 <div class="flex items-center gap-4 mb-8">
                     <div class="h-8 w-1.5 bg-[#009933] rounded-full"></div>
