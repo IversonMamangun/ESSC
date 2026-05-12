@@ -9,30 +9,24 @@ const props = defineProps<{
 
 // Smart Image Resolver
 const imageUrl = computed(() => {
-    // Check multiple possible image property names just in case
     const img = props.product.image || props.product.image_url || props.product.images?.[0];
     if (!img) return '/assets/store/online-store.jpg'; 
     if (img.startsWith('http') || img.startsWith('/assets') || img.startsWith('/storage/')) return img;
     return '/storage/' + img;
 });
 
-// UI Placeholders - Now checks multiple possible backend names
 const rating = computed(() => props.product.rating || '5.0');
-
-// Checks for 'sold_count', 'sold', or defaults to '0'
 const soldCount = computed(() => props.product.sold_count ?? props.product.sold ?? '0');
-
-// Checks for 'stock', 'quantity', 'qty', or defaults to '0'
 const availableStock = computed(() => props.product.stock ?? props.product.quantity ?? '0');
-
-// Attempt to grab the city from the related store, default to 'Local' if null
 const location = computed(() => props.product.store?.city ?? props.product.location ?? 'Local'); 
+
+// Check if this product has a valid active discount
+const isDiscounted = computed(() => props.product.discount_price && props.product.discount_price < props.product.price);
 </script>
 
 <template>
-    <Link :href="`/product/${product.id}`" class="block group h-full">
-        <!-- UPDATED: Replaced gray borders/backgrounds with our zinc theme -->
-        <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 hover:shadow-lg hover:border-[#009933]/50 transition-all duration-300 h-full flex flex-col">
+    <Link :href="`/product/${product.id}`" class="block group h-full relative">
+        <div class="bg-white dark:bg-zinc-900 rounded-2xl overflow-hidden border border-zinc-200 dark:border-zinc-800 hover:shadow-lg hover:border-[#009933]/50 transition-all duration-300 h-full flex flex-col relative">
             
             <div class="relative w-full pt-[100%] overflow-hidden bg-zinc-50 dark:bg-zinc-800 border-b border-zinc-100 dark:border-zinc-800">
                 <img 
@@ -40,6 +34,11 @@ const location = computed(() => props.product.store?.city ?? props.product.locat
                     :alt="product.title" 
                     class="absolute top-0 left-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                 />
+                
+                <!-- NEW: Discount Badge overlay -->
+                <div v-if="isDiscounted" class="absolute top-2 right-2 bg-red-600 text-white text-[10px] sm:text-xs font-black px-2 py-1 rounded-lg shadow-sm z-10 tracking-wider">
+                    -{{ product.discount_percentage }}%
+                </div>
             </div>
             
             <div class="p-4 flex flex-col grow">
@@ -47,8 +46,16 @@ const location = computed(() => props.product.store?.city ?? props.product.locat
                     {{ product.title }}
                 </h3>
                 
-                <div class="mt-3">
-                    <p class="text-[#009933] font-black text-lg tracking-tight">₱{{ product.price }}</p>
+                <!-- NEW: Dynamic Price Layout -->
+                <div class="mt-3 flex flex-wrap items-end gap-2">
+                    <p class="text-[#009933] font-black text-lg tracking-tight">
+                        ₱{{ isDiscounted ? product.discount_price : product.price }}
+                    </p>
+                    
+                    <!-- Crossed out original price -->
+                    <p v-if="isDiscounted" class="text-zinc-400 dark:text-zinc-500 text-xs font-semibold line-through pb-1">
+                        ₱{{ product.price }}
+                    </p>
                 </div>
 
                 <div class="flex items-center text-xs text-zinc-500 dark:text-zinc-400 mt-2 space-x-2 font-medium">

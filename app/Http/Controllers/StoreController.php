@@ -10,14 +10,13 @@ use Inertia\Response;
 
 class StoreController extends Controller
 {
-    /**
-     * Display the main store homepage / index.
-     */
     public function index(): Response
     {
+        // NO MORE RANDOM: Only gets products explicitly marked as a Top Deal
         $topDeals = Product::with('store')
             ->where('stock', '>', 0)
-            ->inRandomOrder()
+            ->where('is_top_deal', true) // <-- The magic filter
+            ->latest() // Shows the newest deals first
             ->limit(8)
             ->get();
 

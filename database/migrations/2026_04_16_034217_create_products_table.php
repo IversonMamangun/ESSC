@@ -13,6 +13,10 @@ return new class extends Migration {
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
             $table->string('title');
             $table->decimal('price', 10, 2);
+            
+            $table->decimal('discount_price', 10, 2)->nullable();
+            $table->boolean('is_top_deal')->default(false);
+            
             $table->integer('stock')->default(0);
             $table->string('image')->nullable();
             $table->text('description')->nullable();

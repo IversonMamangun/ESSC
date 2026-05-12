@@ -10,20 +10,26 @@ use Illuminate\Database\Eloquent\Attributes\Casts;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 #[Table('products')]
-#[Fillable(['store_id', 'category_id', 'title', 'price', 'stock', 'image', 'description'])]
-#[Casts(['price' => 'decimal:2', 'stock' => 'integer'])]
+#[Fillable(['store_id', 'category_id', 'title', 'price', 'discount_price', 'is_top_deal', 'stock', 'image', 'description'])]
+#[Casts(['price' => 'decimal:2', 'discount_price' => 'decimal:2', 'is_top_deal' => 'boolean', 'stock' => 'integer'])]
 class Product extends Model
 {
     use HasFactory;
 
-    // 1. Tell Laravel to ALWAYS include 'sold_count' when sending data to Vue
-    protected $appends = ['sold_count'];
+    // Added 'discount_percentage' so Vue always gets the % off
+    protected $appends = ['sold_count', 'discount_percentage'];
 
-    // 2. Automatically calculate the total sold items based on the pivot table
     public function getSoldCountAttribute(): int
     {
-        // This looks at all orders for this product and sums up the 'quantity' from the pivot table
         return (int) $this->orders()->sum('order_product.quantity');
+    }
+
+    public function getDiscountPercentageAttribute(): int
+    {
+        if (!$this->discount_price || $this->price <= 0 || $this->discount_price >= $this->price) {
+            return 0;
+        }
+        return (int) round((($this->price - $this->discount_price) / $this->price) * 100);
     }
 
     public function store(): BelongsTo
