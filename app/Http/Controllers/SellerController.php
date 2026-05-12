@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Product;
 use App\Models\Store;
-use App\Models\Order; // <-- Make sure Order is imported!
+use App\Models\Order; 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage; 
@@ -85,18 +85,26 @@ class SellerController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
+            'discount_price' => 'nullable|numeric|min:0|lt:price',
+            'is_top_deal' => 'nullable', 
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'images' => 'required|array|min:1',
             'images.*' => 'image|mimes:jpeg,png,jpg,webp|max:2048', 
+            'video' => 'nullable|file|mimetypes:video/mp4,video/webm,video/quicktime|max:102400', 
         ]);
 
         $store = Auth::user()->store;
         $mainImagePath = null;
+        $videoPath = null;
         
         if ($request->hasFile('images')) {
             $files = $request->file('images');
             $mainImagePath = $files[0]->store('products', 'public');
+        }
+
+        if ($request->hasFile('video')) {
+            $videoPath = $request->file('video')->store('products/videos', 'public');
         }
 
         Product::create([
@@ -105,8 +113,11 @@ class SellerController extends Controller
             'title' => $request->title,
             'description' => $request->description,
             'price' => $request->price,
+            'discount_price' => $request->discount_price,
+            'is_top_deal' => $request->boolean('is_top_deal'), 
             'stock' => $request->stock,
             'image' => $mainImagePath, 
+            'video' => $videoPath, 
         ]);
 
         return redirect()->route('seller.dashboard')->with('success', 'Product published successfully!');
@@ -138,11 +149,18 @@ class SellerController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
+            'discount_price' => 'nullable|numeric|min:0|lt:price',
+            'is_top_deal' => 'nullable',
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
+            'video' => 'nullable|file|mimetypes:video/mp4,video/webm,video/quicktime|max:102400',
         ]);
 
+        // Fix the boolean issue for edits as well
+        $validated['is_top_deal'] = $request->boolean('is_top_deal');
+
+        // Handle replacing the old image
         if ($request->hasFile('image')) {
             if ($product->image) {
                 Storage::disk('public')->delete($product->image);
@@ -150,6 +168,16 @@ class SellerController extends Controller
             $validated['image'] = $request->file('image')->store('products', 'public');
         } else {
             unset($validated['image']);
+        }
+
+        // Handle replacing the old video
+        if ($request->hasFile('video')) {
+            if ($product->video) {
+                Storage::disk('public')->delete($product->video);
+            }
+            $validated['video'] = $request->file('video')->store('products/videos', 'public');
+        } else {
+            unset($validated['video']);
         }
 
         $product->update($validated);
@@ -168,15 +196,16 @@ class SellerController extends Controller
         if ($product->image) {
             Storage::disk('public')->delete($product->image);
         }
+        
+        if ($product->video) {
+            Storage::disk('public')->delete($product->video);
+        }
 
         $product->delete();
 
         return redirect()->back()->with('success', 'Product deleted successfully.');
     }
 
-    /**
-     * NEW: Update the status of a specific order
-     */
     public function updateOrderStatus(Request $request, Order $order): RedirectResponse
     {
         $store = Auth::user()->store;
