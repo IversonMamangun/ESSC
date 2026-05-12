@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
 import { Store, MapPin, Package, Star, MessageCircle, Plus } from 'lucide-vue-next';
+import { onMounted } from 'vue';
 import ProductCard from '@/components/ProductCard.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
@@ -11,6 +12,11 @@ const props = defineProps<{
     store: any;
     products: any;
 }>();
+
+onMounted(() => {
+    document.documentElement.classList.remove('dark');
+    
+});
 </script>
 
 <template>
