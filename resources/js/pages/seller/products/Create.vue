@@ -15,8 +15,10 @@ const form = useForm({
     title: '',
     category_id: '',
     price: '',
+    discount_price: '',
     stock: '',
     description: '',
+    is_top_deal: false, 
     images: [] as File[],
 });
 
@@ -45,7 +47,6 @@ const removeImage = (index: number) => {
 const submit = () => {
     if (form.images.length === 0) {
         alert("Please upload at least one image of your product.");
-        
         return;
     }
 
@@ -59,7 +60,6 @@ const submit = () => {
 <template>
     <Head title="Add New Product" />
 
-    <!-- REMOVED bg-gray-50 dark:bg-neutral-950 to use your default app background -->
     <div class="min-h-screen py-10 transition-colors duration-300">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             
@@ -77,10 +77,10 @@ const submit = () => {
                 </Link>
             </div>
 
-            <!-- Changed to zinc-50 to match the rest of your app components -->
             <div class="bg-zinc-50 dark:bg-zinc-900 rounded-3xl shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden transition-colors">
                 <form @submit.prevent="submit" class="p-6 sm:p-8 space-y-8">
                     
+                    <!-- Image Upload Section -->
                     <div class="space-y-4">
                         <div class="flex items-center justify-between">
                             <Label class="dark:text-zinc-300 flex items-center gap-2 font-bold">
@@ -120,9 +120,9 @@ const submit = () => {
 
                     <hr class="border-zinc-200 dark:border-zinc-800" />
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                         
-                        <div class="md:col-span-3">
+                        <div class="sm:col-span-2 md:col-span-4">
                             <Label for="title" class="dark:text-zinc-300 font-bold">Product Title</Label>
                             <Input id="title" v-model="form.title" class="mt-1.5 bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 rounded-xl" placeholder="What are you selling?" required />
                             <InputError :message="form.errors.title" class="mt-2" />
@@ -144,12 +144,42 @@ const submit = () => {
                         </div>
 
                         <div>
+                            <Label for="discount_price" class="dark:text-zinc-300 font-bold flex items-center gap-1">
+                                Discount Price <span class="text-[10px] font-normal text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">Optional</span>
+                            </Label>
+                            <Input id="discount_price" type="number" step="0.01" min="0" v-model="form.discount_price" class="mt-1.5 bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 rounded-xl" placeholder="Leave blank if none" />
+                            <InputError :message="form.errors.discount_price" class="mt-2" />
+                        </div>
+
+                        <div>
                             <Label for="stock" class="dark:text-zinc-300 font-bold">Available Stock</Label>
                             <Input id="stock" type="number" min="0" v-model="form.stock" class="mt-1.5 bg-white dark:bg-zinc-800 border-zinc-200 dark:border-zinc-700 rounded-xl" placeholder="0" required />
                             <InputError :message="form.errors.stock" class="mt-2" />
                         </div>
 
-                        <div class="md:col-span-3">
+                        <div class="sm:col-span-2 md:col-span-4 mt-2">
+                            <label for="top_deal" class="flex items-start gap-3 bg-white dark:bg-zinc-800/50 p-4 rounded-xl border border-zinc-200 dark:border-zinc-700 cursor-pointer hover:border-[#009933] dark:hover:border-[#009933] transition-colors group">
+                                <div class="mt-0.5">
+                                    <input 
+                                        type="checkbox" 
+                                        id="top_deal" 
+                                        v-model="form.is_top_deal"
+                                        class="w-5 h-5 text-[#009933] rounded focus:ring-[#009933] border-zinc-300 dark:border-zinc-600 dark:bg-zinc-700 cursor-pointer transition-colors"
+                                    >
+                                </div>
+                                <div class="flex flex-col select-none">
+                                    <span class="text-sm font-bold text-zinc-900 dark:text-white group-hover:text-[#009933] transition-colors">
+                                        Feature as a Top Deal
+                                    </span>
+                                    <span class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
+                                        Checking this box will highlight this product and place it directly on the main store homepage carousel.
+                                    </span>
+                                </div>
+                            </label>
+                            <InputError :message="form.errors.is_top_deal" class="mt-2" />
+                        </div>
+
+                        <div class="sm:col-span-2 md:col-span-4">
                             <Label for="description" class="dark:text-zinc-300 font-bold">Description</Label>
                             <textarea id="description" v-model="form.description" rows="5" class="mt-1.5 w-full rounded-xl border border-zinc-200 bg-white dark:bg-zinc-800 dark:border-zinc-700 px-3 py-2 text-sm dark:text-zinc-200 focus:ring-2 focus:ring-[#009933]/20 focus:border-[#009933] outline-none transition-colors resize-none" placeholder="Provide details about your product..." required></textarea>
                             <InputError :message="form.errors.description" class="mt-2" />
