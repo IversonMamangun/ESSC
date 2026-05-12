@@ -3,7 +3,7 @@ import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import { 
     Store, Star, MapPin, ShoppingCart, 
     Zap, ChevronRight, ShieldCheck, 
-    Plus, Minus 
+    Plus, Minus, Video
 } from 'lucide-vue-next'; 
 import { ref, computed } from 'vue';
 import Footer from '@/components/sections/Footer.vue';
@@ -19,11 +19,32 @@ const user = computed(() => page.props.auth.user);
 
 const quantity = ref(1);
 
+// Media Logic
 const activeImage = computed(() => {
-    const img = props.product?.images?.[0];
+    const img = props.product?.image || props.product?.images?.[0];
     if (!img) return '/assets/store/online-store.jpg'; 
     if (img.startsWith('http') || img.startsWith('/assets') || img.startsWith('/storage/')) return img;
     return '/storage/' + img;
+});
+
+const hasVideo = computed(() => !!props.product?.video);
+const videoUrl = computed(() => props.product?.video ? '/storage/' + props.product.video : null);
+
+// BULLETPROOF Discount Logic (Forces Math logic to avoid String comparison bugs)
+const isDiscounted = computed(() => {
+    const price = parseFloat(props.product?.price);
+    const discount = parseFloat(props.product?.discount_price);
+    return discount && price && discount < price;
+});
+
+const currentPrice = computed(() => isDiscounted.value ? props.product.discount_price : props.product.price);
+
+// Computes the exact percentage off for the Red Badge!
+const discountPercentage = computed(() => {
+    if (!isDiscounted.value) return 0;
+    const price = parseFloat(props.product.price);
+    const discount = parseFloat(props.product.discount_price);
+    return Math.round(((price - discount) / price) * 100);
 });
 
 const increaseQuantity = () => {
@@ -50,7 +71,6 @@ const handleBuyNow = () => {
         router.visit('/login'); 
         return;
     }
-    // Changed to a POST request pointing to our new Buy Now route
     router.post('/cart/buy-now', {
         product_id: props.product.id,
         quantity: quantity.value
@@ -61,16 +81,15 @@ const handleBuyNow = () => {
 <template>
     <Head :title="`${props.product.title} - Store`" />
     
-    <!-- REMOVED bg-zinc-50 dark:bg-zinc-950 to use global background, added flex flex-col -->
     <div class="min-h-screen transition-colors duration-300 flex flex-col">
         <TopBar />
         <div class="sticky top-0 z-50 mt-8">
             <Navbar />
         </div>
 
-        <!-- Added flex-grow so the footer stays at the bottom -->
         <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 md:py-12 mb-20">
             
+            <!-- Breadcrumbs -->
             <nav class="flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-zinc-400 mb-8">
                 <Link href="/" class="hover:text-[#009933] transition-colors">Home</Link>
                 <ChevronRight class="w-4 h-4" />
@@ -82,18 +101,38 @@ const handleBuyNow = () => {
             <div class="bg-white dark:bg-zinc-900 rounded-[2rem] shadow-sm border border-zinc-200 dark:border-zinc-800 overflow-hidden transition-colors">
                 <div class="flex flex-col lg:flex-row">
                     
-                    <div class="lg:w-1/2 p-6 md:p-8 border-b lg:border-b-0 lg:border-r border-zinc-200 dark:border-zinc-800">
+                    <!-- Left Column: Media (Video & Image) -->
+                    <div class="lg:w-1/2 p-6 md:p-8 border-b lg:border-b-0 lg:border-r border-zinc-200 dark:border-zinc-800 space-y-4">
+                        
+                        <!-- Video Player -->
+                        <div v-if="hasVideo" class="aspect-video w-full rounded-2xl overflow-hidden bg-black relative group border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                            <video :src="videoUrl" controls class="w-full h-full object-cover"></video>
+                            <div class="absolute top-2 left-2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-black px-2 py-1 rounded flex items-center gap-1 uppercase tracking-wider">
+                                <Video class="w-3 h-3" /> Product Video
+                            </div>
+                        </div>
+
+                        <!-- Main Image -->
                         <div class="aspect-square rounded-2xl overflow-hidden bg-zinc-50 dark:bg-zinc-800 relative group border border-zinc-200 dark:border-zinc-700">
                             <img 
                                 :src="activeImage" 
                                 :alt="props.product.title" 
                                 class="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
                             />
+                            
+                            <!-- UPDATED: Sale Badge now uses the computed discountPercentage -->
+                            <div v-if="isDiscounted" class="absolute top-4 right-4 bg-red-600 text-white text-sm font-black px-3 py-1.5 rounded-xl shadow-lg tracking-wider">
+                                -{{ discountPercentage }}% OFF
+                            </div>
                         </div>
                     </div>
 
+                    <!-- Right Column: Details -->
                     <div class="lg:w-1/2 p-6 md:p-10 flex flex-col">
                         <div class="mb-6">
+                            <span v-if="props.product.is_top_deal" class="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-red-200 dark:border-red-800/50 mb-4 inline-block mr-2">
+                                🔥 Top Deal
+                            </span>
                             <span class="bg-green-100 dark:bg-green-900/30 text-[#009933] dark:text-green-400 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-green-200 dark:border-green-800/50 mb-4 inline-block">
                                 Official Product
                             </span>
@@ -107,38 +146,42 @@ const handleBuyNow = () => {
                                     <span class="ml-1 text-zinc-900 dark:text-white font-black">{{ props.product.rating || '5.0' }}</span>
                                 </div>
                                 <div class="w-px h-3 bg-zinc-300 dark:bg-zinc-700"></div>
-                                <span class="text-zinc-500 dark:text-zinc-400 font-bold">{{ props.product.reviews || '0' }} Ratings</span>
-                                <div class="w-px h-3 bg-zinc-300 dark:bg-zinc-700"></div>
-                                <span class="text-zinc-500 dark:text-zinc-400 font-bold">{{ props.product.sold || '0' }} Sold</span>
+                                <span class="text-zinc-500 dark:text-zinc-400 font-bold">{{ props.product.sold_count || '0' }} Sold</span>
                             </div>
                         </div>
 
+                        <!-- Discounted Pricing Block -->
                         <div class="bg-zinc-50 dark:bg-zinc-800/50 p-6 rounded-3xl mb-8 border border-zinc-200 dark:border-zinc-800 transition-colors">
-                            <div class="flex items-baseline gap-2">
+                            <div class="flex flex-wrap items-end gap-3">
                                 <span class="text-4xl md:text-5xl font-black text-[#009933] tracking-tighter">
+                                    ₱{{ currentPrice }}
+                                </span>
+                                
+                                <span v-if="isDiscounted" class="text-lg md:text-xl font-bold text-zinc-400 dark:text-zinc-500 line-through pb-1">
                                     ₱{{ props.product.price }}
                                 </span>
                             </div>
+                            
                             <div class="mt-4 flex items-center gap-2 text-xs text-[#009933] font-bold">
                                 <ShieldCheck class="w-4 h-4" />
                                 100% Authentic Guarantee
                             </div>
                         </div>
 
-                        <div v-if="props.product.storeId" class="flex items-center justify-between p-4 bg-white dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 shadow-sm mb-8 transition-colors">
+                        <div v-if="props.product.store" class="flex items-center justify-between p-4 bg-white dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 shadow-sm mb-8 transition-colors">
                             <div class="flex items-center gap-3">
                                 <div class="w-12 h-12 bg-green-50 dark:bg-green-900/20 text-[#009933] rounded-xl flex items-center justify-center font-black text-xl shadow-inner border border-green-100 dark:border-green-800">
                                     <Store class="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <p class="font-black text-zinc-900 dark:text-white">{{ props.product.storeName }}</p>
+                                    <p class="font-black text-zinc-900 dark:text-white">{{ props.product.store.name }}</p>
                                     <div class="flex items-center text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">
-                                        <MapPin class="w-3 h-3 mr-1" /> {{ props.product.location || 'Local' }}
+                                        <MapPin class="w-3 h-3 mr-1" /> {{ props.product.store.city || 'Local' }}
                                     </div>
                                 </div>
                             </div>
                             <Link 
-                                :href="`/shop/${props.product.storeId}`" 
+                                :href="`/shop/${props.product.store_id}`" 
                                 class="px-5 py-2 text-xs font-black uppercase tracking-widest text-[#009933] border-2 border-[#009933] rounded-xl hover:bg-[#009933] hover:text-white transition-all active:scale-95"
                             >
                                 View Shop
