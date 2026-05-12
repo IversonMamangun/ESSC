@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { Head, useForm, Link, usePage } from '@inertiajs/vue3';
 import { 
     MapPin, CreditCard, AlertCircle, 
@@ -65,6 +65,10 @@ const selectAddress = (id: number) => {
     form.address_id = id;
     isAddressModalOpen.value = false;
 };
+onMounted(() => {
+    document.documentElement.classList.remove('dark');
+    
+});
 </script>
 
 <template>
