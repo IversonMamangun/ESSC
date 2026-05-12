@@ -49,6 +49,8 @@ const toggleDeals = async () => {
 };
 
 onMounted(() => {
+    document.documentElement.classList.remove('dark');
+    
     initCarousel();
 });
 </script>
