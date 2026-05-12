@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
-import { Star, MapPin } from 'lucide-vue-next'; 
+import { Star, MapPin, Play } from 'lucide-vue-next'; 
 
 const props = defineProps<{
     product: any;
@@ -21,7 +21,11 @@ const availableStock = computed(() => props.product.stock ?? props.product.quant
 const location = computed(() => props.product.store?.city ?? props.product.location ?? 'Local'); 
 
 // Check if this product has a valid active discount
-const isDiscounted = computed(() => props.product.discount_price && props.product.discount_price < props.product.price);
+const isDiscounted = computed(() => {
+    const price = parseFloat(props.product.price);
+    const discount = parseFloat(props.product.discount_price);
+    return discount && price && discount < price;
+});
 </script>
 
 <template>
@@ -35,7 +39,10 @@ const isDiscounted = computed(() => props.product.discount_price && props.produc
                     class="absolute top-0 left-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
                 />
                 
-                <!-- NEW: Discount Badge overlay -->
+                <div v-if="product.video" class="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md text-white p-1.5 sm:p-2 rounded-full shadow-sm z-10 flex items-center justify-center pointer-events-none">
+                    <Play class="w-3 h-3 sm:w-4 sm:h-4 fill-white translate-x-[1px]" />
+                </div>
+
                 <div v-if="isDiscounted" class="absolute top-2 right-2 bg-red-600 text-white text-[10px] sm:text-xs font-black px-2 py-1 rounded-lg shadow-sm z-10 tracking-wider">
                     -{{ product.discount_percentage }}%
                 </div>
@@ -46,13 +53,11 @@ const isDiscounted = computed(() => props.product.discount_price && props.produc
                     {{ product.title }}
                 </h3>
                 
-                <!-- NEW: Dynamic Price Layout -->
                 <div class="mt-3 flex flex-wrap items-end gap-2">
                     <p class="text-[#009933] font-black text-lg tracking-tight">
                         ₱{{ isDiscounted ? product.discount_price : product.price }}
                     </p>
                     
-                    <!-- Crossed out original price -->
                     <p v-if="isDiscounted" class="text-zinc-400 dark:text-zinc-500 text-xs font-semibold line-through pb-1">
                         ₱{{ product.price }}
                     </p>
