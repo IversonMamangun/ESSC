@@ -9,10 +9,26 @@ const props = defineProps<{
 
 // Smart Image Resolver
 const imageUrl = computed(() => {
-    const img = props.product.image || props.product.image_url || props.product.images?.[0];
+    // 1. Extract the string
+    const img = props.product?.image || props.product?.image_url || props.product?.images?.[0];
+    
+    // 2. If it's null, undefined, or an empty string, return fallback immediately
     if (!img) return '/assets/store/online-store.jpg'; 
-    if (img.startsWith('http') || img.startsWith('/assets') || img.startsWith('/storage/')) return img;
-    return '/storage/' + img;
+    
+    // 3. Handle external URLs
+    if (img.startsWith('http')) return img;
+
+    // 4. Handle Seeded Assets (public/assets/products/...)
+    // We check if "assets/" exists anywhere in the string
+    if (img.toLowerCase().includes('assets/')) {
+        // Remove leading slash if it exists, then add one back to ensure it's root-relative
+        const cleanPath = img.startsWith('/') ? img.substring(1) : img;
+        return '/' + cleanPath;
+    }
+    
+    // 5. Handle User Uploads (storage/app/public/...)
+    const storagePath = img.startsWith('/') ? img.substring(1) : img;
+    return '/storage/' + storagePath;
 });
 
 const rating = computed(() => props.product.rating || '5.0');
@@ -20,8 +36,12 @@ const soldCount = computed(() => props.product.sold_count ?? props.product.sold 
 const availableStock = computed(() => props.product.stock ?? props.product.quantity ?? '0');
 const location = computed(() => props.product.store?.city ?? props.product.location ?? 'Local'); 
 
+// Check if this product is "Coming Soon" (Price is 0)
+const isComingSoon = computed(() => parseFloat(props.product.price) <= 0);
+
 // Check if this product has a valid active discount
 const isDiscounted = computed(() => {
+    if (isComingSoon.value) return false; // Can't discount something that isn't priced yet
     const price = parseFloat(props.product.price);
     const discount = parseFloat(props.product.discount_price);
     return discount && price && discount < price;
@@ -54,13 +74,23 @@ const isDiscounted = computed(() => {
                 </h3>
                 
                 <div class="mt-3 flex flex-wrap items-end gap-2">
-                    <p class="text-[#009933] font-black text-lg tracking-tight">
-                        ₱{{ isDiscounted ? product.discount_price : product.price }}
-                    </p>
-                    
-                    <p v-if="isDiscounted" class="text-zinc-400 dark:text-zinc-500 text-xs font-semibold line-through pb-1">
-                        ₱{{ product.price }}
-                    </p>
+                    <!-- DISPLAY LOGIC FOR PRICE OR COMING SOON -->
+                    <template v-if="!isComingSoon">
+                        <p class="text-[#009933] font-black text-lg tracking-tight">
+                            ₱{{ isDiscounted ? product.discount_price : product.price }}
+                        </p>
+                        
+                        <p v-if="isDiscounted" class="text-zinc-400 dark:text-zinc-500 text-xs font-semibold line-through pb-1">
+                            ₱{{ product.price }}
+                        </p>
+                    </template>
+
+                    <!-- Coming Soon Badge -->
+                    <div v-else class="bg-zinc-100 dark:bg-zinc-800 px-3 py-1 rounded-lg border border-zinc-200 dark:border-zinc-800">
+                        <span class="text-zinc-500 dark:text-zinc-400 font-black text-[10px] uppercase tracking-widest">
+                            Coming Soon
+                        </span>
+                    </div>
                 </div>
 
                 <div class="flex items-center text-xs text-zinc-500 dark:text-zinc-400 mt-2 space-x-2 font-medium">
