@@ -11,8 +11,12 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('slug')->unique();
+            $table->boolean('is_active')->default(true); 
+            $table->boolean('is_official')->default(false); 
             $table->text('description')->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->string('logo')->nullable();
+            $table->string('banner')->nullable();
+            $table->decimal('rating', 3, 2)->default(0);
             $table->timestamps();
         });
     }
