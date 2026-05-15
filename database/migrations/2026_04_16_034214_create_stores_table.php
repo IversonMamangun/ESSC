@@ -8,7 +8,7 @@ return new class extends Migration {
     {
         Schema::create('stores', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->unique()->cascadeOnDelete();
             $table->string('name');
             $table->string('slug')->unique();
             $table->boolean('is_active')->default(true); 
