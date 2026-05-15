@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { CheckCircle2, Package, ArrowRight, Copy, Wallet } from 'lucide-vue-next';
-import TopBar from '@/components/sections/TopBar.vue';
-import Navbar from '@/components/sections/Navbar.vue';
 import Footer from '@/components/sections/Footer.vue';
+import Navbar from '@/components/sections/Navbar.vue';
+import TopBar from '@/components/sections/TopBar.vue';
 
 const props = defineProps<{
     order: {
