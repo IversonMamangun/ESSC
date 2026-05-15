@@ -19,73 +19,93 @@ const user = computed(() => page.props.auth.user);
 
 const quantity = ref(1);
 
-// --- FIXED IMAGE RESOLVER ---
 const activeImage = computed(() => {
-    // 1. Extract the raw string from the product object
     const img = props.product?.image || props.product?.image_url || props.product?.images?.[0];
     
-    // 2. Fallback if the database field is empty
-    if (!img) return '/assets/store/online-store.jpg'; 
-    
-    // 3. Handle external URLs
-    if (img.startsWith('http')) return img;
+    if (!img) {
+        return '/assets/store/online-store.jpg'; 
+    }
 
-    // 4. Handle Seeded Assets (public/assets/products/...)
-    // This looks for 'assets/' anywhere in the string to avoid 403 errors
+    if (img.startsWith('http')) {
+        return img;
+    }
+
     if (img.toLowerCase().includes('assets/')) {
         const cleanPath = img.startsWith('/') ? img.substring(1) : img;
+
         return '/' + cleanPath;
     }
     
-    // 5. Handle User Uploads (storage/app/public/...)
     const storagePath = img.startsWith('/') ? img.substring(1) : img;
+
     return '/storage/' + storagePath;
 });
 
-// --- FIXED VIDEO RESOLVER ---
 const hasVideo = computed(() => !!props.product?.video);
 const videoUrl = computed(() => {
-    if (!hasVideo.value) return null;
+    if (!hasVideo.value) {
+        return null;
+    }
+
     const vid = props.product.video;
     
     if (vid.toLowerCase().includes('assets/')) {
         return vid.startsWith('/') ? vid : '/' + vid;
     }
+
     return '/storage/' + (vid.startsWith('/') ? vid.substring(1) : vid);
 });
 
 const isComingSoon = computed(() => parseFloat(props.product?.price) <= 0);
 
 const isDiscounted = computed(() => {
-    if (isComingSoon.value) return false;
+    if (isComingSoon.value) {
+        return false;
+    }
+
     const price = parseFloat(props.product?.price);
     const discount = parseFloat(props.product?.discount_price);
+    
     return discount && price && discount < price;
 });
 
 const currentPrice = computed(() => isDiscounted.value ? props.product.discount_price : props.product.price);
 
 const discountPercentage = computed(() => {
-    if (!isDiscounted.value) return 0;
+    if (!isDiscounted.value) {
+        return 0;
+    }
+
     const price = parseFloat(props.product.price);
     const discount = parseFloat(props.product.discount_price);
+    
     return Math.round(((price - discount) / price) * 100);
 });
 
 const increaseQuantity = () => {
-    if (quantity.value < props.product.stock) quantity.value++;
+    if (quantity.value < props.product.stock) {
+        quantity.value++;
+
+    }
 };
 
 const decreaseQuantity = () => {
-    if (quantity.value > 1) quantity.value--;
+    if (quantity.value > 1) {
+        quantity.value--;
+    }
 };
 
 const handleAddToCart = () => {
-    if (isComingSoon.value) return; 
+    if (isComingSoon.value) {
+        return; 
+    }
+
     if (!user.value) {
         router.visit('/login'); 
+
         return;
     }
+
     router.post('/cart', {
         product_id: props.product.id,
         quantity: quantity.value
@@ -93,11 +113,17 @@ const handleAddToCart = () => {
 };
 
 const handleBuyNow = () => {
-    if (isComingSoon.value) return; 
+    if (isComingSoon.value) {
+        return;
+    
+    }
+    
     if (!user.value) {
         router.visit('/login'); 
+
         return;
     }
+    
     router.post('/cart/buy-now', {
         product_id: props.product.id,
         quantity: quantity.value
