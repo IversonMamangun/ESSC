@@ -2,11 +2,11 @@
 import { Head, router } from '@inertiajs/vue3';
 import { Store, MapPin, Package, Star, MessageCircle, Plus } from 'lucide-vue-next';
 import { onMounted } from 'vue';
+import Pagination from '@/components/Pagination.vue'; 
 import ProductCard from '@/components/ProductCard.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import Pagination from '@/components/Pagination.vue'; 
 
 const props = defineProps<{
     store: any;
@@ -22,7 +22,6 @@ onMounted(() => {
 <template>
     <Head :title="store.name" />
     
-    <!-- REMOVED bg-zinc-50 dark:bg-zinc-950 to use global background -->
     <div class="min-h-screen transition-colors duration-300 flex flex-col">
         <TopBar />
         <div class="sticky top-0 z-50 mt-8">
