@@ -7,10 +7,18 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Table('user_types')]
-#[Fillable(['name', 'slug'])]
+#[Fillable([
+    'name', 
+    'slug'
+])]
 class UserType extends Model
 {
+    public const ADMIN = 1;
+    public const SELLER = 2;
+    public const CUSTOMER = 3;
+
+    // protected $fillable = [];
+
     public function users(): HasMany
     {
         return $this->hasMany(User::class);

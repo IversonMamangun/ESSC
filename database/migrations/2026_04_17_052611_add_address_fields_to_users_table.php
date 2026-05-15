@@ -13,7 +13,7 @@ return new class extends Migration
 {
     Schema::table('users', function (Blueprint $table) {
         // We make them nullable so old users without addresses don't break the database
-        $table->string('address')->nullable();
+        $table->string('street')->nullable();
         $table->string('city')->nullable();
         $table->string('province')->nullable();
         $table->string('zip')->nullable();
@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
 {
     Schema::table('users', function (Blueprint $table) {
-        $table->dropColumn(['address', 'city', 'province', 'zip']);
+        $table->dropColumn(['street', 'city', 'province', 'zip']);
     });
 }
 };

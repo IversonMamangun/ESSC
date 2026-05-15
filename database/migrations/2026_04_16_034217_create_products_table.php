@@ -10,18 +10,13 @@ return new class extends Migration {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->foreignId('store_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
-            $table->string('title');
-            $table->decimal('price', 10, 2);
-            
-            $table->decimal('discount_price', 10, 2)->nullable();
-            $table->boolean('is_top_deal')->default(false);
-            
-            $table->integer('stock')->default(0);
-            $table->string('image')->nullable();
-            $table->string('video')->nullable();
-            $table->text('description')->nullable();
-            $table->timestamps();
+            $table->string('name');
+            $table->string('slug')->unique();
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_featured')->default(false);
+            $table->longText('description')->nullable();
+            $table->unsignedBigInteger('views')->default(0);
+            $table->timestamps();        
         });
     }
 

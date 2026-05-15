@@ -63,7 +63,7 @@
                         </div>
                         <div class="flex flex-col">
                             <h3 class="text-lg font-semibold text-[#009933]">Call Us</h3>
-                            <p class="text-gray-800 dark:text-gray-300">(632) 4310-5357</p>
+                            <p class="text-gray-800 dark:text-gray-300">8932-0234 / 0949- 447-0269 / 0915-261-3649</p>
                         </div>
                     </div>
 
@@ -83,7 +83,7 @@
                         </div>
                         <div class="flex flex-col">
                             <h3 class="text-lg font-semibold text-[#009933]">Address</h3>
-                            <p class="text-gray-800 dark:text-gray-300">#85 Doña Justina Street corner Dalton StreetFilinvest II, Batasan HillsQuezon City, Philippines</p>
+                            <p class="text-gray-800 dark:text-gray-300">#87 Doña Justina St. Filinvest || Batasan Hills, Quezon City, 1126</p>
                         </div>
                     </div>
 

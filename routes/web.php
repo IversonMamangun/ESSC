@@ -64,7 +64,7 @@ Route::middleware('auth')->group(function () {
     // --- BUYER ROUTES ---
     Route::get('/purchases', [BuyerController::class, 'purchases'])->name('buyer.purchases');
     Route::patch('/buyer/orders/{order}/complete', [BuyerController::class, 'completeOrder'])->name('buyer.orders.complete');
-    Route::patch('/buyer/orders/{order}/cancel', [BuyerController::class, 'cancelOrder'])->name('buyer.orders.cancel'); // <-- THIS WAS MISSING
+    Route::patch('/buyer/orders/{order}/cancel', [BuyerController::class, 'cancelOrder'])->name('buyer.orders.cancel');
     
     Route::get('/account', [BuyerController::class, 'account'])->name('buyer.account');
     Route::post('/account/profile', [BuyerController::class, 'updateProfile'])->name('buyer.profile.update');
@@ -77,16 +77,34 @@ Route::middleware('auth')->group(function () {
     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
     Route::get('/checkout/success/{tracking}', [CheckoutController::class, 'success'])->name('checkout.success');
 
-    // --- SELLER ROUTES ---
-    Route::get('/seller/dashboard', [SellerController::class, 'index'])->name('seller.dashboard');
-    Route::post('/seller/store', [SellerController::class, 'store'])->name('seller.store.create');
-    Route::patch('/seller/orders/{order}/status', [SellerController::class, 'updateOrderStatus'])->name('seller.orders.status');
+});
 
-    Route::get('/seller/products/create', [SellerController::class, 'createProduct'])->name('seller.products.create');
-    Route::post('/seller/products', [SellerController::class, 'storeProduct'])->name('seller.products.store');
-    Route::get('/seller/products/{product}/edit', [SellerController::class, 'editProduct'])->name('seller.products.edit');
-    Route::post('/seller/products/{product}', [SellerController::class, 'updateProduct'])->name('seller.products.update');
-    Route::delete('/seller/products/{product}', [SellerController::class, 'destroyProduct'])->name('seller.products.destroy');
+    // --- SELLER ROUTES ---
+    Route::middleware(['auth', 'seller'])->group(function () {
+
+    Route::get('/seller/dashboard', [SellerController::class, 'index'])
+        ->name('seller.dashboard');
+
+    Route::post('/seller/store', [SellerController::class, 'store'])
+        ->name('seller.store.create');
+
+    Route::patch('/seller/orders/{order}/status', [SellerController::class, 'updateOrderStatus'])
+        ->name('seller.orders.status');
+
+    Route::get('/seller/products/create', [SellerController::class, 'createProduct'])
+        ->name('seller.products.create');
+
+    Route::post('/seller/products', [SellerController::class, 'storeProduct'])
+        ->name('seller.products.store');
+
+    Route::get('/seller/products/{product}/edit', [SellerController::class, 'editProduct'])
+        ->name('seller.products.edit');
+
+    Route::post('/seller/products/{product}', [SellerController::class, 'updateProduct'])
+        ->name('seller.products.update');
+
+    Route::delete('/seller/products/{product}', [SellerController::class, 'destroyProduct'])
+        ->name('seller.products.destroy');
 });
 
 require __DIR__.'/settings.php';
