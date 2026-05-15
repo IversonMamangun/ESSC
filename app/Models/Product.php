@@ -5,45 +5,29 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+#[Fillable([
+    'store_id',
+    'name',
+    'slug',
+    'is_active',
+    'is_featured',
+    'description',
+    'views',
+])]
 class Product extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-    'store_id', 
-    'category_id', 
-    'title', 
-    'price', 
-    'discount_price', 
-    'is_top_deal', 
-    'stock', 
-    'image', 
-    'video', 
-    'description'
-];
-
-    protected $casts = [
-        'price' => 'decimal:2', 
-        'discount_price' => 'decimal:2', 
-        'is_top_deal' => 'boolean', 
-        'stock' => 'integer'
-    ];
-
-    protected $appends = ['sold_count', 'discount_percentage'];
-
-    public function getSoldCountAttribute(): int
+    protected function casts(): array
     {
-        return (int) $this->orders()->sum('order_product.quantity');
-    }
-
-    public function getDiscountPercentageAttribute(): int
-    {
-        if (!$this->discount_price || $this->price <= 0 || $this->discount_price >= $this->price) {
-            return 0;
-        }
-        return (int) round((($this->price - $this->discount_price) / $this->price) * 100);
+        return [
+            'is_active' => 'boolean',
+            'is_featured' => 'boolean',
+            'views' => 'integer',
+        ];
     }
 
     public function store(): BelongsTo
@@ -51,15 +35,9 @@ class Product extends Model
         return $this->belongsTo(Store::class);
     }
 
-    public function category(): BelongsTo
+    public function categories(): BelongsToMany
     {
-        return $this->belongsTo(Category::class);
-    }
-
-    public function orders(): BelongsToMany
-    {
-        return $this->belongsToMany(Order::class, 'order_product')
-            ->withPivot(['quantity', 'price_at_time'])
+        return $this->belongsToMany(Category::class)
             ->withTimestamps();
     }
 }

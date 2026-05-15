@@ -16,9 +16,7 @@ return new class extends Migration {
             $table->boolean('is_featured')->default(false);
             $table->longText('description')->nullable();
             $table->unsignedBigInteger('views')->default(0);
-            $table->timestamps();
-            
-            $table->index(['store_id', 'category_id']);
+            $table->timestamps();        
         });
     }
 
