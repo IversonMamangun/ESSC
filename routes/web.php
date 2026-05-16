@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
+use App\Models\UserType;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController; 
@@ -15,17 +16,6 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 Route::inertia('/', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
 ])->name('home');
-
-Route::get('/store', [StoreController::class, 'index'])->name('store.index');
-Route::get('/shop/{id}', [StoreController::class, 'shopProfile'])->name('shop.show');
-Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
-
-// --- PUBLIC CART ROUTES ---
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
-Route::post('/cart/buy-now', [CartController::class, 'buyNow'])->name('cart.buyNow'); 
-Route::patch('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
-Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
 
 Route::middleware('guest')->group(function () {
     Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
@@ -45,19 +35,35 @@ Route::middleware('guest')->group(function () {
     Route::post('/register/complete', [RegisterController::class, 'complete'])->name('register.complete');
 });
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        $user = auth()->user();
-        if ($user->userType?->slug === 'buyer') {
-            return redirect()->route('store.index');
-        }
-        if ($user->userType?->slug === 'seller') {
-            return redirect()->route('seller.dashboard');
-        }
-        return inertia('Dashboard');
-    })->name('dashboard');
+// dedicated customer routes
+Route::middleware([
+    'auth', 
+    'role:' . UserType::CUSTOMER
+])->group(function () {
+
+
 });
 
+// dedicated seller routes
+Route::middleware([
+    'auth', 
+    'role:' . UserType::SELLER
+])->group(function () {
+
+
+});
+
+// dedicated admin routes
+Route::middleware([
+    'auth', 
+    'role:' . UserType::ADMIN
+])->group(function () {
+
+
+});
+
+
+// ???
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
     
@@ -79,8 +85,19 @@ Route::middleware('auth')->group(function () {
 
 });
 
-    // --- SELLER ROUTES ---
-    Route::middleware(['auth', 'seller'])->group(function () {
+Route::get('/store', [StoreController::class, 'index'])->name('store.index');
+Route::get('/shop/{id}', [StoreController::class, 'shopProfile'])->name('shop.show');
+Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
+
+// --- PUBLIC CART ROUTES ---
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+Route::post('/cart/buy-now', [CartController::class, 'buyNow'])->name('cart.buyNow'); 
+Route::patch('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
+
+// --- SELLER ROUTES ---
+Route::middleware(['auth'])->group(function () {
 
     Route::get('/seller/dashboard', [SellerController::class, 'index'])
         ->name('seller.dashboard');

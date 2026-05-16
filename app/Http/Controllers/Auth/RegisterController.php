@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash; 
 use App\Models\User; 
+use App\Models\UserType;
 use App\Services\MoviderService;
 
 class RegisterController extends Controller
@@ -73,7 +74,7 @@ class RegisterController extends Controller
         User::create([
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'user_type_id' => 2,
+            'user_type_id' => UserType::CUSTOMER
         ]);
 
         Cache::forget('reg_token_' . $request->phone);
