@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
 import { Link, router, usePage } from '@inertiajs/vue3' 
-import { home, logout, login, register } from '@/routes';
 import { User, Package, LogOut, ShoppingCart, LayoutDashboard } from 'lucide-vue-next';
+import { ref, onMounted, computed } from 'vue'
+import { home, logout, login, register } from '@/routes';
 
 const isMenuOpen = ref(false)
 const activeLink = ref('Home')
@@ -36,6 +36,7 @@ const setActive = (linkName: string, sectionId: string) => {
       onSuccess: () => {
         setTimeout(() => {
           const element = document.getElementById(sectionId)
+
           if (element) {
             const y = element.getBoundingClientRect().top + window.scrollY - 100
             window.scrollTo({ top: y, behavior: 'smooth' })
@@ -43,10 +44,12 @@ const setActive = (linkName: string, sectionId: string) => {
         }, 100)
       }
     })
+
     return; 
   }
 
   const element = document.getElementById(sectionId)
+
   if (element) {
     const y = element.getBoundingClientRect().top + window.scrollY - 100 
     window.scrollTo({ top: y, behavior: 'smooth' })
@@ -55,6 +58,7 @@ const setActive = (linkName: string, sectionId: string) => {
 
 const toggleDarkMode = () => {
   isDarkMode.value = !isDarkMode.value
+  
   if (isDarkMode.value) {
     document.documentElement.classList.add('dark')
   } else {
