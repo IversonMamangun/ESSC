@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Features;
 use App\Models\UserType;
 use App\Http\Controllers\StoreController;
-use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController; 
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
@@ -20,13 +19,6 @@ Route::inertia('/', 'Welcome', [
 Route::middleware('guest')->group(function () {
     Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
     Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
-
-    Route::get('/login', [LoginController::class, 'create'])->name('login');
-    Route::post('/login', [LoginController::class, 'store'])->name('login.store');
-
-    Route::post('/login/otp', [LoginController::class, 'sendOtp'])->name('login.otp.send');
-    Route::get('/login/verify-otp', [LoginController::class, 'showVerifyOtp'])->name('login.otp.verify');
-    Route::post('/login/verify-otp', [LoginController::class, 'verifyOtp'])->name('login.otp.check');
 
     Route::inertia('/register', 'auth/Register')->name('register');
     Route::post('/register/initiate', [RegisterController::class, 'initiate'])->name('register.initiate');
@@ -65,8 +57,6 @@ Route::middleware([
 
 // ???
 Route::middleware('auth')->group(function () {
-    Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
-    
     // --- BUYER ROUTES ---
     Route::get('/purchases', [BuyerController::class, 'purchases'])->name('buyer.purchases');
     Route::patch('/buyer/orders/{order}/complete', [BuyerController::class, 'completeOrder'])->name('buyer.orders.complete');
