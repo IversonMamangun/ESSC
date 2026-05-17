@@ -14,6 +14,8 @@ use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use Laravel\Fortify\Fortify;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -33,6 +35,23 @@ class FortifyServiceProvider extends ServiceProvider
         $this->configureActions();
         $this->configureViews();
         $this->configureRateLimiting();
+
+        // allow login with email or phone
+        Fortify::authenticateUsing(function (Request $request) {
+            $login = trim($request->login);
+
+            $field = filter_var($login, FILTER_VALIDATE_EMAIL)
+                ? 'email'
+                : 'phone';
+
+            $user = User::where($field, $login)->first();
+
+            if ($user && Hash::check($request->password, $user->password)) {
+                return $user;
+            }
+
+            return null;
+        });
     }
 
     /**
