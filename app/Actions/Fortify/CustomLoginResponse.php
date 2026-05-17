@@ -14,8 +14,8 @@ class CustomLoginResponse implements LoginResponseContract
         $route = match ($user->user_type_id) {
             UserType::ADMIN => route('admin.dashboard'),
             UserType::SELLER => route('seller.dashboard'),
-            UserType::CUSTOMER => route('customer.dashboard'),
-            default => route('home'),
+            UserType::CUSTOMER => route('shop.home'),
+            default => route('landing'),
         };
 
         return $request->wantsJson()

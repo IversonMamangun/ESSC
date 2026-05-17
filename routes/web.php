@@ -14,7 +14,7 @@ use App\Http\Controllers\Auth\GoogleAuthController;
 
 Route::inertia('/', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
-])->name('home');
+])->name('landing');
 
 Route::middleware('guest')->group(function () {
     Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
@@ -27,11 +27,22 @@ Route::middleware('guest')->group(function () {
     Route::post('/register/complete', [RegisterController::class, 'complete'])->name('register.complete');
 });
 
-// dedicated customer routes
+// dedicated guest shop routes
+Route::prefix('shop')
+->name('shop.')
+->group(function () {
+
+
+});
+
+// dedicated customer shop routes (customer experience)
 Route::middleware([
     'auth', 
     'role:' . UserType::CUSTOMER
-])->group(function () {
+])
+->prefix('shop')
+->name('shop.')
+->group(function () {
 
 
 });
@@ -40,7 +51,10 @@ Route::middleware([
 Route::middleware([
     'auth', 
     'role:' . UserType::SELLER
-])->group(function () {
+])
+->prefix('seller')
+->name('seller.')
+->group(function () {
 
 
 });
@@ -49,7 +63,10 @@ Route::middleware([
 Route::middleware([
     'auth', 
     'role:' . UserType::ADMIN
-])->group(function () {
+])
+->prefix('admin')
+->name('admin.')
+->group(function () {
 
 
 });
