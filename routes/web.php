@@ -11,6 +11,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\BuyerController; 
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
+use App\Http\Controllers\Seller\StoreController as SellerStoreController;
 
 Route::inertia('/', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
@@ -56,6 +58,13 @@ Route::middleware([
 ->name('seller.')
 ->group(function () {
 
+    Route::get('/dashboard', [SellerDashboardController::class, 'index'])
+        ->name('dashboard');
+
+    Route::get('/store/create', [SellerStoreController::class, 'create'])
+        ->name('store.create');
+    Route::post('/store', [SellerStoreController::class, 'store'])
+        ->name('store.store');
 
 });
 
@@ -104,31 +113,31 @@ Route::patch('/cart/{product}', [CartController::class, 'update'])->name('cart.u
 Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
 
 // --- SELLER ROUTES ---
-Route::middleware(['auth'])->group(function () {
+// Route::middleware(['auth'])->group(function () {
 
-    Route::get('/seller/dashboard', [SellerController::class, 'index'])
-        ->name('seller.dashboard');
+//     Route::get('/seller/dashboard', [SellerController::class, 'index'])
+//         ->name('seller.dashboard');
 
-    Route::post('/seller/store', [SellerController::class, 'store'])
-        ->name('seller.store.create');
+//     Route::post('/seller/store', [SellerController::class, 'store'])
+//         ->name('seller.store.create');
 
-    Route::patch('/seller/orders/{order}/status', [SellerController::class, 'updateOrderStatus'])
-        ->name('seller.orders.status');
+//     Route::patch('/seller/orders/{order}/status', [SellerController::class, 'updateOrderStatus'])
+//         ->name('seller.orders.status');
 
-    Route::get('/seller/products/create', [SellerController::class, 'createProduct'])
-        ->name('seller.products.create');
+//     Route::get('/seller/products/create', [SellerController::class, 'createProduct'])
+//         ->name('seller.products.create');
 
-    Route::post('/seller/products', [SellerController::class, 'storeProduct'])
-        ->name('seller.products.store');
+//     Route::post('/seller/products', [SellerController::class, 'storeProduct'])
+//         ->name('seller.products.store');
 
-    Route::get('/seller/products/{product}/edit', [SellerController::class, 'editProduct'])
-        ->name('seller.products.edit');
+//     Route::get('/seller/products/{product}/edit', [SellerController::class, 'editProduct'])
+//         ->name('seller.products.edit');
 
-    Route::post('/seller/products/{product}', [SellerController::class, 'updateProduct'])
-        ->name('seller.products.update');
+//     Route::post('/seller/products/{product}', [SellerController::class, 'updateProduct'])
+//         ->name('seller.products.update');
 
-    Route::delete('/seller/products/{product}', [SellerController::class, 'destroyProduct'])
-        ->name('seller.products.destroy');
-});
+//     Route::delete('/seller/products/{product}', [SellerController::class, 'destroyProduct'])
+//         ->name('seller.products.destroy');
+// });
 
 require __DIR__.'/settings.php';
