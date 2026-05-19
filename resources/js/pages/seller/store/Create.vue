@@ -72,7 +72,7 @@ const submitStore = () => {
               :disabled="form.processing"
               class="mt-2 w-full rounded-xl bg-[#009933] py-4 text-lg font-black text-white shadow-md transition-colors hover:bg-green-700 disabled:bg-zinc-400"
             >
-              Open My Store
+              {{ form.processing ? 'Creating...' : 'Create Store' }}
             </button>
           </form>
         </div>

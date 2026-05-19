@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('attribute_value_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
 
-            $table->unique(['product_variant_id','attribute_value_id']);
+            $table->unique(['product_variant_id', 'attribute_value_id'], 'variant_attr_value_unique');
         });
     }
 
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('product_variant_attributes');
+        Schema::dropIfExists('product_variant_attribute_values');
     }
 };
