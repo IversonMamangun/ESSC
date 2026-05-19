@@ -41,7 +41,8 @@ class StoreController extends Controller
             'is_active' => true,
         ]);
 
-        return redirect()->route('seller.dashboard');
+        return redirect()->route('seller.dashboard')
+        ->with('success', 'Congratulations! Your store is now open.');
     }
 
 }
