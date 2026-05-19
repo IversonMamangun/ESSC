@@ -155,13 +155,14 @@ const getStatusColor = (status: string) => {
               <h2 class="text-2xl font-black text-zinc-900 dark:text-white">
                 {{ props.store.name }}
               </h2>
-              <Link
-                :href="`/shop/${props.store.id}`"
-                class="mt-1 flex items-center gap-1 text-sm font-medium text-zinc-500 transition-colors hover:text-[#009933] dark:text-zinc-400"
-              >
-                View Store Profile
-                <ExternalLink class="h-3 w-3" />
-              </Link>
+             <Link
+  :href="`/seller/store/${props.store.id}/edit`"
+  class="mt-1 flex items-center gap-1 text-sm font-medium text-zinc-500 transition-colors hover:text-[#009933] dark:text-zinc-400"
+>
+  Edit Store Profile
+  
+  <ExternalLink class="h-3 w-3" /> 
+</Link>
             </div>
           </div>
 
