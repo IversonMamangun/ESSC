@@ -65,7 +65,10 @@ Route::middleware([
         ->name('store.create');
     Route::post('/store', [SellerStoreController::class, 'store'])
         ->name('store.store');
-
+    Route::get('/store/{store}/edit', [SellerStoreController::class, 'edit'])
+        ->name('store.edit');
+    Route::post('/store/{store}', [SellerStoreController::class, 'update'])
+        ->name('store.update');
 });
 
 // dedicated admin routes
@@ -115,8 +118,8 @@ Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart
 // --- SELLER ROUTES ---
 // Route::middleware(['auth'])->group(function () {
 
-//     Route::get('/seller/dashboard', [SellerController::class, 'index'])
-//         ->name('seller.dashboard');
+    Route::get('/seller/dashboard', [SellerController::class, 'index'])
+        ->name('seller.dashboard');
 
 //     Route::post('/seller/store', [SellerController::class, 'store'])
 //         ->name('seller.store.create');
