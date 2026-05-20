@@ -5,6 +5,8 @@ namespace Database\Factories;
 use App\Models\Product;
 use App\Models\Store;
 use App\Models\Category;
+use App\Models\Attribute;
+use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
@@ -42,6 +44,25 @@ class ProductFactory extends Factory
                 ->pluck('id');
 
             $product->categories()->attach($categoryIds);
+
+            $variants = ProductVariant::factory(rand(2, 4))
+                ->create([
+                    'product_id' => $product->id,
+                ]);
+
+            $variants->first()->update([
+                'is_default' => true,
+            ]);
+
+            $attributes = Attribute::with('values')->get();
+
+            foreach ($variants as $variant) {
+                foreach ($attributes as $attribute) {
+                    // pick random value for each attribute
+                    $value = $attribute->values->random();
+                    $variant->attributeValues()->attach($value->id);
+                }
+            }
         });
     }
 }

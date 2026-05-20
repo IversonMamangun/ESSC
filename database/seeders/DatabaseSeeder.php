@@ -25,13 +25,21 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        User::factory(3)->create([
+        $sellers = User::factory(3)->create([
             'user_type_id' => UserType::SELLER,
         ]);
 
         User::factory(5)->create([
             'user_type_id' => UserType::CUSTOMER,
         ]);
+
+        foreach ($sellers as $seller) {
+            Store::factory()->create([
+                'user_id' => $seller->id,
+            ]);
+        }
+
+        Product::factory(20)->create();
 
         // // Create the Admin User
         // $admin = User::factory()->create([
