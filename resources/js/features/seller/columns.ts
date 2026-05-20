@@ -1,6 +1,7 @@
 import { h } from 'vue';
 import type { ColumnDef } from '@tanstack/vue-table';
 import type { SellerProduct } from '@/types';
+import { Badge } from '@/components/ui/badge';
 
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('en-PH', {
@@ -36,12 +37,31 @@ export const sellerProductsColumns: ColumnDef<SellerProduct>[] = [
     },
   },
   {
+    accessorKey: 'is_active',
+    header: 'Status',
+    cell: ({ row }) => {
+      const isActive = row.original.is_active;
+
+      return h(
+        Badge,
+        {
+          variant: isActive ? 'default' : 'destructive',
+        },
+        () => (isActive ? 'Active' : 'Inactive'),
+      );
+    },
+  },
+  {
     accessorKey: 'variant_count',
     header: 'Variants',
   },
   {
     accessorKey: 'total_stock',
     header: 'Stock',
+  },
+  {
+    accessorKey: 'views',
+    header: 'Views',
   },
   {
     id: 'price',
