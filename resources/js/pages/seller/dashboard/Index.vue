@@ -73,7 +73,7 @@ const activeTab = ref('products');
                 {{ props.store.name }}
               </h2>
               <Link
-                :href="seller.store.edit(props.store.id)"
+                :href="seller.store.edit(props.store.slug)"
                 class="mt-1 flex items-center gap-1 text-sm font-medium text-zinc-500 transition-colors hover:text-[#009933] dark:text-zinc-400"
               >
                 Edit Store Profile

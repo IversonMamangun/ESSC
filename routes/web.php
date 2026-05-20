@@ -65,9 +65,9 @@ Route::middleware([
         ->name('store.create');
     Route::post('/store', [SellerStoreController::class, 'store'])
         ->name('store.store');
-    Route::get('/store/{store}/edit', [SellerStoreController::class, 'edit'])
+    Route::get('/store/{store:slug}/edit', [SellerStoreController::class, 'edit'])
         ->name('store.edit');
-    Route::post('/store/{store}', [SellerStoreController::class, 'update'])
+    Route::post('/store/{store:slug}', [SellerStoreController::class, 'update'])
         ->name('store.update');
 });
 
