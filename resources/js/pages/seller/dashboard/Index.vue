@@ -6,21 +6,23 @@ import {
   TrendingUpIcon,
   ShoppingBagIcon,
   PlusIcon,
+  AlertCircleIcon,
   Edit,
   Trash2,
   ExternalLinkIcon,
   Clock,
   Truck,
   CheckCircle2,
-  AlertCircle,
 } from 'lucide-vue-next';
 import { ref, computed, h } from 'vue';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import DataTable from '@/components/DataTable.vue';
 import ProductVariantsTable from '@/components/products/ProductVariantsTable.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import { sellerProductsColumns } from '@/features/seller/columns';
 import type { Store, SellerProduct } from '@/types';
+import seller from '@/routes/seller';
 
 const props = defineProps<{
   store: Store;
@@ -51,7 +53,7 @@ const activeTab = ref('products');
         </p>
       </div>
 
-      <div class="flex flex-col gap-8">
+      <div v-if="props.store.is_active" class="flex flex-col gap-8">
         <div
           class="flex flex-col justify-between gap-6 rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm transition-colors md:flex-row md:items-center dark:border-zinc-800 dark:bg-zinc-900"
         >
@@ -71,10 +73,11 @@ const activeTab = ref('products');
                 {{ props.store.name }}
               </h2>
               <Link
-                :href="`/shop/${props.store.id}`"
+                :href="seller.store.edit(props.store.id)"
                 class="mt-1 flex items-center gap-1 text-sm font-medium text-zinc-500 transition-colors hover:text-[#009933] dark:text-zinc-400"
               >
-                View Store Profile
+                Edit Store Profile
+
                 <ExternalLinkIcon class="h-3 w-3" />
               </Link>
             </div>
@@ -398,6 +401,17 @@ const activeTab = ref('products');
             </div> -->
           </div>
         </div>
+      </div>
+
+      <div v-else class="flex flex-col gap-8">
+        <Alert variant="destructive">
+          <AlertCircleIcon class="mt-1 h-5 w-5" />
+          <AlertTitle class="text-xl font-semibold">Store Inactive</AlertTitle>
+          <AlertDescription class="mt-1">
+            The store {{ props.store.name }} is currently deactivated.
+            <span> Please contact support for more information. </span>
+          </AlertDescription>
+        </Alert>
       </div>
     </main>
   </div>

@@ -1,5 +1,5 @@
 export interface Store {
-  id: string;
+  id: number;
   name: string;
   is_active: boolean;
   is_official: boolean;
