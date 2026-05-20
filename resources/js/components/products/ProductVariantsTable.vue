@@ -24,7 +24,9 @@ const formatPrice = (price: number) => {
 
 <template>
   <div class="p-4">
-    <div class="overflow-hidden rounded-xl border bg-background">
+    <div
+      class="overflow-hidden rounded-xl border border-accent-foreground/20 bg-accent"
+    >
       <Table>
         <TableHeader>
           <TableRow>
@@ -37,12 +39,16 @@ const formatPrice = (price: number) => {
         </TableHeader>
 
         <TableBody>
-          <TableRow v-for="variant in variants" :key="variant.id">
+          <TableRow
+            v-for="variant in variants"
+            :key="variant.id"
+            class="border-accent-foreground/20"
+          >
             <!-- VARIANT -->
             <TableCell>
               <div class="flex items-center gap-3">
                 <div
-                  class="h-14 w-14 overflow-hidden rounded-lg border bg-muted"
+                  class="h-14 w-14 overflow-hidden rounded-lg border border-accent-foreground/20 bg-muted"
                 >
                   <img
                     v-if="variant.image"
@@ -62,7 +68,7 @@ const formatPrice = (price: number) => {
                   <Badge
                     v-for="attribute in variant.attributes"
                     :key="`${attribute.attribute}-${attribute.value}`"
-                    variant="secondary"
+                    variant="default"
                   >
                     {{ attribute.attribute }}:
                     {{ attribute.value }}
@@ -101,7 +107,7 @@ const formatPrice = (price: number) => {
 
             <!-- DEFAULT -->
             <TableCell>
-              <Badge v-if="variant.is_default" variant="outline">
+              <Badge v-if="variant.is_default" variant="default">
                 Default
               </Badge>
             </TableCell>
