@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Store;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class StoreController extends Controller
@@ -17,7 +18,7 @@ class StoreController extends Controller
             abort(403, 'You already have a store.');
         }
 
-        return Inertia::render('seller/store/create');
+        return Inertia::render('seller/store/Create');
     }
 
     public function store(Request $request)
@@ -46,7 +47,7 @@ class StoreController extends Controller
     
     public function edit(Store $store)
     {
-        if ($store->user_id !== auth()->id()) {
+        if ($store->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
@@ -57,7 +58,7 @@ class StoreController extends Controller
 
     public function update(Request $request, Store $store)
     {
-        if ($store->user_id !== auth()->id()) {
+        if ($store->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 

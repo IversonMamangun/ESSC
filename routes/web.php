@@ -85,41 +85,41 @@ Route::middleware([
 
 
 // ???
-Route::middleware('auth')->group(function () {
-    // --- BUYER ROUTES ---
-    Route::get('/purchases', [BuyerController::class, 'purchases'])->name('buyer.purchases');
-    Route::patch('/buyer/orders/{order}/complete', [BuyerController::class, 'completeOrder'])->name('buyer.orders.complete');
-    Route::patch('/buyer/orders/{order}/cancel', [BuyerController::class, 'cancelOrder'])->name('buyer.orders.cancel');
+// Route::middleware('auth')->group(function () {
+//     // --- BUYER ROUTES ---
+//     Route::get('/purchases', [BuyerController::class, 'purchases'])->name('buyer.purchases');
+//     Route::patch('/buyer/orders/{order}/complete', [BuyerController::class, 'completeOrder'])->name('buyer.orders.complete');
+//     Route::patch('/buyer/orders/{order}/cancel', [BuyerController::class, 'cancelOrder'])->name('buyer.orders.cancel');
     
-    Route::get('/account', [BuyerController::class, 'account'])->name('buyer.account');
-    Route::post('/account/profile', [BuyerController::class, 'updateProfile'])->name('buyer.profile.update');
+//     Route::get('/account', [BuyerController::class, 'account'])->name('buyer.account');
+//     Route::post('/account/profile', [BuyerController::class, 'updateProfile'])->name('buyer.profile.update');
     
-    Route::get('/account/address', [BuyerController::class, 'address'])->name('buyer.address');
-    Route::post('/account/address', [BuyerController::class, 'storeAddress'])->name('buyer.address.store');
+//     Route::get('/account/address', [BuyerController::class, 'address'])->name('buyer.address');
+//     Route::post('/account/address', [BuyerController::class, 'storeAddress'])->name('buyer.address.store');
     
-    // --- CHECKOUT ROUTES ---
-    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-    Route::get('/checkout/success/{tracking}', [CheckoutController::class, 'success'])->name('checkout.success');
+//     // --- CHECKOUT ROUTES ---
+//     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+//     Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+//     Route::get('/checkout/success/{tracking}', [CheckoutController::class, 'success'])->name('checkout.success');
 
-});
+// });
 
-Route::get('/store', [StoreController::class, 'index'])->name('store.index');
-Route::get('/shop/{id}', [StoreController::class, 'shopProfile'])->name('shop.show');
-Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
+// Route::get('/store', [StoreController::class, 'index'])->name('store.index');
+// Route::get('/shop/{id}', [StoreController::class, 'shopProfile'])->name('shop.show');
+// Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show');
 
-// --- PUBLIC CART ROUTES ---
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
-Route::post('/cart/buy-now', [CartController::class, 'buyNow'])->name('cart.buyNow'); 
-Route::patch('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
-Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
+// // --- PUBLIC CART ROUTES ---
+// Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+// Route::post('/cart', [CartController::class, 'store'])->name('cart.store');
+// Route::post('/cart/buy-now', [CartController::class, 'buyNow'])->name('cart.buyNow'); 
+// Route::patch('/cart/{product}', [CartController::class, 'update'])->name('cart.update');
+// Route::delete('/cart/{product}', [CartController::class, 'destroy'])->name('cart.destroy');
 
 // --- SELLER ROUTES ---
 // Route::middleware(['auth'])->group(function () {
 
-    Route::get('/seller/dashboard', [SellerController::class, 'index'])
-        ->name('seller.dashboard');
+//     Route::get('/seller/dashboard', [SellerController::class, 'index'])
+//         ->name('seller.dashboard');
 
 //     Route::post('/seller/store', [SellerController::class, 'store'])
 //         ->name('seller.store.create');

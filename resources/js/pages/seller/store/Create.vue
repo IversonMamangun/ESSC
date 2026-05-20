@@ -3,6 +3,7 @@ import { Head, useForm } from '@inertiajs/vue3';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import seller from '@/routes/seller';
+import { StoreIcon } from 'lucide-vue-next';
 
 const form = useForm({
   name: '',
@@ -28,7 +29,7 @@ const submitStore = () => {
         <h1
           class="flex items-center gap-3 text-3xl font-black text-zinc-900 dark:text-white"
         >
-          <Store class="h-8 w-8 text-[#009933]" /> Seller Center
+          <StoreIcon class="h-8 w-8 text-[#009933]" /> Seller Center
         </h1>
         <p class="mt-1 font-medium text-zinc-500 dark:text-zinc-400">
           Manage your storefront, products, and orders.
