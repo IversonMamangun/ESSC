@@ -29,7 +29,9 @@ const discountPreview = computed(() => {
     const d = parseFloat(form.discount_price);
     
     // If values are invalid, negative, or discount is higher than regular price, return null
-    if (!p || !d || p <= 0 || d >= p) return null;
+    if (!p || !d || p <= 0 || d >= p) {
+        return null;
+    }
     
     return Math.round(((p - d) / p) * 100);
 });
@@ -39,6 +41,7 @@ const videoPreview = ref<string | null>(null);
 
 const handleImageUpload = (event: Event) => {
     const target = event.target as HTMLInputElement;
+
     if (target.files && target.files.length > 0) {
         const newFiles = Array.from(target.files);
         newFiles.forEach(file => {
@@ -46,6 +49,7 @@ const handleImageUpload = (event: Event) => {
             imagePreviews.value.push(URL.createObjectURL(file));
         });
     }
+
     target.value = '';
 };
 
@@ -57,18 +61,24 @@ const removeImage = (index: number) => {
 const handleVideoUpload = (event: Event) => {
     const target = event.target as HTMLInputElement;
     const file = target.files?.[0];
-    if (!file) return;
+
+    if (!file) {
+        return;
+    }
 
     const videoElement = document.createElement('video');
     videoElement.preload = 'metadata';
     
     videoElement.onloadedmetadata = function() {
         window.URL.revokeObjectURL(videoElement.src);
+        
         if (videoElement.duration > 61) {
             alert(`Video is too long! Maximum length is 1 minute. Your video is ${Math.round(videoElement.duration)} seconds.`);
             target.value = ''; 
+
             return;
         }
+
         form.video = file;
         videoPreview.value = URL.createObjectURL(file);
     }
@@ -83,6 +93,7 @@ const removeVideo = () => {
 const submit = () => {
     if (form.images.length === 0) {
         alert("Please upload at least one image of your product.");
+
         return;
     }
 

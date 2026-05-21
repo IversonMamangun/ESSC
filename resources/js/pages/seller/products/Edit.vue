@@ -42,12 +42,17 @@ const form = useForm({
 const discountPreview = computed(() => {
     const p = parseFloat(form.price as any);
     const d = parseFloat(form.discount_price as any);
-    if (!p || !d || p <= 0 || d >= p) return null;
+
+    if (!p || !d || p <= 0 || d >= p) {
+        return null;
+    }
+
     return Math.round(((p - d) / p) * 100);
 });
 
 const handleImageUpload = (event: Event) => {
     const target = event.target as HTMLInputElement;
+    
     if (target.files && target.files[0]) {
         const file = target.files[0];
         form.image = file;
@@ -58,18 +63,24 @@ const handleImageUpload = (event: Event) => {
 const handleVideoUpload = (event: Event) => {
     const target = event.target as HTMLInputElement;
     const file = target.files?.[0];
-    if (!file) return;
+
+    if (!file) {
+        return;
+    }
 
     const videoElement = document.createElement('video');
     videoElement.preload = 'metadata';
     
     videoElement.onloadedmetadata = function() {
         window.URL.revokeObjectURL(videoElement.src);
+
         if (videoElement.duration > 61) {
             alert(`Video is too long! Maximum length is 1 minute. Your video is ${Math.round(videoElement.duration)} seconds.`);
             target.value = ''; 
+    
             return;
         }
+        
         form.video = file;
         videoPreview.value = URL.createObjectURL(file);
     }
