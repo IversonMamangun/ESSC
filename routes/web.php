@@ -13,6 +13,7 @@ use App\Http\Controllers\BuyerController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
 use App\Http\Controllers\Seller\StoreController as SellerStoreController;
+use App\Http\Controllers\Seller\ProductController as SellerProductController;
 
 Route::inertia('/', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
@@ -69,6 +70,9 @@ Route::middleware([
         ->name('store.edit');
     Route::post('/store/{store:slug}', [SellerStoreController::class, 'update'])
         ->name('store.update');
+
+    Route::get('/products/create', [SellerProductController::class, 'create'])
+        ->name('products.create');
 });
 
 // dedicated admin routes
