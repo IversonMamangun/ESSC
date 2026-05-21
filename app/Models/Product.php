@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
     'is_active',
     'is_featured',
     'description',
+    'video',
     'views',
 ])]
 class Product extends Model
