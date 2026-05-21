@@ -6,6 +6,12 @@ export interface Product {
   views: number;
 }
 
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 interface VariantAttribute {
   attribute: string;
   value: string;
@@ -29,4 +35,46 @@ export interface SellerProduct extends Product {
   min_price: number;
   max_price: number;
   variants: any[];
+}
+
+// form purposes
+export interface FormAttributeValue {
+  id?: number;
+  value: string;
+  is_new?: boolean;
+}
+export interface FormAttribute {
+  id: number;
+  name: string;
+  values: FormAttributeValue[];
+}
+export interface ProductVariantOption {
+  attribute_id: number | null;
+  values: FormAttributeValue[];
+}
+export interface ProductVariantAttributeForm {
+  attribute_id: number;
+  attribute_name: string;
+  value_id?: number;
+  value: string;
+  is_new?: boolean;
+}
+export interface ProductVariantForm {
+  sku: string;
+  price: number | undefined;
+  compare_price: number | undefined;
+  stock: number;
+  image: File | null;
+  attributes: ProductVariantAttributeForm[];
+}
+export interface ProductForm {
+  name: string;
+  description: string;
+  category_ids: number[];
+  is_active: boolean;
+  is_featured: boolean;
+  images: File[];
+  video: File | null;
+  variant_options: ProductVariantOption[];
+  variants: ProductVariantForm[];
 }
