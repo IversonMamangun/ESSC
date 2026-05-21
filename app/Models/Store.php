@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Casts;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Storage;
 
 #[Fillable([
     'user_id',
@@ -30,6 +32,28 @@ class Store extends Model
             'is_active' => 'boolean',
             'is_official' => 'boolean',
         ];
+    }
+    
+    protected $appends = [
+        'logo_url',
+        'banner_url',
+    ];
+
+    protected function logoUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->logo
+                ? Storage::url($this->logo)
+                : null,
+        );
+    }
+    protected function bannerUrl(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->banner
+                ? Storage::url($this->banner)
+                : null,
+        );
     }
 
     public function user(): BelongsTo

@@ -160,7 +160,7 @@ const activeTab = ref('products');
               "
               class="flex flex-1 items-center justify-center gap-2 border-b-2 py-4 text-center font-black transition-all"
             >
-              Active Products
+              Products
               <span
                 class="rounded-full bg-zinc-200 px-2 py-0.5 text-xs text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300"
                 >{{ products.data.length }}</span
