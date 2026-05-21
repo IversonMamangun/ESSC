@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Seller\StoreCreateRequest;
+use App\Http\Requests\Seller\StoreUpdateRequest;
 use Illuminate\Http\Request;
 use App\Models\Store;
 use Illuminate\Support\Str;
@@ -21,20 +23,12 @@ class StoreController extends Controller
         return Inertia::render('seller/store/Create');
     }
 
-    public function store(Request $request)
+    public function store(StoreCreateRequest $request)
     {
-        $user = $request->user()->loadMissing(['store']);
-        if ($user->store) {
-            abort(403, 'You already have a store.');
-        }
-
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string', 'max:1000'],
-        ]);
+        $validated = $request->validated();
 
         Store::create([
-            'user_id' => $user->id,
+            'user_id' => $request->user()->id,
             'name' => $validated['name'],
             'slug' => Str::slug($validated['name']),
             'description' => $validated['description'],
@@ -56,30 +50,23 @@ class StoreController extends Controller
         ]);
     }
 
-    public function update(Request $request, Store $store)
+    public function update(StoreUpdateRequest $request, Store $store)
     {
-        if ($store->user_id !== Auth::id()) {
-            abort(403, 'Unauthorized action.');
-        }
-
-        $validated = $request->validate([
-            'description' => 'required|string|max:1000',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'cover_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        $validated = $request->validated();
 
         $store->description = $validated['description'];
 
         if ($request->hasFile('logo')) {
-            $store->logo_path = $request->file('logo')->store('store_logos', 'public');
+            $store->logo = $request->file('logo')->store('store_logos', 'public');
         }
 
-        if ($request->hasFile('cover_image')) {
-            $store->cover_image_path = $request->file('cover_image')->store('store_covers', 'public');
+        if ($request->hasFile('banner')) {
+            $store->banner = $request->file('banner')->store('store_banners', 'public');
         }
 
         $store->save();
 
-        return redirect()->route('seller.dashboard')->with('success', 'Store profile updated successfully!');
+        return back()
+        ->with('success', 'Store profile updated successfully!');
     }
 }
