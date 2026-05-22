@@ -16,6 +16,8 @@ return new class extends Migration
             $table->foreignId('attribute_id')->constrained()->cascadeOnDelete();
             $table->string('value');
             $table->timestamps();
+
+            $table->unique(['attribute_id', 'value']);
         });
     }
 
