@@ -10,6 +10,10 @@ export interface Category {
   id: number;
   name: string;
   slug: string;
+  image?: string | null;
+  children: {
+    data: Category[];
+  };
 }
 
 interface VariantAttribute {
@@ -48,14 +52,9 @@ export interface FormAttribute {
   name: string;
   values: FormAttributeValue[];
 }
-export interface ProductVariantOption {
-  attribute_id: number | null;
-  values: FormAttributeValue[];
-}
 export interface ProductVariantAttributeForm {
-  attribute_id: number;
-  attribute_name: string;
-  value_id?: number;
+  attribute_id: number | null;
+  value_id: number | null;
   value: string;
   is_new?: boolean;
 }
@@ -64,17 +63,17 @@ export interface ProductVariantForm {
   price: number | undefined;
   compare_price: number | undefined;
   stock: number;
+  weight: number | undefined;
   image: File | null;
+  is_default: boolean;
   attributes: ProductVariantAttributeForm[];
 }
 export interface ProductForm {
   name: string;
   description: string;
   category_ids: number[];
-  is_active: boolean;
   is_featured: boolean;
   images: File[];
   video: File | null;
-  variant_options: ProductVariantOption[];
   variants: ProductVariantForm[];
 }

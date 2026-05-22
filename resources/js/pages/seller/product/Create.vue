@@ -1,15 +1,13 @@
 <script setup lang="ts">
 import { Head, useForm, Link } from '@inertiajs/vue3';
-import { computed, watch } from 'vue';
 import ProductMediaSection from '@/components/products/ProductMediaSection.vue';
 import ProductInfoSection from '@/components/products/ProductInfoSection.vue';
-import VariantOptionsBuilder from '@/components/products/VariantOptionsBuilder.vue';
 import ProductVariantsSection from '@/components/products/ProductVariantsSection.vue';
 import type { ProductForm, FormAttribute, Category } from '@/types';
 import { ArrowLeftIcon, PackageIcon } from 'lucide-vue-next';
 import seller from '@/routes/seller';
 
-const props = defineProps<{
+defineProps<{
   categories: Category[];
   attributes: FormAttribute[];
 }>();
@@ -17,73 +15,16 @@ const props = defineProps<{
 const form = useForm<ProductForm>({
   name: '',
   description: '',
-
   category_ids: [],
-
-  is_active: true,
   is_featured: false,
-
   images: [],
   video: null,
-
-  variant_options: [],
-
   variants: [],
 });
 
-const cartesian = <T,>(arrays: T[][]): T[][] => {
-  return arrays.reduce<T[][]>(
-    (acc, curr) => acc.flatMap((x) => curr.map((y) => [...x, y])),
-    [[]],
-  );
+const submit = () => {
+  form.post(seller.products.store.url());
 };
-
-watch(
-  () => form.variant_options,
-  (options) => {
-    const validOptions = options.filter(
-      (o) => o.attribute_id && o.values.length,
-    );
-
-    if (!validOptions.length) {
-      form.variants = [];
-      return;
-    }
-
-    const grouped = validOptions.map((option) => {
-      const attribute = props.attributes.find(
-        (a) => a.id === option.attribute_id,
-      );
-
-      return option.values.map((value) => ({
-        attribute_id: option.attribute_id!,
-        attribute_name: attribute?.name ?? '',
-        value_id: value.id,
-        value: value.value,
-        is_new: value.is_new,
-      }));
-    });
-
-    const combinations = cartesian(grouped);
-
-    form.variants = combinations.map((attributes) => ({
-      sku: '',
-
-      price: undefined,
-
-      compare_price: undefined,
-
-      stock: 0,
-
-      image: null,
-
-      attributes,
-    }));
-  },
-  {
-    deep: true,
-  },
-);
 </script>
 
 <template>
@@ -112,30 +53,37 @@ watch(
       </div>
 
       <div
-        class="space-y-4 overflow-hidden rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900"
+        class="overflow-hidden rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900"
       >
-        <ProductInfoSection
-          v-model:name="form.name"
-          v-model:description="form.description"
-          v-model:category-ids="form.category_ids"
-          v-model:is-active="form.is_active"
-          v-model:is-featured="form.is_featured"
-          :categories="categories"
-          :errors="form.errors"
-        />
+        <form class="space-y-6" @submit.prevent="submit">
+          <ProductInfoSection
+            v-model:name="form.name"
+            v-model:description="form.description"
+            v-model:category-ids="form.category_ids"
+            v-model:is-featured="form.is_featured"
+            :categories="categories"
+            :errors="form.errors"
+          />
 
-        <ProductMediaSection
-          v-model:images="form.images"
-          v-model:video="form.video"
-          :errors="form.errors"
-        />
+          <ProductMediaSection
+            v-model:images="form.images"
+            v-model:video="form.video"
+            :errors="form.errors"
+          />
 
-        <VariantOptionsBuilder
-          v-model="form.variant_options"
-          :attributes="attributes"
-        />
+          <ProductVariantsSection
+            v-model="form.variants"
+            :attributes="attributes"
+          />
 
-        <ProductVariantsSection v-model="form.variants" />
+          <button
+            type="submit"
+            class="rounded-xl bg-black px-6 py-3 text-white"
+            :disabled="form.processing"
+          >
+            Create Product
+          </button>
+        </form>
       </div>
     </div>
   </div>

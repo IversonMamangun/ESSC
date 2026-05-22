@@ -204,7 +204,7 @@ const submit = () => {
             <button
               type="submit"
               form="storeUpdateForm"
-              :disabled="form.processing"
+              :disabled="form.processing || !form.isDirty"
               class="inline-flex justify-center rounded-xl bg-[#009933] px-5 py-2.5 text-sm font-bold whitespace-nowrap text-white shadow-sm transition-colors hover:bg-[#007a29] focus:ring-2 focus:ring-[#009933] focus:ring-offset-2 focus:outline-none disabled:opacity-50"
             >
               {{ form.processing ? 'Saving...' : 'Save Changes' }}
