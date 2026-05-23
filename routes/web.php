@@ -75,6 +75,10 @@ Route::middleware([
         ->name('products.create');
     Route::post('/products', [SellerProductController::class, 'store'])
         ->name('products.store');
+    Route::get('/products/{product:slug}/edit', [SellerProductController::class, 'edit'])
+        ->name('products.edit');
+    Route::post('/products/{product:slug}', [SellerProductController::class, 'update'])
+        ->name('products.update');
 });
 
 // dedicated admin routes

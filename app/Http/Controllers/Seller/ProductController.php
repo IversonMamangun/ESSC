@@ -175,6 +175,17 @@ class ProductController extends Controller
         ->with('success', 'Product published successfully!');
     }
 
+    public function edit(Request $request, Product $product)
+    {
+
+        return Inertia::render('seller/product/Edit', []);
+    }
+
+    public function update(Request $request, Product $product)
+    {
+
+    }
+
     protected function generateUniqueSlug(string $name): string 
     {
         $slug = Str::slug($name);
