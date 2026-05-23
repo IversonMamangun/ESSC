@@ -50,11 +50,20 @@ const handleVideo = (e: Event) => {
       <div class="flex flex-wrap gap-3">
         <!-- Previews -->
         <div 
-          v-for="src in imagePreviews" 
+          v-for="(src, index) in imagePreviews" 
           :key="src" 
-          class="relative h-20 w-20 rounded border border-zinc-200 dark:border-zinc-700"
+          class="group relative h-20 w-20 rounded border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800"
         >
           <img :src="src" class="h-full w-full rounded object-cover" />
+          
+          <!-- Pure HTML/Template Remove Button -->
+          <button
+            type="button"
+            @click="imagePreviews = imagePreviews.filter((_, i) => i !== index); images = images.filter((_, i) => i !== index)"
+            class="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full border border-zinc-200 bg-white text-[10px] font-bold text-zinc-500 shadow-sm hover:text-red-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:text-red-400"
+          >
+            ✕
+          </button>
         </div>
 
         <label
@@ -71,26 +80,35 @@ const handleVideo = (e: Event) => {
 
     <!-- Video Section -->
     <div>
-      <label class="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Product Video</label>
+  <label class="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">Product Video</label>
 
-      <div class="flex flex-wrap gap-3">
-        <!-- Preview -->
-        <div v-if="videoPreview" class="h-20 w-20 rounded border border-zinc-200 bg-black dark:border-zinc-700">
-          <video :src="videoPreview" controls class="h-full w-full rounded object-cover"></video>
-        </div>
-
-        <label
-          v-else
-          class="flex h-20 w-20 cursor-pointer flex-col items-center justify-center rounded border border-dashed border-zinc-300 bg-zinc-50 text-zinc-500 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
-        >
-          <svg class="mb-1 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-          </svg>
-          <span class="text-[10px] font-medium">Add Video</span>
-          <input type="file" accept="video/*" class="hidden" @change="handleVideo" />
-        </label>
-      </div>
+  <div class="flex flex-wrap gap-3">
+    <!-- Preview -->
+    <div v-if="videoPreview" class="relative h-20 w-20 rounded border border-zinc-200 bg-black dark:border-zinc-700">
+      <video :src="videoPreview" controls class="h-full w-full rounded object-cover"></video>
+      
+      <!-- Standard Video Remove Button (Resets back to null inline) -->
+      <button
+        @click="videoPreview = null; video = null"
+        type="button"
+        class="absolute -right-1.5 -top-1.5 z-10 flex h-4 w-4 items-center justify-center rounded-full border border-zinc-200 bg-white text-[10px] font-bold text-zinc-500 shadow-sm transition-colors hover:bg-zinc-50 hover:text-red-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-red-400"
+      >
+        ✕
+      </button>
     </div>
+
+    <label
+      v-else
+      class="flex h-20 w-20 cursor-pointer flex-col items-center justify-center rounded border border-dashed border-zinc-300 bg-zinc-50 text-zinc-500 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700 transition-colors"
+    >
+      <svg class="mb-1 h-5 w-5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+      </svg>
+      <span class="text-[10px] font-medium">Add Video</span>
+      <input type="file" accept="video/*" class="hidden" @change="handleVideo" />
+    </label>
+  </div>
+</div>
 
   </div>
 </template>
