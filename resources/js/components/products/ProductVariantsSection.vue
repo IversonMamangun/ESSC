@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
-import { PlusIcon, Trash2Icon, CopyIcon } from 'lucide-vue-next';
+import { PlusIcon, Trash2Icon, CopyIcon, XIcon } from 'lucide-vue-next';
 import type {
   ProductVariantForm,
   ProductVariantAttributeForm,
@@ -15,70 +15,88 @@ const props = defineProps<{
   attributes: FormAttribute[];
 }>();
 
-const model = defineModel<ProductVariantForm[]>({
-  required: true,
+const model = defineModel<ProductVariantForm[]>({ required: true });
+
+// Tracks IDs of variants the user removed (Edit only; ignored in Create)
+const deletedVariantIds = defineModel<number[]>('deletedVariantIds', {
+  default: () => [],
 });
 
 const newValueInputs = ref<Record<string, string>>({});
+const newImagePreviews = ref<Record<number, string>>({});
 
 const createVariant = (): ProductVariantForm => ({
+  id: null,
   sku: '',
   price: undefined,
   compare_price: undefined,
   stock: 0,
   image: null,
+  existingImageUrl: null,
+  delete_image: false,
   weight: undefined,
   is_default: false,
   attributes: [],
 });
 
-const addVariant = () => {
-  model.value.push(createVariant());
-};
+const addVariant = () => model.value.push(createVariant());
 
 const removeVariant = (index: number) => {
+  const variant = model.value[index];
+
+  // If it was a persisted variant, track its ID for deletion
+  if (variant.id) {
+    deletedVariantIds.value.push(variant.id);
+  }
+
+  // Clean up the new-image preview URL
+  if (newImagePreviews.value[index]) {
+    URL.revokeObjectURL(newImagePreviews.value[index]);
+    delete newImagePreviews.value[index];
+  }
+
   model.value.splice(index, 1);
+
+  // Shift preview keys down
+  const shifted: Record<number, string> = {};
+  Object.entries(newImagePreviews.value).forEach(([k, v]) => {
+    const i = Number(k);
+    if (i > index) shifted[i - 1] = v;
+    else if (i < index) shifted[i] = v;
+  });
+  newImagePreviews.value = shifted;
 };
 
 const duplicateVariant = (variant: ProductVariantForm) => {
   model.value.push({
+    id: null,
     sku: '',
     price: variant.price,
     compare_price: variant.compare_price,
     stock: variant.stock,
     image: null,
+    existingImageUrl: null,
+    delete_image: false,
     weight: variant.weight,
     is_default: false,
-    attributes: variant.attributes.map((a) => ({
-      ...a,
-    })),
+    attributes: variant.attributes.map((a) => ({ ...a })),
   });
 };
 
-const addAttribute = (variant: ProductVariantForm) => {
-  variant.attributes.push({
-    attribute_id: null,
-    value_id: null,
-    value: '',
-  });
-};
+const addAttribute = (v: ProductVariantForm) =>
+  v.attributes.push({ attribute_id: null, value_id: null, value: '' });
 
-const removeAttribute = (variant: ProductVariantForm, index: number) => {
-  variant.attributes.splice(index, 1);
-};
+const removeAttribute = (v: ProductVariantForm, i: number) =>
+  v.attributes.splice(i, 1);
 
-const getAttribute = (attributeId: number | null) => {
-  return props.attributes.find((a) => a.id === attributeId);
-};
+const getAttribute = (id: number | null) =>
+  props.attributes.find((a) => a.id === id);
 
 const syncSelectedValue = (attribute: ProductVariantAttributeForm) => {
-  const selectedAttribute = getAttribute(attribute.attribute_id);
-
-  const selectedValue = selectedAttribute?.values.find(
+  const selectedValue = getAttribute(attribute.attribute_id)?.values.find(
     (v) => v.id === attribute.value_id,
   );
   if (!selectedValue) return;
-
   attribute.value = selectedValue.value;
   attribute.is_new = false;
 };
@@ -95,35 +113,51 @@ const addCustomValue = (
   attribute.value_id = null;
   attribute.value = value.trim();
   attribute.is_new = true;
-
   newValueInputs.value[key] = '';
 };
 
+// default variant
 const setDefaultVariant = (selectedIndex: number) => {
-  model.value.forEach((variant, index) => {
-    variant.is_default = index === selectedIndex;
-  });
+  model.value.forEach((v, i) => (v.is_default = i === selectedIndex));
 };
 
-const variantLabel = computed(() => {
-  return (variant: ProductVariantForm) => {
-    return variant.attributes
+//  images
+const handleVariantImage = (e: Event, variantIndex: number) => {
+  const file = (e.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+  model.value[variantIndex].image = file;
+  model.value[variantIndex].delete_image = false;
+  newImagePreviews.value[variantIndex] = URL.createObjectURL(file);
+};
+
+const removeVariantImage = (variantIndex: number) => {
+  // Clear new upload
+  if (newImagePreviews.value[variantIndex]) {
+    URL.revokeObjectURL(newImagePreviews.value[variantIndex]);
+    delete newImagePreviews.value[variantIndex];
+  }
+  model.value[variantIndex].image = null;
+
+  // If there was an existing server image, mark for deletion
+  if (model.value[variantIndex].existingImageUrl) {
+    model.value[variantIndex].delete_image = true;
+    model.value[variantIndex].existingImageUrl = null;
+  }
+};
+
+// display helpers
+const variantLabel = computed(
+  () => (variant: ProductVariantForm) =>
+    variant.attributes
       .map((a) => a.value)
       .filter(Boolean)
-      .join(' / ');
-  };
-});
+      .join(' / '),
+);
 
-const imagePreviews = ref<Record<number, string>>({});
-
-const handleVariantImage = (event: Event, variantIndex: number) => {
-  const target = event.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (!file) return;
-
-  model.value[variantIndex].image = file;
-  imagePreviews.value[variantIndex] = URL.createObjectURL(file);
-};
+const getVariantImageSrc = (variantIndex: number): string | null =>
+  newImagePreviews.value[variantIndex] ??
+  model.value[variantIndex].existingImageUrl ??
+  null;
 </script>
 
 <template>
@@ -156,6 +190,7 @@ const handleVariantImage = (event: Event, variantIndex: number) => {
       :key="variantIndex"
       class="space-y-6 rounded-2xl border p-6"
     >
+      <!-- header -->
       <div class="flex items-start justify-between">
         <div>
           <h3 class="font-semibold">
@@ -212,7 +247,6 @@ const handleVariantImage = (event: Event, variantIndex: number) => {
         >
           <div class="grid gap-4 md:grid-cols-2">
             <!-- attribute -->
-
             <div class="space-y-2">
               <Label>Attribute</Label>
 
@@ -221,7 +255,6 @@ const handleVariantImage = (event: Event, variantIndex: number) => {
                 class="w-full rounded-md border bg-background px-3 py-2"
               >
                 <option :value="null">Select Attribute</option>
-
                 <option
                   v-for="attr in attributes"
                   :key="attr.id"
@@ -233,7 +266,6 @@ const handleVariantImage = (event: Event, variantIndex: number) => {
             </div>
 
             <!-- values -->
-
             <div class="space-y-2">
               <Label>Value</Label>
 
@@ -243,7 +275,6 @@ const handleVariantImage = (event: Event, variantIndex: number) => {
                 @change="syncSelectedValue(attribute)"
               >
                 <option :value="null">Select Value</option>
-
                 <option
                   v-for="value in getAttribute(attribute.attribute_id)
                     ?.values ?? []"
@@ -312,7 +343,7 @@ const handleVariantImage = (event: Event, variantIndex: number) => {
         </div>
       </div>
 
-      <!-- inventory -->
+      <!-- inventory + default -->
       <div class="grid gap-4 md:grid-cols-2">
         <div class="space-y-2">
           <Label>Stock</Label>
@@ -344,19 +375,48 @@ const handleVariantImage = (event: Event, variantIndex: number) => {
         </div>
 
         <div class="space-y-2">
-          <Label> Variant Image </Label>
+          <Label>Variant Image</Label>
 
+          <!-- image preview (new upload or existing) -->
+          <div
+            v-if="getVariantImageSrc(variantIndex)"
+            class="group relative inline-block"
+          >
+            <img
+              :src="getVariantImageSrc(variantIndex)!"
+              class="h-24 w-24 rounded-xl border object-cover"
+            />
+            <button
+              type="button"
+              class="absolute -top-1.5 -right-1.5 hidden rounded-full bg-red-500 p-0.5 text-white group-hover:flex"
+              @click="removeVariantImage(variantIndex)"
+            >
+              <XIcon class="h-3 w-3" />
+            </button>
+          </div>
+
+          <!-- upload input (shown when no image) -->
           <Input
+            v-else
             type="file"
             accept="image/*"
             @change="handleVariantImage($event, variantIndex)"
           />
 
-          <img
-            v-if="imagePreviews[variantIndex]"
-            :src="imagePreviews[variantIndex]"
-            class="h-24 w-24 rounded-xl border object-cover"
-          />
+          <!-- replace button when image exists -->
+          <label v-if="getVariantImageSrc(variantIndex)" class="mt-1 block">
+            <span
+              class="cursor-pointer text-xs text-zinc-500 underline hover:text-zinc-800"
+            >
+              Replace image
+            </span>
+            <input
+              type="file"
+              accept="image/*"
+              class="hidden"
+              @change="handleVariantImage($event, variantIndex)"
+            />
+          </label>
         </div>
       </div>
     </div>

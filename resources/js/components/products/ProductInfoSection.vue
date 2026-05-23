@@ -28,31 +28,19 @@ const props = defineProps<{
 }>();
 
 const name = defineModel<string>('name', { required: true });
+const description = defineModel<string>('description', { required: true });
+const categoryIds = defineModel<number[]>('categoryIds', { required: true });
+const isFeatured = defineModel<boolean>('isFeatured', { required: true });
 
-const description = defineModel<string>('description', {
-  required: true,
-});
-
-const categoryIds = defineModel<number[]>('categoryIds', {
-  required: true,
-});
-
-const isFeatured = defineModel<boolean>('isFeatured', {
-  required: true,
-});
+const isActive = defineModel<boolean>('isActive');
 
 const flattenCategories = (
   categories: Category[] = [],
   level = 0,
 ): Category[] => {
   if (!Array.isArray(categories)) return [];
-
   return categories.flatMap((category) => [
-    {
-      ...category,
-      name: '— '.repeat(level) + category.name,
-    },
-
+    { ...category, name: '— '.repeat(level) + category.name },
     ...flattenCategories(category.children?.data ?? [], level + 1),
   ]);
 };
@@ -68,6 +56,9 @@ const flatCategories = computed(() =>
       <Label>Product Name</Label>
 
       <Input v-model="name" />
+      <p v-if="errors?.name" class="mt-1 text-sm text-destructive">
+        {{ errors.name }}
+      </p>
     </div>
 
     <div>
@@ -80,8 +71,7 @@ const flatCategories = computed(() =>
     </div>
 
     <div class="space-y-2">
-      <Label> Categories </Label>
-
+      <Label>Categories</Label>
       <Popover>
         <PopoverTrigger as-child>
           <Button variant="outline" class="w-full justify-between">
@@ -100,7 +90,7 @@ const flatCategories = computed(() =>
         <PopoverContent class="w-[350px] p-0" align="start">
           <Command>
             <CommandInput placeholder="Search categories..." />
-            <CommandEmpty> No category found. </CommandEmpty>
+            <CommandEmpty>No category found.</CommandEmpty>
             <CommandList>
               <CommandGroup>
                 <CommandItem
@@ -146,7 +136,6 @@ const flatCategories = computed(() =>
           class="gap-1"
         >
           {{ flatCategories.find((c) => c.id === id)?.name }}
-
           <button
             type="button"
             @click="categoryIds = categoryIds.filter((x) => x !== id)"
@@ -160,8 +149,13 @@ const flatCategories = computed(() =>
     <div class="flex gap-6">
       <Label class="flex items-center gap-2">
         <Checkbox v-model:checked="isFeatured" />
-
         Featured
+      </Label>
+
+      <!-- Only shown when Edit passes -->
+      <Label v-if="isActive" class="flex items-center gap-2">
+        <Checkbox v-model:checked="isActive" />
+        Active (visible to buyers)
       </Label>
     </div>
   </div>
