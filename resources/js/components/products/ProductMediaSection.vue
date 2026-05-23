@@ -13,6 +13,7 @@ const imagePreviews = ref<string[]>([]);
 const videoPreview = ref<string | null>(null);
 
 const handleImages = (e: Event) => {
+
   const target = e.target as HTMLInputElement;
 
   const files = Array.from(target.files ?? []);
@@ -44,7 +45,6 @@ const handleVideo = (e: Event) => {
     <div>
       <div class="mb-2 flex items-center justify-between">
         <label class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Product Images</label>
-        <span class="text-xs text-zinc-500 dark:text-zinc-400">{{ images.length }} / 5</span>
       </div>
 
       <div class="flex flex-wrap gap-3">
