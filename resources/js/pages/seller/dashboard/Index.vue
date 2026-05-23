@@ -20,7 +20,7 @@ import DataTable from '@/components/DataTable.vue';
 import ProductVariantsTable from '@/components/products/ProductVariantsTable.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import { sellerProductsColumns } from '@/features/seller/columns';
+import { getSellerProductsColumns } from '@/features/seller/columns';
 import type { Store, SellerProduct } from '@/types';
 import seller from '@/routes/seller';
 
@@ -32,6 +32,24 @@ const props = defineProps<{
 }>();
 
 const activeTab = ref('products');
+
+const viewProduct = (productSlug: string) => {
+  // router.visit(seller.products.show(productSlug));
+};
+
+const editProduct = (productSlug: string) => {
+  // router.visit(seller.products.edit(productSlug));
+};
+
+const deleteProduct = (productSlug: string) => {
+  // router.visit(seller.products.destroy(productSlug));
+};
+
+const productColumns = getSellerProductsColumns({
+  viewProduct,
+  editProduct,
+  deleteProduct,
+});
 </script>
 
 <template>
@@ -84,7 +102,7 @@ const activeTab = ref('products');
           </div>
 
           <Link
-            href="/seller/products/create"
+            :href="seller.products.create()"
             class="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#009933] px-6 py-3.5 font-bold text-white shadow-md transition-colors hover:bg-green-700 active:scale-95"
           >
             <PlusIcon class="h-5 w-5" /> Add New Product
@@ -212,7 +230,7 @@ const activeTab = ref('products');
             </div>
 
             <div v-else class="custom-scrollbar overflow-x-auto">
-              <DataTable :columns="sellerProductsColumns" :data="products.data">
+              <DataTable :columns="productColumns" :data="products.data">
                 <template #expanded-row="{ row }">
                   <ProductVariantsTable :variants="row.variants" />
                 </template>
