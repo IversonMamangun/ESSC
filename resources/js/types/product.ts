@@ -1,6 +1,7 @@
 export interface Product {
   id: string;
   name: string;
+  slug: string;
   is_active: boolean;
   is_featured: boolean;
   views: number;
@@ -59,12 +60,15 @@ export interface ProductVariantAttributeForm {
   is_new?: boolean;
 }
 export interface ProductVariantForm {
+  id?: number | null;
   sku: string;
   price: number | undefined;
   compare_price: number | undefined;
   stock: number;
   weight: number | undefined;
   image: File | null;
+  existingImageUrl?: string | null;
+  delete_image?: boolean;
   is_default: boolean;
   attributes: ProductVariantAttributeForm[];
 }
@@ -76,4 +80,38 @@ export interface ProductForm {
   images: File[];
   video: File | null;
   variants: ProductVariantForm[];
+}
+// update
+export interface ExistingProductImage {
+  id: number;
+  url: string;
+  sort_order: number;
+}
+export interface ExistingProductData extends Omit<
+  ProductForm,
+  'images' | 'video' | 'variants'
+> {
+  id: number;
+  slug: string;
+  is_active: boolean;
+  images: ExistingProductImage[];
+  video: string | null;
+  variants: ExistingProductVariant[];
+}
+export interface ExistingProductVariant extends Omit<
+  ProductVariantForm,
+  'price' | 'compare_price' | 'weight' | 'image'
+> {
+  id: number;
+  price: number;
+  compare_price: number | null;
+  weight: number | null;
+  image: string | null;
+  attributes: ProductVariantAttributeForm[];
+}
+export interface ProductUpdateForm extends ProductForm {
+  is_active: boolean;
+  deleted_image_ids: number[];
+  delete_video: boolean;
+  deleted_variant_ids: number[];
 }
