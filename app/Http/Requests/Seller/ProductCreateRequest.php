@@ -14,7 +14,7 @@ class ProductCreateRequest extends FormRequest
     public function authorize(): bool
     {
         $user = $this->user()->loadMissing(['store']);
-        return !$user->store;
+        return $user->store && $user->store->is_active;
     }
 
     /**
@@ -32,8 +32,9 @@ class ProductCreateRequest extends FormRequest
                 'max:255',
             ],
             'description' => [
-                'nullable',
+                'required',
                 'string',
+                'max:1000',
             ],
             'category_ids' => [
                 'required',
@@ -51,7 +52,7 @@ class ProductCreateRequest extends FormRequest
             ],
             // media
             'images' => [
-                'nullable',
+                'required',
                 'array',
             ],
             'images.*' => [
