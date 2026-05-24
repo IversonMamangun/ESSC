@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { Head, useForm, Link } from '@inertiajs/vue3';
+import { ArrowLeftIcon } from 'lucide-vue-next';
 import { ref } from 'vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import { ArrowLeftIcon } from 'lucide-vue-next';
-import type { Store } from '@/types';
 import seller from '@/routes/seller';
+import type { Store } from '@/types';
 
 const props = defineProps<{
   store: Store;

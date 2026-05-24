@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { Head, useForm } from '@inertiajs/vue3';
+import { StoreIcon } from 'lucide-vue-next';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import seller from '@/routes/seller';
-import { StoreIcon } from 'lucide-vue-next';
 
 const form = useForm({
   name: '',
