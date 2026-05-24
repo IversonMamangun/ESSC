@@ -6,6 +6,7 @@ import type { Category } from '@/types';
 import { computed } from 'vue';
 import { CheckIcon, ChevronsUpDownIcon, XIcon } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
+import InputError from '@/components/InputError.vue';
 import {
   Command,
   CommandEmpty,
@@ -51,37 +52,48 @@ const flatCategories = computed(() =>
 </script>
 
 <template>
-  <div class="space-y-6 rounded-2xl border p-6">
+  <div class="space-y-6 border-b p-6">
     <div>
-      <Label>Product Name</Label>
+      <Label class="mb-1.5 font-bold text-zinc-700 dark:text-zinc-300"
+        >Product Name</Label
+      >
 
-      <Input v-model="name" />
-      <p v-if="errors?.name" class="mt-1 text-sm text-destructive">
-        {{ errors.name }}
-      </p>
+      <Input
+        v-model="name"
+        placeholder="What are you selling?"
+        class="rounded-xl border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
+      />
+      <InputError :message="errors?.name" class="mt-0.5" />
     </div>
 
     <div>
-      <Label>Description</Label>
+      <Label class="mb-1.5 font-bold text-zinc-700 dark:text-zinc-300"
+        >Description</Label
+      >
 
       <textarea
         v-model="description"
-        class="min-h-32 w-full rounded-md border bg-background px-3 py-2"
+        placeholder="Provide details about your product..."
+        rows="4"
+        class="w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
       />
+      <InputError :message="errors?.description" />
     </div>
 
-    <div class="space-y-2">
-      <Label>Categories</Label>
+    <div>
+      <Label class="mb-1.5 font-bold text-zinc-700 dark:text-zinc-300"
+        >Categories</Label
+      >
       <Popover>
         <PopoverTrigger as-child>
-          <Button variant="outline" class="w-full justify-between">
-            <span class="truncate">
-              {{
-                categoryIds.length
-                  ? `${categoryIds.length} categories selected`
-                  : 'Select categories'
-              }}
+          <Button
+            variant="outline"
+            class="w-full cursor-pointer justify-between rounded-xl border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
+          >
+            <span v-if="categoryIds.length" class="truncate">
+              {{ `${categoryIds.length} categories selected` }}
             </span>
+            <span v-else class="text-zinc-400">Select categories</span>
 
             <ChevronsUpDownIcon class="ml-2 h-4 w-4 opacity-50" />
           </Button>
@@ -108,6 +120,7 @@ const flatCategories = computed(() =>
                       }
                     }
                   "
+                  class="cursor-pointer hover:bg-accent/50"
                 >
                   <CheckIcon
                     :class="
@@ -128,7 +141,7 @@ const flatCategories = computed(() =>
       </Popover>
 
       <!-- selected -->
-      <div class="flex flex-wrap gap-2">
+      <div v-if="categoryIds.length" class="mt-2.5 flex flex-wrap gap-2">
         <Badge
           v-for="id in categoryIds"
           :key="id"
@@ -137,6 +150,7 @@ const flatCategories = computed(() =>
         >
           {{ flatCategories.find((c) => c.id === id)?.name }}
           <button
+            class="cursor-pointer hover:text-destructive"
             type="button"
             @click="categoryIds = categoryIds.filter((x) => x !== id)"
           >
@@ -144,19 +158,49 @@ const flatCategories = computed(() =>
           </button>
         </Badge>
       </div>
+
+      <InputError :message="errors?.category_ids" class="mt-0.5" />
     </div>
 
-    <div class="flex gap-6">
-      <Label class="flex items-center gap-2">
-        <Checkbox v-model:checked="isFeatured" />
-        Featured
-      </Label>
+    <div class="flex flex-col gap-6">
+      <div class="w-full">
+        <Label
+          class="flex cursor-pointer items-center gap-4 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800/50"
+        >
+          <Checkbox v-model:checked="isFeatured" class="border-zinc-500" />
+          <div class="flex flex-col select-none">
+            <span
+              class="text-sm font-bold text-zinc-900 transition-colors group-hover:text-[#009933] dark:text-white"
+            >
+              Feature as a Top Deal
+            </span>
+            <span class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+              Checking this box will place it directly on the main store
+              homepage carousel.
+            </span>
+          </div>
+        </Label>
+        <InputError :message="errors?.is_featured" class="mt-0.5" />
+      </div>
 
       <!-- Only shown when Edit passes -->
-      <Label v-if="isActive" class="flex items-center gap-2">
-        <Checkbox v-model:checked="isActive" />
-        Active (visible to buyers)
-      </Label>
+      <div v-if="isActive" class="w-full">
+        <Label
+          class="flex cursor-pointer items-center gap-4 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800/50"
+        >
+          <Checkbox v-model:checked="isActive" class="border-zinc-500" />
+          <div class="flex flex-col select-none">
+            <span
+              class="text-sm font-bold text-zinc-900 transition-colors group-hover:text-[#009933] dark:text-white"
+            >
+              Active
+            </span>
+            <span class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+              Checking this box will make the product visible to buyers.
+            </span>
+          </div>
+        </Label>
+      </div>
     </div>
   </div>
 </template>

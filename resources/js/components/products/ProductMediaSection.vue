@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { XIcon, VideoIcon } from 'lucide-vue-next';
+import { XIcon, VideoIcon, PlusIcon } from 'lucide-vue-next';
+import { Label } from '@/components/ui/label';
+import InputError from '@/components/InputError.vue';
 import type { ExistingProductImage } from '@/types';
 
 // edit passing props
@@ -78,31 +80,27 @@ const showExistingVideo = computed(
 </script>
 
 <template>
-  <div
-    class="space-y-6 rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900"
-  >
+  <div class="grid grid-cols-[2fr_1fr] gap-8 space-y-6 border-b p-6">
     <!-- Images -->
     <div>
-      <label
-        class="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-      >
+      <Label class="mb-4 font-bold text-zinc-700 dark:text-zinc-300">
         Product Images
-      </label>
+      </Label>
 
       <div class="flex flex-wrap gap-3">
         <!-- Existing images (edit mode) -->
         <div
           v-for="img in visibleExistingImages"
           :key="`existing-${img.id}`"
-          class="group relative h-20 w-20 rounded border border-zinc-200 dark:border-zinc-700"
+          class="group relative h-36 w-36 rounded border border-zinc-200 dark:border-zinc-700"
         >
           <img :src="img.url" class="h-full w-full rounded object-cover" />
           <button
             type="button"
-            class="absolute -top-1.5 -right-1.5 hidden rounded-full bg-red-500 p-0.5 text-white group-hover:flex"
+            class="absolute -top-1.5 -right-1.5 hidden cursor-pointer rounded-full bg-red-500 p-0.5 text-white group-hover:flex"
             @click="markImageDeleted(img.id)"
           >
-            <XIcon class="h-3 w-3" />
+            <XIcon class="h-4 w-4" />
           </button>
         </div>
 
@@ -110,36 +108,29 @@ const showExistingVideo = computed(
         <div
           v-for="(src, i) in newImagePreviews"
           :key="`new-${src}`"
-          class="group relative h-20 w-20 rounded border border-zinc-200 dark:border-zinc-700"
+          class="group relative h-36 w-36 rounded border border-zinc-200 dark:border-zinc-700"
         >
           <img :src="src" class="h-full w-full rounded object-cover" />
           <button
             type="button"
-            class="absolute -top-1.5 -right-1.5 hidden rounded-full bg-red-500 p-0.5 text-white group-hover:flex"
+            class="absolute -top-1.5 -right-1.5 hidden cursor-pointer rounded-full bg-red-500 p-0.5 text-white group-hover:flex"
             @click="removeNewImage(i)"
           >
-            <XIcon class="h-3 w-3" />
+            <XIcon class="h-4 w-4" />
           </button>
         </div>
 
         <!-- Upload button -->
         <label
-          class="flex h-20 w-20 cursor-pointer flex-col items-center justify-center rounded border border-dashed border-zinc-300 bg-zinc-50 text-zinc-500 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+          class="group flex h-36 w-36 cursor-pointer flex-col items-center justify-center rounded border-2 border-dashed border-zinc-300 bg-zinc-50 text-zinc-500 hover:border-zinc-800 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-200"
         >
-          <svg
-            class="mb-1 h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+          <PlusIcon
+            class="mb-2 h-6 w-6 group-hover:text-zinc-800 dark:group-hover:text-zinc-200"
+          />
+          <span
+            class="text-xs font-medium group-hover:text-zinc-800 dark:group-hover:text-zinc-200"
+            >Add Photo</span
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
-          <span class="text-[10px] font-medium">Add Photo</span>
           <input
             type="file"
             multiple
@@ -149,34 +140,34 @@ const showExistingVideo = computed(
           />
         </label>
       </div>
+
+      <InputError :message="errors?.images" class="mt-1.5" />
     </div>
 
     <!-- Video -->
     <div>
-      <label
-        class="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-      >
+      <Label class="mb-4 font-bold text-zinc-700 dark:text-zinc-300">
         Product Video
-      </label>
+      </Label>
 
       <div class="flex flex-wrap gap-3">
         <!-- Existing video preview (edit mode) -->
         <div
           v-if="showExistingVideo"
-          class="relative h-20 w-20 rounded border border-zinc-200 bg-black dark:border-zinc-700"
+          class="group relative h-36 w-60 rounded border border-zinc-200 dark:border-zinc-700"
         >
           <video
             :src="existingVideo!"
             controls
             class="h-full w-full rounded object-cover"
           />
-          <div class="absolute -top-1.5 -right-1.5 flex gap-1">
+          <div class="absolute -top-1.5 -right-1.5 flex gap-2">
             <label
-              class="cursor-pointer rounded-full bg-zinc-700 p-0.5 text-white"
+              class="cursor-pointer rounded-full bg-blue-500 p-1 text-white"
               title="Replace video"
               @click="handleReplaceVideo"
             >
-              <VideoIcon class="h-3 w-3" />
+              <VideoIcon class="mx-0.5 h-4 w-4" />
               <input
                 type="file"
                 accept="video/*"
@@ -186,11 +177,11 @@ const showExistingVideo = computed(
             </label>
             <button
               type="button"
-              class="rounded-full bg-red-500 p-0.5 text-white"
+              class="cursor-pointer rounded-full bg-red-500 p-1 text-white"
               title="Remove video"
               @click="handleDeleteVideo"
             >
-              <XIcon class="h-3 w-3" />
+              <XIcon class="h-4 w-4" />
             </button>
           </div>
         </div>
@@ -198,7 +189,7 @@ const showExistingVideo = computed(
         <!-- New video preview -->
         <div
           v-else-if="newVideoPreview"
-          class="relative h-20 w-20 rounded border border-zinc-200 bg-black dark:border-zinc-700"
+          class="group relative h-36 w-60 rounded border border-zinc-200 dark:border-zinc-700"
         >
           <video
             :src="newVideoPreview"
@@ -207,7 +198,7 @@ const showExistingVideo = computed(
           />
           <button
             type="button"
-            class="absolute -top-1.5 -right-1.5 rounded-full bg-red-500 p-0.5 text-white"
+            class="absolute -top-1.5 -right-1.5 cursor-pointer rounded-full bg-red-500 p-1 text-white"
             @click="
               () => {
                 video = null;
@@ -215,29 +206,22 @@ const showExistingVideo = computed(
               }
             "
           >
-            <XIcon class="h-3 w-3" />
+            <XIcon class="h-4 w-4" />
           </button>
         </div>
 
         <!-- Upload button (shown when no video exists / video was deleted) -->
         <label
           v-else
-          class="flex h-20 w-20 cursor-pointer flex-col items-center justify-center rounded border border-dashed border-zinc-300 bg-zinc-50 text-zinc-500 hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700"
+          class="group flex h-36 w-60 cursor-pointer flex-col items-center justify-center rounded border-2 border-dashed border-zinc-300 bg-zinc-50 text-zinc-500 hover:border-zinc-800 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-200"
         >
-          <svg
-            class="mb-1 h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+          <VideoIcon
+            class="mb-2 h-6 w-6 group-hover:text-zinc-800 dark:group-hover:text-zinc-200"
+          />
+          <span
+            class="text-xs font-medium group-hover:text-zinc-800 dark:group-hover:text-zinc-200"
+            >Add Video</span
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-            />
-          </svg>
-          <span class="text-[10px] font-medium">Add Video</span>
           <input
             type="file"
             accept="video/*"
@@ -246,6 +230,8 @@ const showExistingVideo = computed(
           />
         </label>
       </div>
+
+      <InputError :message="errors?.video" class="mt-1.5" />
     </div>
   </div>
 </template>
