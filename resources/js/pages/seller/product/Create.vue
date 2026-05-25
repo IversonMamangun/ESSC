@@ -74,6 +74,7 @@ const submit = () => {
           <ProductVariantsSection
             v-model="form.variants"
             :attributes="attributes"
+            :errors="form.errors"
           />
 
           <button

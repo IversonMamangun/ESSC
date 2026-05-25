@@ -13,6 +13,7 @@ import type {
 
 const props = defineProps<{
   attributes: FormAttribute[];
+  errors?: Record<string, string>;
 }>();
 
 const model = defineModel<ProductVariantForm[]>({ required: true });
@@ -161,7 +162,7 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
 </script>
 
 <template>
-  <div class="space-y-6 rounded-2xl border p-6">
+  <div class="space-y-6 p-6">
     <div class="flex items-center justify-between">
       <div>
         <h2 class="text-xl font-semibold">Variants</h2>
@@ -171,7 +172,7 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
         </p>
       </div>
 
-      <Button type="button" @click="addVariant">
+      <Button type="button" @click="addVariant" class="cursor-pointer">
         <PlusIcon class="mr-2 h-4 w-4" />
 
         Add Variant
@@ -207,6 +208,7 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
             type="button"
             variant="outline"
             size="sm"
+            class="cursor-pointer"
             @click="duplicateVariant(variant)"
           >
             <CopyIcon class="h-4 w-4" />
@@ -216,6 +218,7 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
             type="button"
             variant="destructive"
             size="sm"
+            class="cursor-pointer"
             @click="removeVariant(variantIndex)"
           >
             <Trash2Icon class="h-4 w-4" />
@@ -232,6 +235,7 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
             type="button"
             variant="outline"
             size="sm"
+            class="cursor-pointer"
             @click="addAttribute(variant)"
           >
             <PlusIcon class="mr-2 h-4 w-4" />
@@ -252,9 +256,11 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
 
               <select
                 v-model="attribute.attribute_id"
-                class="w-full rounded-md border bg-background px-3 py-2"
+                class="w-full cursor-pointer rounded-xl border border-zinc-200 bg-white p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
               >
-                <option :value="null">Select Attribute</option>
+                <option :value="null" class="text-zinc-400">
+                  Select Attribute
+                </option>
                 <option
                   v-for="attr in attributes"
                   :key="attr.id"
@@ -271,7 +277,7 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
 
               <select
                 v-model="attribute.value_id"
-                class="w-full rounded-md border bg-background px-3 py-2"
+                class="w-full cursor-pointer rounded-xl border border-zinc-200 bg-white p-2 text-sm dark:border-zinc-700 dark:bg-zinc-800"
                 @change="syncSelectedValue(attribute)"
               >
                 <option :value="null">Select Value</option>
@@ -295,11 +301,13 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
               <Input
                 v-model="newValueInputs[`${variantIndex}-${attributeIndex}`]"
                 placeholder="Enter custom value"
+                class="rounded-xl border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
               />
 
               <Button
                 type="button"
                 variant="secondary"
+                class="cursor-pointer"
                 @click="addCustomValue(variantIndex, attributeIndex, attribute)"
               >
                 Add
@@ -307,11 +315,16 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
             </div>
           </div>
 
-          <div class="mt-4 flex justify-end">
+          <div class="mt-4 flex justify-between">
+            <span class="text-sm text-zinc-500 dark:text-zinc-400"
+              >selected:
+              <span class="text-blue-500"> {{ attribute.value }}</span></span
+            >
             <Button
               type="button"
               variant="ghost"
               size="sm"
+              class="cursor-pointer"
               @click="removeAttribute(variant, attributeIndex)"
             >
               <Trash2Icon class="mr-2 h-4 w-4" />
@@ -327,71 +340,67 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
         <div class="space-y-2">
           <Label>SKU</Label>
 
-          <Input v-model="variant.sku" />
+          <Input
+            v-model="variant.sku"
+            placeholder="Stock Keeping Unit"
+            class="rounded-xl border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
+          />
         </div>
 
         <div class="space-y-2">
           <Label>Price</Label>
 
-          <Input v-model="variant.price" type="number" />
+          <Input
+            v-model="variant.price"
+            type="number"
+            placeholder="0.00"
+            class="rounded-xl border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
+          />
         </div>
 
         <div class="space-y-2">
           <Label>Compare Price</Label>
 
-          <Input v-model="variant.compare_price" type="number" />
+          <Input
+            v-model="variant.compare_price"
+            type="number"
+            placeholder="0.00"
+            class="rounded-xl border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
+          />
         </div>
       </div>
 
-      <!-- inventory + default -->
-      <div class="grid gap-4 md:grid-cols-2">
+      <!-- inventory + default + shipping + images -->
+      <div class="grid grid-cols-[2fr_1fr] grid-rows-3 gap-4">
         <div class="space-y-2">
           <Label>Stock</Label>
 
-          <Input v-model="variant.stock" type="number" />
-        </div>
-
-        <div class="flex items-center gap-2 pt-8">
-          <Checkbox
-            :checked="variant.is_default"
-            @update:checked="setDefaultVariant(variantIndex)"
-          />
-
-          <Label> Default Variant </Label>
-        </div>
-      </div>
-
-      <!-- shipping -->
-      <div class="grid gap-4 md:grid-cols-2">
-        <div class="space-y-2">
-          <Label> Weight (kg) </Label>
-
           <Input
-            v-model="variant.weight"
+            v-model="variant.stock"
             type="number"
-            step="0.01"
-            placeholder="Optional"
+            placeholder="0"
+            class="rounded-xl border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
           />
         </div>
 
-        <div class="space-y-2">
+        <div class="row-span-3 space-y-2">
           <Label>Variant Image</Label>
 
           <!-- image preview (new upload or existing) -->
           <div
             v-if="getVariantImageSrc(variantIndex)"
-            class="group relative inline-block"
+            class="group relative h-36 w-36 rounded border border-zinc-200 dark:border-zinc-700"
           >
             <img
               :src="getVariantImageSrc(variantIndex)!"
-              class="h-24 w-24 rounded-xl border object-cover"
+              class="h-full w-full rounded object-cover"
             />
             <button
               type="button"
-              class="absolute -top-1.5 -right-1.5 hidden rounded-full bg-red-500 p-0.5 text-white group-hover:flex"
+              class="absolute -top-1.5 -right-1.5 hidden cursor-pointer rounded-full bg-red-500 p-0.5 text-white group-hover:flex"
               @click="removeVariantImage(variantIndex)"
             >
-              <XIcon class="h-3 w-3" />
+              <XIcon class="h-4 w-4" />
             </button>
           </div>
 
@@ -406,7 +415,7 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
           <!-- replace button when image exists -->
           <label v-if="getVariantImageSrc(variantIndex)" class="mt-1 block">
             <span
-              class="cursor-pointer text-xs text-zinc-500 underline hover:text-zinc-800"
+              class="cursor-pointer text-xs text-zinc-500 underline hover:text-zinc-400"
             >
               Replace image
             </span>
@@ -417,6 +426,41 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
               @change="handleVariantImage($event, variantIndex)"
             />
           </label>
+        </div>
+
+        <div class="space-y-2">
+          <Label>Weight (kg)</Label>
+
+          <Input
+            v-model="variant.weight"
+            type="number"
+            step="0.01"
+            placeholder="0.00"
+            class="rounded-xl border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
+          />
+        </div>
+
+        <div class="w-full">
+          <Label
+            class="flex cursor-pointer items-center gap-4 rounded-xl border border-zinc-200 bg-white px-5 py-2.5 dark:border-zinc-700 dark:bg-zinc-800/50"
+          >
+            <Checkbox
+              :checked="variant.is_default"
+              @update:checked="setDefaultVariant(variantIndex)"
+              class="border-zinc-500"
+            />
+            <div class="flex flex-col select-none">
+              <span
+                class="text-sm font-bold text-zinc-900 transition-colors group-hover:text-[#009933] dark:text-white"
+              >
+                Default Variant
+              </span>
+              <span class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                Checking this box will make this variant the default.
+              </span>
+            </div>
+          </Label>
+          <InputError :message="errors?.is_featured" class="mt-0.5" />
         </div>
       </div>
     </div>
