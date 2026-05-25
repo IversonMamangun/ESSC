@@ -1,5 +1,5 @@
-import { watch } from 'vue';
 import { usePage } from '@inertiajs/vue3';
+import { watch } from 'vue';
 import { toast } from 'vue-sonner';
 
 interface FlashProps {
@@ -20,8 +20,10 @@ export function useFlashToast() {
   watch(
     () => page.props?.flash,
     (flash) => {
-      if (!flash) return;
-
+      if (!flash) {
+        return;
+      }
+      
       if (flash.success) {
         toast.success(flash.success);
       }
