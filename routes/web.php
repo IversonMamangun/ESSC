@@ -31,11 +31,11 @@ Route::middleware('guest')->group(function () {
 });
 
 // dedicated guest shop routes
-Route::prefix('shop')
-->name('shop.')
+Route::name('shop.')
 ->group(function () {
-
-
+    Route::inertia('/home', 'shop/public/Home');
+    Route::inertia('/product/{id}', 'shop/public/Product');
+    Route::inertia('/store/{id}', 'shop/public/Store');
 });
 
 // dedicated customer shop routes (customer experience)
