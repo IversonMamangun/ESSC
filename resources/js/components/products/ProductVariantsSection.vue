@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { PlusIcon, Trash2Icon, CopyIcon, XIcon } from 'lucide-vue-next';
+import InputError from '@/components/InputError.vue';
 import type {
   ProductVariantForm,
   ProductVariantAttributeForm,
@@ -17,6 +18,7 @@ const props = defineProps<{
 }>();
 
 const model = defineModel<ProductVariantForm[]>({ required: true });
+const totalVariants = computed(() => model.value.length);
 
 // Tracks IDs of variants the user removed (Edit only; ignored in Create)
 const deletedVariantIds = defineModel<number[]>('deletedVariantIds', {
@@ -165,7 +167,15 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
   <div class="space-y-6 p-6">
     <div class="flex items-center justify-between">
       <div>
-        <h2 class="text-xl font-semibold">Variants</h2>
+        <div class="flex items-center gap-3">
+          <h2 class="text-xl font-semibold">Variants</h2>
+
+          <span
+            class="rounded-full bg-zinc-100 px-2.5 py-1 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
+          >
+            {{ totalVariants }} variants
+          </span>
+        </div>
 
         <p class="text-sm text-muted-foreground">
           Create and manage product variants.
@@ -178,6 +188,7 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
         Add Variant
       </Button>
     </div>
+    <InputError :message="errors?.variants" />
 
     <div
       v-if="!model.length"
@@ -228,21 +239,27 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
 
       <!-- attributes -->
       <div class="space-y-4">
-        <div class="flex items-center justify-between">
-          <Label>Attributes</Label>
+        <div>
+          <div class="flex items-center justify-between">
+            <Label>Attributes</Label>
 
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            class="cursor-pointer"
-            @click="addAttribute(variant)"
-          >
-            <PlusIcon class="mr-2 h-4 w-4" />
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              class="cursor-pointer"
+              @click="addAttribute(variant)"
+            >
+              <PlusIcon class="mr-2 h-4 w-4" />
 
-            Add Attribute
-          </Button>
+              Add Attribute
+            </Button>
+          </div>
         </div>
+
+        <InputError
+          :message="errors?.[`variants.${variantIndex}.attributes`]"
+        />
 
         <div
           v-for="(attribute, attributeIndex) in variant.attributes"
@@ -269,6 +286,13 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
                   {{ attr.name }}
                 </option>
               </select>
+              <InputError
+                :message="
+                  errors?.[
+                    `variants.${variantIndex}.attributes.${attributeIndex}.attribute_id`
+                  ]
+                "
+              />
             </div>
 
             <!-- values -->
@@ -290,6 +314,20 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
                   {{ value.value }}
                 </option>
               </select>
+              <InputError
+                :message="
+                  errors?.[
+                    `variants.${variantIndex}.attributes.${attributeIndex}.value_id`
+                  ]
+                "
+              />
+              <InputError
+                :message="
+                  errors?.[
+                    `variants.${variantIndex}.attributes.${attributeIndex}.value`
+                  ]
+                "
+              />
             </div>
           </div>
 
@@ -300,7 +338,9 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
             <div class="mt-2 flex gap-2">
               <Input
                 v-model="newValueInputs[`${variantIndex}-${attributeIndex}`]"
+                :disabled="attribute.value_id"
                 placeholder="Enter custom value"
+                maxlength="50"
                 class="rounded-xl border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
               />
 
@@ -308,6 +348,7 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
                 type="button"
                 variant="secondary"
                 class="cursor-pointer"
+                :disabled="attribute.value_id"
                 @click="addCustomValue(variantIndex, attributeIndex, attribute)"
               >
                 Add
@@ -345,6 +386,7 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
             placeholder="Stock Keeping Unit"
             class="rounded-xl border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
           />
+          <InputError :message="errors?.[`variants.${variantIndex}.sku`]" />
         </div>
 
         <div class="space-y-2">
@@ -356,6 +398,7 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
             placeholder="0.00"
             class="rounded-xl border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
           />
+          <InputError :message="errors?.[`variants.${variantIndex}.price`]" />
         </div>
 
         <div class="space-y-2">
@@ -366,6 +409,9 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
             type="number"
             placeholder="0.00"
             class="rounded-xl border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
+          />
+          <InputError
+            :message="errors?.[`variants.${variantIndex}.compare_price`]"
           />
         </div>
       </div>
@@ -381,10 +427,17 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
             placeholder="0"
             class="rounded-xl border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
           />
+          <InputError :message="errors?.[`variants.${variantIndex}.stock`]" />
         </div>
 
         <div class="row-span-3 space-y-2">
-          <Label>Variant Image</Label>
+          <div class="flex items-center justify-between">
+            <Label>Variant Image</Label>
+
+            <span class="text-xs text-zinc-500">
+              {{ getVariantImageSrc(variantIndex) ? '1/1' : '0/1' }}
+            </span>
+          </div>
 
           <!-- image preview (new upload or existing) -->
           <div
@@ -405,15 +458,27 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
           </div>
 
           <!-- upload input (shown when no image) -->
-          <Input
+          <Label
             v-else
-            type="file"
-            accept="image/*"
-            @change="handleVariantImage($event, variantIndex)"
-          />
+            class="group flex h-36 w-36 cursor-pointer flex-col items-center justify-center rounded border-2 border-dashed border-zinc-300 bg-zinc-50 text-zinc-500 hover:border-zinc-800 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-200"
+          >
+            <PlusIcon
+              class="mb-2 h-6 w-6 group-hover:text-zinc-800 dark:group-hover:text-zinc-200"
+            />
+            <span
+              class="text-xs font-medium group-hover:text-zinc-800 dark:group-hover:text-zinc-200"
+              >Add Photo</span
+            >
+            <Input
+              type="file"
+              accept="image/*"
+              class="hidden"
+              @change="handleVariantImage($event, variantIndex)"
+            />
+          </Label>
 
           <!-- replace button when image exists -->
-          <label v-if="getVariantImageSrc(variantIndex)" class="mt-1 block">
+          <Label v-if="getVariantImageSrc(variantIndex)" class="mt-1 block">
             <span
               class="cursor-pointer text-xs text-zinc-500 underline hover:text-zinc-400"
             >
@@ -425,7 +490,9 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
               class="hidden"
               @change="handleVariantImage($event, variantIndex)"
             />
-          </label>
+          </Label>
+
+          <InputError :message="errors?.[`variants.${variantIndex}.image`]" />
         </div>
 
         <div class="space-y-2">
@@ -438,6 +505,7 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
             placeholder="0.00"
             class="rounded-xl border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800"
           />
+          <InputError :message="errors?.[`variants.${variantIndex}.weight`]" />
         </div>
 
         <div class="w-full">
@@ -460,7 +528,7 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
               </span>
             </div>
           </Label>
-          <InputError :message="errors?.is_featured" class="mt-0.5" />
+          <InputError :message="errors?.is_default" />
         </div>
       </div>
     </div>

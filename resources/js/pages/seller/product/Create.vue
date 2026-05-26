@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, useForm, Link } from '@inertiajs/vue3';
-import { ArrowLeftIcon, PackageIcon } from 'lucide-vue-next';
+import { ArrowLeftIcon, PackageIcon, PackagePlusIcon } from 'lucide-vue-next';
+import { Button } from '@/components/ui/button';
 import ProductInfoSection from '@/components/products/ProductInfoSection.vue';
 import ProductMediaSection from '@/components/products/ProductMediaSection.vue';
 import ProductVariantsSection from '@/components/products/ProductVariantsSection.vue';
@@ -77,13 +78,16 @@ const submit = () => {
             :errors="form.errors"
           />
 
-          <button
-            type="submit"
-            class="rounded-xl bg-black px-6 py-3 text-white"
-            :disabled="form.processing"
-          >
-            Create Product
-          </button>
+          <div class="flex items-center justify-end gap-4">
+            <Button
+              type="submit"
+              class="cursor-pointer rounded-xl"
+              :disabled="form.processing"
+            >
+              <PackagePlusIcon />
+              Create Product
+            </Button>
+          </div>
         </form>
       </div>
     </div>

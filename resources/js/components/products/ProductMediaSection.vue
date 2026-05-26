@@ -32,6 +32,24 @@ const deleteVideo = defineModel<boolean>('deleteVideo', { default: false });
 const newImagePreviews = ref<string[]>([]);
 const newVideoPreview = ref<string | null>(null);
 
+const MAX_IMAGES = 5;
+const MAX_VIDEO = 1;
+
+const totalImages = computed(
+  () => visibleExistingImages.value.length + images.value.length,
+);
+
+const hasVideo = computed(
+  () =>
+    !!video.value ||
+    !!newVideoPreview.value ||
+    (!!props.existingVideo && !deleteVideo.value),
+);
+
+const remainingImages = computed(() => MAX_IMAGES - totalImages.value);
+const canAddImages = computed(() => totalImages.value < MAX_IMAGES);
+const canAddVideo = computed(() => !hasVideo.value);
+
 // Existing images not yet marked for deletion
 const visibleExistingImages = computed(() =>
   props.existingImages.filter((img) => !deletedImageIds.value.includes(img.id)),
@@ -44,9 +62,18 @@ const markImageDeleted = (id: number) => {
 };
 
 const handleImages = (e: Event) => {
-  const files = Array.from((e.target as HTMLInputElement).files ?? []);
-  images.value.push(...files);
-  newImagePreviews.value.push(...files.map((f) => URL.createObjectURL(f)));
+  const input = e.target as HTMLInputElement;
+  const files = Array.from(input.files ?? []);
+
+  if (!files.length) return;
+  const allowedFiles = files.slice(0, remainingImages.value);
+
+  images.value.push(...allowedFiles);
+  newImagePreviews.value.push(
+    ...allowedFiles.map((f) => URL.createObjectURL(f)),
+  );
+
+  input.value = '';
 };
 
 const removeNewImage = (index: number) => {
@@ -56,6 +83,7 @@ const removeNewImage = (index: number) => {
 };
 
 const handleVideo = (e: Event) => {
+  if (!canAddVideo.value) return;
   const file = (e.target as HTMLInputElement).files?.[0];
   if (!file) return;
   video.value = file;
@@ -83,9 +111,15 @@ const showExistingVideo = computed(
   <div class="grid grid-cols-[2fr_1fr] gap-8 space-y-6 border-b p-6">
     <!-- Images -->
     <div>
-      <Label class="mb-4 font-bold text-zinc-700 dark:text-zinc-300">
-        Product Images
-      </Label>
+      <div class="mb-4 flex items-center justify-between">
+        <Label class="font-bold text-zinc-700 dark:text-zinc-300">
+          Product Images
+        </Label>
+
+        <span class="text-sm text-zinc-500">
+          {{ totalImages }}/{{ MAX_IMAGES }}
+        </span>
+      </div>
 
       <div class="flex flex-wrap gap-3">
         <!-- Existing images (edit mode) -->
@@ -122,33 +156,49 @@ const showExistingVideo = computed(
 
         <!-- Upload button -->
         <label
-          class="group flex h-36 w-36 cursor-pointer flex-col items-center justify-center rounded border-2 border-dashed border-zinc-300 bg-zinc-50 text-zinc-500 hover:border-zinc-800 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-200"
+          :class="[
+            'group flex h-36 w-36 flex-col items-center justify-center rounded border-2 border-dashed transition',
+            canAddImages
+              ? 'cursor-pointer border-zinc-300 bg-zinc-50 text-zinc-500 hover:border-zinc-800 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-200'
+              : 'cursor-not-allowed border-zinc-200 bg-zinc-100 text-zinc-400 opacity-50',
+          ]"
         >
           <PlusIcon
             class="mb-2 h-6 w-6 group-hover:text-zinc-800 dark:group-hover:text-zinc-200"
           />
           <span
             class="text-xs font-medium group-hover:text-zinc-800 dark:group-hover:text-zinc-200"
-            >Add Photo</span
+            >{{ canAddImages ? 'Add Photo' : 'Limit Reached' }}</span
           >
           <input
             type="file"
             multiple
             accept="image/*"
             class="hidden"
+            :disabled="!canAddImages"
             @change="handleImages"
           />
         </label>
       </div>
 
       <InputError :message="errors?.images" class="mt-1.5" />
+
+      <div v-for="(_, index) in images" :key="index">
+        <InputError :message="errors?.[`images.${index}`]" class="mt-1.5" />
+      </div>
     </div>
 
     <!-- Video -->
     <div>
-      <Label class="mb-4 font-bold text-zinc-700 dark:text-zinc-300">
-        Product Video
-      </Label>
+      <div class="mb-4 flex items-center justify-between">
+        <Label class="font-bold text-zinc-700 dark:text-zinc-300">
+          Product Video
+        </Label>
+
+        <span class="text-sm text-zinc-500">
+          {{ hasVideo ? 1 : 0 }}/{{ MAX_VIDEO }}
+        </span>
+      </div>
 
       <div class="flex flex-wrap gap-3">
         <!-- Existing video preview (edit mode) -->
