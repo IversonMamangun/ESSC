@@ -38,7 +38,7 @@ const viewProduct = (productSlug: string) => {
 };
 
 const editProduct = (productSlug: string) => {
-  // router.visit(seller.products.edit(productSlug));
+  router.visit(seller.products.edit(productSlug));
 };
 
 const deleteProduct = (productSlug: string) => {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\AttributeResource;
+use App\Http\Resources\Seller\ProductEditResource;
 use App\Http\Requests\Seller\ProductCreateRequest;
 use App\Models\Product;
 use App\Models\Category;
@@ -177,8 +178,29 @@ class ProductController extends Controller
 
     public function edit(Request $request, Product $product)
     {
+        $product->load([
+            'categories',
+            'images',
+            'variants.attributeValues',
+        ]);
 
-        return Inertia::render('seller/product/Edit', []);
+        abort_unless(
+            $product->store_id === $request->user()->store->id,
+            403
+        );
+
+        return Inertia::render('seller/product/Edit', [
+            'product' => ProductEditResource::make($product)->resolve(),
+            'categories' => CategoryResource::collection(
+                Category::query()
+                    ->whereNull('parent_id')
+                    ->with('children')
+                    ->get()
+            )->resolve(),
+            'attributes' => AttributeResource::collection(
+                Attribute::with('values')->get()
+            )->resolve(),
+        ]);
     }
 
     public function update(Request $request, Product $product)
