@@ -54,6 +54,8 @@ class ProductCreateRequest extends FormRequest
             'images' => [
                 'required',
                 'array',
+                'min:1',
+                'max:5',
             ],
             'images.*' => [
                 'image',
@@ -70,6 +72,7 @@ class ProductCreateRequest extends FormRequest
                 'required',
                 'array',
                 'min:1',
+                'max:10',
             ],
             'variants.*.sku' => [
                 'required',
@@ -81,24 +84,29 @@ class ProductCreateRequest extends FormRequest
             'variants.*.price' => [
                 'required',
                 'numeric',
-                'min:0',
+                'min:1',
+                'max:999999.99',
             ],
             'variants.*.compare_price' => [
-                'nullable',
+                'required',
                 'numeric',
+                'min:1',
+                'max:999999.99',
             ],
             'variants.*.stock' => [
                 'required',
                 'integer',
-                'min:0',
+                'min:1',
+                'max:999999',
             ],
             'variants.*.weight' => [
-                'nullable',
+                'required',
                 'numeric',
-                'min:0',
+                'min:0.01',
+                'max:9000.99',
             ],
             'variants.*.image' => [
-                'nullable',
+                'required',
                 'image',
                 'max:2048',
             ],
@@ -121,6 +129,8 @@ class ProductCreateRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
+                'distinct',
+                'unique:attribute_values,value',
             ],
             'variants.*.attributes.*.value_id' => [
                 'nullable',
