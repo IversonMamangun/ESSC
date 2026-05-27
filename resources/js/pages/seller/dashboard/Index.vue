@@ -78,6 +78,9 @@ const productColumns = getSellerProductsColumns({
           <div class="flex items-center gap-6">
             <div
               class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#009933] text-3xl font-black text-white shadow-md"
+              :class="{
+                'bg-transparent': props.store.logo,
+              }"
             >
               <img
                 v-if="props.store.logo"

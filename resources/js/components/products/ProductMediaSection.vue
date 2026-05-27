@@ -160,7 +160,7 @@ const showExistingVideo = computed(
             'group flex h-36 w-36 flex-col items-center justify-center rounded border-2 border-dashed transition',
             canAddImages
               ? 'cursor-pointer border-zinc-300 bg-zinc-50 text-zinc-500 hover:border-zinc-800 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:border-zinc-200'
-              : 'cursor-not-allowed border-zinc-200 bg-zinc-100 text-zinc-400 opacity-50',
+              : 'cursor-not-allowed border-zinc-500 text-zinc-500 opacity-50',
           ]"
         >
           <PlusIcon
