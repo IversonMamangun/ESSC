@@ -55,7 +55,7 @@ class ProductController extends Controller
                     $validated['name']
                 ),
                 'description' => $validated['description'],
-                'is_active' => $validated['is_active'],
+                'is_active' => true,
                 'is_featured' => $validated['is_featured'],
             ]);
 

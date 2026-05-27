@@ -129,8 +129,6 @@ class ProductCreateRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                'distinct',
-                'unique:attribute_values,value',
             ],
             'variants.*.attributes.*.value_id' => [
                 'nullable',

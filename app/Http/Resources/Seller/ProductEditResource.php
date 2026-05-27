@@ -20,6 +20,7 @@ class ProductEditResource extends JsonResource
             'name' => $this->name,
             'description' => $this->description,
             'is_featured' => $this->is_featured,
+            'is_active' => $this->is_active,
             'category_ids' => $this->categories
                 ->pluck('id')
                 ->values(),
