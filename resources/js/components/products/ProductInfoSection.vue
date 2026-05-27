@@ -33,7 +33,9 @@ const description = defineModel<string>('description', { required: true });
 const categoryIds = defineModel<number[]>('categoryIds', { required: true });
 const isFeatured = defineModel<boolean>('isFeatured', { required: true });
 
-const isActive = defineModel<boolean>('isActive');
+const isActive = defineModel<boolean | undefined>('isActive', {
+  default: undefined,
+});
 
 const flattenCategories = (
   categories: Category[] = [],
@@ -167,7 +169,11 @@ const flatCategories = computed(() =>
         <Label
           class="flex cursor-pointer items-center gap-4 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800/50"
         >
-          <Checkbox v-model:checked="isFeatured" class="border-zinc-500" />
+          <Checkbox
+            :model-value="isFeatured === true"
+            @update:model-value="(val) => (isFeatured = val === true)"
+            class="border-zinc-500"
+          />
           <div class="flex flex-col select-none">
             <span
               class="text-sm font-bold text-zinc-900 transition-colors group-hover:text-[#009933] dark:text-white"
@@ -184,11 +190,15 @@ const flatCategories = computed(() =>
       </div>
 
       <!-- Only shown when Edit passes -->
-      <div v-if="isActive" class="w-full">
+      <div v-if="isActive !== undefined" class="w-full">
         <Label
           class="flex cursor-pointer items-center gap-4 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800/50"
         >
-          <Checkbox v-model:checked="isActive" class="border-zinc-500" />
+          <Checkbox
+            :model-value="isActive === true"
+            @update:model-value="(val) => (isActive = val === true)"
+            class="border-zinc-500"
+          />
           <div class="flex flex-col select-none">
             <span
               class="text-sm font-bold text-zinc-900 transition-colors group-hover:text-[#009933] dark:text-white"

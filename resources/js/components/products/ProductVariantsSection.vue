@@ -513,8 +513,8 @@ const getVariantImageSrc = (variantIndex: number): string | null =>
             class="flex cursor-pointer items-center gap-4 rounded-xl border border-zinc-200 bg-white px-5 py-2.5 dark:border-zinc-700 dark:bg-zinc-800/50"
           >
             <Checkbox
-              :checked="variant.is_default"
-              @update:checked="setDefaultVariant(variantIndex)"
+              :model-value="variant.is_default === true"
+              @update:model-value="setDefaultVariant(variantIndex)"
               class="border-zinc-500"
             />
             <div class="flex flex-col select-none">
