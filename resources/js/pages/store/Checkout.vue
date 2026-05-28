@@ -54,7 +54,10 @@ const selectedAddress = computed(() => {
 const hasAddress = computed(() => !!selectedAddress.value);
 
 const submitOrder = () => {
-    if (!hasAddress.value) return; 
+    if (!hasAddress.value) {
+        return; 
+    }
+    
     form.post('/checkout');
 };
 
