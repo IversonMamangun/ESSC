@@ -210,18 +210,6 @@ class ProductController extends Controller
 
     protected function generateUniqueSlug(string $name): string 
     {
-        $slug = Str::slug($name);
-        $originalSlug = $slug;
-        $counter = 1;
-
-        while (Product::where('slug', $slug)->exists()) {
-            $slug =
-                $originalSlug
-                .'-'
-                .$counter;
-            $counter++;
-        }
-
-        return $slug;
+        return Str::slug($name) . '-' . strtolower(Str::random(8));
     }
 }
