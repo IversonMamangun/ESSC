@@ -11,6 +11,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\BuyerController; 
 use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Shop\HomeController as ShopHomeController;
+use App\Http\Controllers\Shop\ProductController as ShopProductController;
 use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
 use App\Http\Controllers\Seller\StoreController as SellerStoreController;
 use App\Http\Controllers\Seller\ProductController as SellerProductController;
@@ -33,9 +35,15 @@ Route::middleware('guest')->group(function () {
 // dedicated guest shop routes
 Route::name('shop.')
 ->group(function () {
-    Route::inertia('/home', 'shop/public/Home');
-    Route::inertia('/product/{id}', 'shop/public/Product');
-    Route::inertia('/store/{id}', 'shop/public/Store');
+    Route::get('/home', [ShopHomeController::class, 'index'])
+        ->name('home');
+
+    Route::get('/products', [ShopProductController::class, 'index'])
+        ->name('products.index');   
+    Route::get('/products/{product:slug}', [ShopProductController::class, 'show'])
+        ->name('products.show');
+
+    Route::inertia('/store/{id}', 'shop/public/Store')->name('store');
 });
 
 // dedicated customer shop routes (customer experience)

@@ -6,29 +6,33 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\Shop\ProductCardResource;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
-class HomeController extends Controller
+class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        return Inertia::render('shop/public/Home', [
-            'productsTopDeals' => ProductCardResource::collection(
-                $this->buildBaseQuery('top_deals')
-                    ->limit(4)
-                    ->get()
-            ),
+        $validated = $request->validate([
+            'type' => ['required', 'string', Rule::in(['top-deals', 'discover'])],
+        ]);
 
-            'productsDiscover' => ProductCardResource::collection(
-                $this->buildBaseQuery('discover')
-                    ->limit(10)
-                    ->get()
+        $filters = [
+            'type' => $validated['type'] ?? 'top-deals',
+        ];
+
+        return Inertia::render('shop/public/product/Index', [
+            'products' => ProductCardResource::collection(
+                $this->buildBaseQuery($filters)
+                ->paginate(20)
+                ->withQueryString()
             ),
+            'filters' => $filters,
         ]);
     }
 
-    private function buildBaseQuery(string $type): Builder
+    private function buildBaseQuery(array $filters): Builder
     {
         return Product::query()
             ->select([
@@ -46,7 +50,7 @@ class HomeController extends Controller
             ->having('total_stock', '>', 0)
             ->where('is_active', true)
             ->when(
-                $type === 'top_deals',
+                $filters['type'] === 'top-deals',
                 fn (Builder $query) => $query
                     ->where('is_featured', true)
                     ->latest(),
