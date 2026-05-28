@@ -7,6 +7,48 @@ export interface Product {
   views: number;
 }
 
+export type ProductFilterType = 'top-deals' | 'discover';
+
+export interface ProductFilters {
+  type: ProductFilterType;
+  search?: string;
+  category?: string;
+}
+
+export interface ProductCard extends Product {
+  image: string;
+  price: string;
+  compare_price: string | null;
+  stock: number;
+}
+
+export interface LaravelPaginationItem {
+  url: string | null;
+  label: string;
+  page: number | null;
+  active: boolean;
+}
+
+export interface PaginatedProducts {
+  data: ProductCard[];
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: LaravelPaginationItem[];
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
+}
+
 export interface Category {
   id: number;
   name: string;
