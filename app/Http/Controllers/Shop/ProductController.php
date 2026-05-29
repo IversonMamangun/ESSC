@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Shop\ProductCardResource;
+use App\Http\Resources\Shop\ProductShowResource;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
@@ -58,5 +59,18 @@ class ProductController extends Controller
                 fn (Builder $query) => $query
                     ->latest()
             );
+    }
+
+    public function show(Product $product)
+    {
+        $product->load([
+            'categories',
+            'images',
+            'variants.attributeValues.attribute',
+        ]);
+
+        return Inertia::render('shop/public/product/Show', [
+            'product' => ProductShowResource::make($product)->resolve(),
+        ]);
     }
 }
