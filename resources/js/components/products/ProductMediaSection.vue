@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { XIcon, VideoIcon, PlusIcon } from 'lucide-vue-next';
-import { Label } from '@/components/ui/label';
+import { ref, computed } from 'vue';
 import InputError from '@/components/InputError.vue';
+import { Label } from '@/components/ui/label';
 import type { ExistingProductImage } from '@/types';
 
 // edit passing props
@@ -65,7 +65,10 @@ const handleImages = (e: Event) => {
   const input = e.target as HTMLInputElement;
   const files = Array.from(input.files ?? []);
 
-  if (!files.length) return;
+  if (!files.length) {
+    return;
+  }
+
   const allowedFiles = files.slice(0, remainingImages.value);
 
   images.value.push(...allowedFiles);
@@ -83,9 +86,16 @@ const removeNewImage = (index: number) => {
 };
 
 const handleVideo = (e: Event) => {
-  if (!canAddVideo.value) return;
+  if (!canAddVideo.value) {
+    return;
+  }
+
   const file = (e.target as HTMLInputElement).files?.[0];
-  if (!file) return;
+  
+  if (!file) {
+    return;
+  }
+
   video.value = file;
   newVideoPreview.value = URL.createObjectURL(file);
   deleteVideo.value = false;
