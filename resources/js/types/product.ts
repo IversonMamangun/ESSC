@@ -49,6 +49,14 @@ export interface PaginatedProducts {
   };
 }
 
+export interface ProductShow extends Product {
+  description: string | null;
+  categories: Category[];
+  images: ExistingProductImage[];
+  video: string | null;
+  variants: ProductVariant[];
+}
+
 export interface Category {
   id: number;
   name: string;
@@ -61,6 +69,7 @@ export interface Category {
 
 interface VariantAttribute {
   attribute: string;
+  name: string;
   value: string;
 }
 
