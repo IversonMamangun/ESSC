@@ -6,6 +6,7 @@ import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import Pagination from '@/components/Pagination.vue';
+import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import type { PaginatedProducts, ProductFilters } from '@/types';
 import shop from '@/routes/shop';
 
@@ -30,6 +31,11 @@ const pageDescription = computed(() => {
     ? 'Grab the best discounts and limited-time offers on our hottest products.'
     : 'Explore our latest arrivals, trending items, and full catalog.';
 });
+
+const breadcrumbs = computed(() => [
+  { title: 'Home', href: shop.home() },
+  { title: pageTitle.value, href: '#' },
+]);
 </script>
 
 <template>
@@ -63,6 +69,10 @@ const pageDescription = computed(() => {
           </div>
         </div>
       </section>
+
+      <div class="mx-auto mt-4 max-w-7xl px-4">
+        <Breadcrumbs :breadcrumbs="breadcrumbs" />
+      </div>
 
       <section class="mt-8 flex w-full justify-center px-4">
         <div
