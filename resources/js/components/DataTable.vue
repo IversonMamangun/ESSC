@@ -1,6 +1,8 @@
 <script setup lang="ts" generic="T">
 import { FlexRender, getCoreRowModel, useVueTable } from '@tanstack/vue-table';
 import type { ColumnDef, ExpandedState, Row } from '@tanstack/vue-table';
+import { ChevronDown, ChevronRight } from 'lucide-vue-next';
+import { ref, h } from 'vue';
 import {
   Table,
   TableBody,
@@ -9,8 +11,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ChevronDown, ChevronRight } from 'lucide-vue-next';
-import { ref, h } from 'vue';
 
 interface Props<T> {
   columns: ColumnDef<T, any>[];

@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
 import { Head, useForm, Link, usePage } from '@inertiajs/vue3';
 import { 
     MapPin, CreditCard, AlertCircle, 
     ChevronLeft, CheckCircle2, ShieldCheck, X, Building2, Phone
 } from 'lucide-vue-next';
+import { ref, computed, onMounted } from 'vue';
+import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import Footer from '@/components/sections/Footer.vue';
 
-// Define the Address Type
 interface AddressType {
     id: number;
     label: string;
@@ -34,7 +33,6 @@ const props = defineProps<{
     addresses: AddressType[]; // We now receive an array of addresses from the controller
 }>();
 
-// Automatically find the default address, or fallback to the very first one they created
 const defaultAddress = computed(() => {
     return props.addresses.find(a => a.is_default) || props.addresses[0] || null;
 });
@@ -45,12 +43,10 @@ const form = useForm({
     address_id: defaultAddress.value?.id || null, // Attach the chosen address ID to the order
 });
 
-// Get the actual object of the currently selected address for display purposes
 const selectedAddress = computed(() => {
     return props.addresses.find(a => a.id === form.address_id) || null;
 });
 
-// Failsafe: check if they have selected an address
 const hasAddress = computed(() => !!selectedAddress.value);
 
 const submitOrder = () => {

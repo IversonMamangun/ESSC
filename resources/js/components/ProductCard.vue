@@ -2,8 +2,8 @@
 import { computed } from 'vue';
 import { Link } from '@inertiajs/vue3';
 import { StarIcon, MapPinIcon } from 'lucide-vue-next';
-import type { ProductCard } from '@/types';
 import shop from '@/routes/shop';
+import type { ProductCard } from '@/types';
 
 const props = defineProps<{
   product: ProductCard;
