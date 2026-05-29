@@ -15,14 +15,14 @@ import {
   CheckCircle2,
 } from 'lucide-vue-next';
 import { ref, computed, h } from 'vue';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import DataTable from '@/components/DataTable.vue';
 import ProductVariantsTable from '@/components/products/ProductVariantsTable.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getSellerProductsColumns } from '@/features/seller/columns';
-import type { Store, SellerProduct } from '@/types';
 import seller from '@/routes/seller';
+import type { Store, SellerProduct } from '@/types';
 
 const props = defineProps<{
   store: Store;

@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { PlusIcon, Trash2Icon, CopyIcon, XIcon } from 'lucide-vue-next';
 import { computed, ref } from 'vue';
+import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import { PlusIcon, Trash2Icon, CopyIcon, XIcon } from 'lucide-vue-next';
-import InputError from '@/components/InputError.vue';
 import type {
   ProductVariantForm,
   ProductVariantAttributeForm,
@@ -64,8 +64,12 @@ const removeVariant = (index: number) => {
   const shifted: Record<number, string> = {};
   Object.entries(newImagePreviews.value).forEach(([k, v]) => {
     const i = Number(k);
-    if (i > index) shifted[i - 1] = v;
-    else if (i < index) shifted[i] = v;
+
+    if (i > index) {
+      shifted[i - 1] = v;
+    }else if (i < index) {
+      shifted[i] = v;
+    }
   });
   newImagePreviews.value = shifted;
 };
@@ -99,7 +103,11 @@ const syncSelectedValue = (attribute: ProductVariantAttributeForm) => {
   const selectedValue = getAttribute(attribute.attribute_id)?.values.find(
     (v) => v.id === attribute.value_id,
   );
-  if (!selectedValue) return;
+
+  if (!selectedValue) {
+    return;
+  }
+
   attribute.value = selectedValue.value;
   attribute.is_new = false;
 };
@@ -111,7 +119,10 @@ const addCustomValue = (
 ) => {
   const key = `${variantIndex}-${attributeIndex}`;
   const value = newValueInputs.value[key];
-  if (!value?.trim()) return;
+
+  if (!value?.trim()) {
+    return;
+  }
 
   attribute.value_id = null;
   attribute.value = value.trim();
@@ -127,7 +138,11 @@ const setDefaultVariant = (selectedIndex: number) => {
 //  images
 const handleVariantImage = (e: Event, variantIndex: number) => {
   const file = (e.target as HTMLInputElement).files?.[0];
-  if (!file) return;
+
+  if (!file) {
+    return;
+  }
+
   model.value[variantIndex].image = file;
   model.value[variantIndex].delete_image = false;
   newImagePreviews.value[variantIndex] = URL.createObjectURL(file);
@@ -139,6 +154,7 @@ const removeVariantImage = (variantIndex: number) => {
     URL.revokeObjectURL(newImagePreviews.value[variantIndex]);
     delete newImagePreviews.value[variantIndex];
   }
+  
   model.value[variantIndex].image = null;
 
   // If there was an existing server image, mark for deletion

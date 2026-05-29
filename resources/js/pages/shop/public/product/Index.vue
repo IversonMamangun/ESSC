@@ -7,8 +7,8 @@ import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import Pagination from '@/components/Pagination.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
-import type { PaginatedProducts, ProductFilters } from '@/types';
 import shop from '@/routes/shop';
+import type { PaginatedProducts, ProductFilters } from '@/types';
 
 const props = defineProps<{
   products: PaginatedProducts;

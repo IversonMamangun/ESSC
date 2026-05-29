@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { Head } from '@inertiajs/vue3';
+import ProductCard from '@/components/ProductCard.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import ProductCard from '@/components/ProductCard.vue';
 
 // Mock data for the specific Vendor/Seller
 const vendor = {

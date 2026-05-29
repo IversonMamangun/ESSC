@@ -38,6 +38,8 @@ export default defineConfigWithVueTs(
             },
         },
         rules: {
+            '@typescript-eslint/no-unused-vars': 'off',
+            'vue/no-unused-vars': 'error',
             'vue/multi-word-component-names': 'off',
             '@typescript-eslint/no-explicit-any': 'off',
             '@typescript-eslint/consistent-type-imports': [

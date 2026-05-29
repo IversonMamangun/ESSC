@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Checkbox } from '@/components/ui/checkbox';
-import type { Category } from '@/types';
-import { computed } from 'vue';
 import { CheckIcon, ChevronsUpDownIcon, XIcon } from 'lucide-vue-next';
-import { Button } from '@/components/ui/button';
+import { computed } from 'vue';
 import InputError from '@/components/InputError.vue';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Command,
   CommandEmpty,
@@ -15,13 +14,15 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import type { Category } from '@/types';
 
 const props = defineProps<{
   categories: Category[];
@@ -41,7 +42,11 @@ const flattenCategories = (
   categories: Category[] = [],
   level = 0,
 ): Category[] => {
-  if (!Array.isArray(categories)) return [];
+  if (!Array.isArray(categories)) {
+    
+    return [];
+  }
+
   return categories.flatMap((category) => [
     { ...category, name: '— '.repeat(level) + category.name },
     ...flattenCategories(category.children?.data ?? [], level + 1),
