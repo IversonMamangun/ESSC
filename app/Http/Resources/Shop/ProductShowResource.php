@@ -51,6 +51,15 @@ class ProductShowResource extends JsonResource
                     ]),
                 ];
             })->values(),
+            'store' => [
+                'id' => $this->store->id,
+                'name' => $this->store->name,
+                'slug' => $this->store->slug,
+                'logo' => $this->store->logo
+                    ? Storage::url($this->store->logo)
+                    : null,
+                'is_official' => $this->store->is_official,
+            ],
         ];
     }
 }

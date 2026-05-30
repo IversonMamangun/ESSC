@@ -16,7 +16,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $validated = $request->validate([
-            'type' => ['required', 'string', Rule::in(['top-deals', 'discover'])],
+            'type' => ['sometimes', 'string', Rule::in(['top-deals', 'discover'])],
         ]);
 
         $filters = [
@@ -64,6 +64,7 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         $product->load([
+            'store',
             'categories',
             'images',
             'variants.attributeValues.attribute',
