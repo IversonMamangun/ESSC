@@ -9,6 +9,8 @@ import {
   ShieldCheckIcon,
   MinusIcon,
   PlusIcon,
+  VideoIcon,
+  BadgeCheckIcon,
 } from 'lucide-vue-next';
 import { ref, computed, onMounted } from 'vue';
 import { Button } from '@/components/ui/button';
@@ -309,7 +311,7 @@ onMounted(() => {
                     <div
                       class="absolute top-2 left-2 flex items-center gap-1 rounded bg-black/60 px-2 py-1 text-[10px] font-black tracking-wider text-white uppercase backdrop-blur-sm"
                     >
-                      <Video class="h-3 w-3" /> Product Video
+                      <VideoIcon class="h-3 w-3" /> Product Video
                     </div>
 
                     <div
@@ -445,7 +447,7 @@ onMounted(() => {
                 >
                   <button
                     @click="decreaseQuantity"
-                    class="flex h-10 w-10 items-center justify-center rounded-xl text-zinc-600 transition-all hover:bg-white active:scale-90 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                    class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-zinc-600 transition-all hover:bg-white active:scale-90 dark:text-zinc-300 dark:hover:bg-zinc-700"
                   >
                     <MinusIcon class="h-5 w-5" />
                   </button>
@@ -456,7 +458,7 @@ onMounted(() => {
                   </div>
                   <button
                     @click="increaseQuantity"
-                    class="flex h-10 w-10 items-center justify-center rounded-xl text-zinc-600 transition-all hover:bg-white active:scale-90 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                    class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-zinc-600 transition-all hover:bg-white active:scale-90 dark:text-zinc-300 dark:hover:bg-zinc-700"
                   >
                     <PlusIcon class="h-5 w-5" />
                   </button>
@@ -482,6 +484,35 @@ onMounted(() => {
                 <ZapIcon class="h-5 w-5 fill-current" /> Buy Now
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Store -->
+      <div
+        class="mt-8 rounded-4xl border border-zinc-200 bg-white p-5 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900"
+      >
+        <div class="flex items-center gap-4">
+          <div
+            class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#009933] text-3xl font-black text-white shadow-md"
+            :class="{
+              'bg-transparent': product.store.logo,
+            }"
+          >
+            <img
+              v-if="product.store.logo"
+              :src="product.store.logo"
+              class="h-full w-full object-cover"
+            />
+            <span v-else>{{ product.store.name.charAt(0) }}</span>
+          </div>
+          <div class="flex flex-col gap-1">
+            <h3 class="text-lg font-black text-zinc-900 dark:text-white">
+              {{ product.store.name }}
+            </h3>
+            <Badge v-if="product.store.is_official"
+              ><BadgeCheckIcon /> Official Store</Badge
+            >
           </div>
         </div>
       </div>

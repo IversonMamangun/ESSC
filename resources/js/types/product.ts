@@ -1,3 +1,5 @@
+import { Store } from './store';
+
 export interface Product {
   id: string;
   name: string;
@@ -55,6 +57,7 @@ export interface ProductShow extends Product {
   images: ExistingProductImage[];
   video: string | null;
   variants: ProductVariant[];
+  store: Store;
 }
 
 export interface Category {
