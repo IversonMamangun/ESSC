@@ -1,42 +1,25 @@
 <script setup lang="ts">
 import { Head, Link, usePage, router } from '@inertiajs/vue3';
 import {
-  Store,
-  Star,
-  MapPin,
-  ShoppingCart,
-  Zap,
-  ChevronRight,
-  ShieldCheck,
-  Plus,
-  Minus,
-  Video,
+  StarIcon,
+  ShoppingCartIcon,
+  ZapIcon,
+  ChevronRightIcon,
+  ChevronLeftIcon,
+  ShieldCheckIcon,
+  MinusIcon,
+  PlusIcon,
 } from 'lucide-vue-next';
 import { ref, computed, onMounted } from 'vue';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import shop from '@/routes/shop';
-import type { ProductShow } from '@/types';
-
-// Sample product data for testing when no real data is passed
-const sampleProduct = {
-  id: 1,
-  title: 'Wireless Headphones',
-  name: 'Wireless Headphones',
-  price: 99.99,
-  image: '/assets/store/products/headphones.jpg',
-  description: 'High-quality wireless headphones with noise cancellation',
-  rating: 4.5,
-  is_top_deal: true,
-  stock: 100,
-  sold_count: 45,
-  store: {
-    id: 1,
-    name: 'Tech Store',
-    city: 'New York',
-  },
-};
+import type { ProductShow, ProductVariant } from '@/types';
 
 const props = defineProps<{
   product: ProductShow;
@@ -45,14 +28,156 @@ const props = defineProps<{
 const page = usePage();
 const user = computed(() => page.props.auth?.user || null);
 
+const selectedImage = ref(props.product.images[0]?.url ?? null);
+const selectedVariant = ref<ProductVariant | null>(null);
+
 const quantity = ref(1);
 
-const increaseQuantity = () => {
-  //
+// price and stock
+const currentPrice = computed(() => {
+  if (!selectedVariant.value) {
+    return null;
+  }
+
+  return selectedVariant.value.price;
+});
+const currentComparePrice = computed(
+  () => selectedVariant.value?.compare_price,
+);
+const priceRange = computed(() => {
+  const prices = props.product.variants.map((v) => Number(v.price));
+
+  if (prices.length === 0) {
+    return { min: '0.00', max: '0.00' };
+  }
+
+  return {
+    min: Math.min(...prices).toFixed(2),
+    max: Math.max(...prices).toFixed(2),
+  };
+});
+const currentStock = computed(() => {
+  if (selectedVariant.value) {
+    return selectedVariant.value.stock;
+  }
+  return props.product.variants.reduce(
+    (total, variant) => total + variant.stock,
+    0,
+  );
+});
+
+// attributes
+const selectedAttributes = ref<Record<string, string>>({});
+const isAttributeValueAvailable = (attributeName: string, value: string) => {
+  const selections = {
+    ...selectedAttributes.value,
+    [attributeName]: value,
+  };
+
+  return props.product.variants.some((variant) =>
+    Object.entries(selections).every(([name, selected]) =>
+      variant.attributes.some(
+        (attr) => attr.name === name && attr.value === selected,
+      ),
+    ),
+  );
+};
+const selectAttribute = (attributeName: string, value: string) => {
+  if (selectedAttributes.value[attributeName] === value) {
+    delete selectedAttributes.value[attributeName];
+  } else {
+    selectedAttributes.value[attributeName] = value;
+  }
+
+  updateVariant();
+};
+const attributeGroups = computed(() => {
+  const groups: Record<string, string[]> = {};
+
+  props.product.variants.forEach((variant) => {
+    variant.attributes.forEach((attr) => {
+      if (!groups[attr.name]) {
+        groups[attr.name] = [];
+      }
+
+      if (!groups[attr.name].includes(attr.value)) {
+        groups[attr.name].push(attr.value);
+      }
+    });
+  });
+
+  return groups;
+});
+
+// variant
+const updateVariant = () => {
+  const variant = props.product.variants.find((variant) =>
+    variant.attributes.every(
+      (attr) => selectedAttributes.value[attr.name] === attr.value,
+    ),
+  );
+
+  selectedVariant.value = variant ?? null;
+
+  quantity.value = 1;
+
+  if (variant?.image) {
+    selectedImage.value = variant.image;
+  }
 };
 
+// images
+const imageDialogOpen = ref(false);
+const galleryImages = computed(() => {
+  const images = [
+    ...props.product.images.map((img) => ({
+      type: 'product',
+      url: img.url,
+    })),
+  ];
+  props.product.variants.forEach((variant) => {
+    if (variant.image) {
+      images.push({
+        type: 'variant',
+        url: variant.image,
+      });
+    }
+  });
+
+  return Array.from(
+    new Map(images.map((image) => [image.url, image])).values(),
+  );
+});
+const currentImageIndex = computed(() =>
+  galleryImages.value.findIndex((image) => image.url === selectedImage.value),
+);
+const nextImage = () => {
+  const next = (currentImageIndex.value + 1) % galleryImages.value.length;
+
+  selectedImage.value = galleryImages.value[next].url;
+};
+const prevImage = () => {
+  const prev =
+    (currentImageIndex.value - 1 + galleryImages.value.length) %
+    galleryImages.value.length;
+
+  selectedImage.value = galleryImages.value[prev].url;
+};
+
+// quantity for ordering
+const increaseQuantity = () => {
+  if (quantity.value >= currentStock.value) {
+    return;
+  }
+
+  quantity.value++;
+};
 const decreaseQuantity = () => {
-  //
+  if (quantity.value <= 1) {
+    return;
+  }
+
+  quantity.value--;
 };
 
 const handleAddToCart = () => {
@@ -78,83 +203,200 @@ onMounted(() => {
     </div>
 
     <main
-      class="mx-auto mb-20 w-full max-w-7xl flex-grow px-4 py-8 sm:px-6 md:py-12 lg:px-8"
+      class="mx-auto mb-20 w-full max-w-7xl grow px-4 py-8 sm:px-6 md:py-12 lg:px-8"
     >
       <!-- Breadcrumbs -->
       <nav
         class="mb-8 flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-zinc-400"
       >
-        <Link :href="" class="transition-colors hover:text-[#009933]"
+        <Link :href="shop.home()" class="transition-colors hover:text-[#009933]"
           >Home</Link
         >
-        <ChevronRight class="h-4 w-4" />
-        <Link :href="" class="transition-colors hover:text-[#009933]"
+        <ChevronRightIcon class="h-4 w-4" />
+        <Link
+          :href="shop.products.index()"
+          class="transition-colors hover:text-[#009933]"
           >Online Store</Link
         >
-        <ChevronRight class="h-4 w-4" />
+        <ChevronRightIcon class="h-4 w-4" />
         <span
           class="max-w-[200px] truncate text-zinc-900 md:max-w-none dark:text-white"
-          >{{ productData.title }}</span
+          >{{ product.name }}</span
         >
       </nav>
 
       <div
-        class="overflow-hidden rounded-[2rem] border border-zinc-200 bg-white shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900"
+        class="overflow-hidden rounded-4xl border border-zinc-200 bg-white shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900"
       >
         <div class="flex flex-col lg:flex-row">
           <!-- Left Column: Media (Video & Image) -->
           <div
             class="space-y-4 border-b border-zinc-200 p-6 md:p-8 lg:w-1/2 lg:border-r lg:border-b-0 dark:border-zinc-800"
           >
-            <!-- Main Image -->
-            <div
-              class="group relative aspect-square overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800"
-            >
-              <img
-                :src="productData.image"
-                :alt="productData.title"
-                class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-              />
+            <Tabs default-value="images">
+              <TabsList class="mb-2 h-full w-full p-1.5">
+                <TabsTrigger
+                  value="images"
+                  class="cursor-pointer hover:bg-input"
+                >
+                  Images
+                </TabsTrigger>
 
-              <!-- Sale Badge -->
-              <div
-                class="absolute top-4 right-4 rounded-xl bg-red-600 px-3 py-1.5 text-sm font-black tracking-wider text-white shadow-lg"
-              >
-                -1% OFF
-              </div>
-            </div>
+                <TabsTrigger
+                  value="video"
+                  class="cursor-pointer hover:bg-input"
+                >
+                  Video
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="images">
+                <div class="aspect-square overflow-hidden rounded-xl border">
+                  <div class="relative">
+                    <img
+                      :src="selectedImage"
+                      :alt="product.name"
+                      class="aspect-square w-full cursor-zoom-in rounded-xl border object-cover"
+                      @click="imageDialogOpen = true"
+                    />
+
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      class="absolute top-1/2 left-3 -translate-y-1/2 cursor-pointer"
+                      @click="prevImage"
+                    >
+                      <ChevronLeftIcon class="h-4 w-4" />
+                    </Button>
+
+                    <Button
+                      size="icon"
+                      variant="secondary"
+                      class="absolute top-1/2 right-3 -translate-y-1/2 cursor-pointer"
+                      @click="nextImage"
+                    >
+                      <ChevronRightIcon class="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
+                <!-- Carousel -->
+                <div class="mt-4 flex gap-2 overflow-x-auto pb-2">
+                  <button
+                    v-for="image in galleryImages"
+                    :key="image.url"
+                    class="shrink-0"
+                    @click="selectedImage = image.url"
+                  >
+                    <img
+                      :src="image.url"
+                      :alt="product.name"
+                      class="h-20 w-20 cursor-pointer rounded-lg border object-cover"
+                      :class="
+                        selectedImage === image.url ? 'border-primary' : ''
+                      "
+                    />
+                  </button>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="video">
+                <div v-if="!product.video">
+                  <div
+                    class="group relative aspect-video w-full overflow-hidden rounded-2xl border border-zinc-200 bg-black shadow-sm dark:border-zinc-700"
+                  >
+                    <video class="h-full w-full object-cover"></video>
+                    <div
+                      class="absolute top-2 left-2 flex items-center gap-1 rounded bg-black/60 px-2 py-1 text-[10px] font-black tracking-wider text-white uppercase backdrop-blur-sm"
+                    >
+                      <Video class="h-3 w-3" /> Product Video
+                    </div>
+
+                    <div
+                      class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-sm font-bold text-zinc-400"
+                    >
+                      No video available
+                    </div>
+                  </div>
+                </div>
+
+                <div v-else>
+                  <video controls class="w-full rounded-xl">
+                    <source :src="product.video" type="video/mp4" />
+                  </video>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
 
           <!-- Right Column: Details -->
-          <div class="flex flex-col p-6 md:p-10 lg:w-1/2">
+          <div class="flex flex-col p-6 lg:w-1/2">
             <div class="mb-6">
-              <span
-                v-if="productData.is_top_deal"
-                class="mr-2 mb-4 inline-block rounded-full border border-red-200 bg-red-100 px-3 py-1 text-[10px] font-black tracking-widest text-red-600 uppercase dark:border-red-800/50 dark:bg-red-900/30 dark:text-red-400"
+              <h1
+                class="mb-4 text-3xl leading-tight font-semibold text-zinc-900 dark:text-white"
               >
-                🔥 Top Deal
-              </span>
+                {{ product.name }}
+              </h1>
+
               <span
-                class="mb-4 inline-block rounded-full border border-green-200 bg-green-100 px-3 py-1 text-[10px] font-black tracking-widest text-[#009933] uppercase dark:border-green-800/50 dark:bg-green-900/30 dark:text-green-400"
+                v-if="product.is_featured"
+                class="inline-block rounded-full border border-green-200 bg-green-100 px-3 py-1 text-[10px] font-black tracking-widest text-[#009933] uppercase dark:border-green-800/50 dark:bg-green-900/30 dark:text-green-400"
               >
                 Official Product
               </span>
-              <h1
-                class="text-2xl leading-tight font-black text-zinc-900 md:text-4xl dark:text-white"
+
+              <div class="my-4 flex flex-wrap gap-2">
+                <Badge
+                  v-for="category in product.categories"
+                  :key="category.id"
+                  variant="secondary"
+                >
+                  {{ category.name }}
+                </Badge>
+              </div>
+
+              <div
+                v-for="(values, attributeName) in attributeGroups"
+                :key="attributeName"
+                class="mb-4 space-y-1"
               >
-                {{ productData.title }}
-              </h1>
+                <div class="text-sm font-semibold">
+                  {{ attributeName }}
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                  <Button
+                    v-for="value in values"
+                    :key="value"
+                    variant="outline"
+                    :disabled="!isAttributeValueAvailable(attributeName, value)"
+                    :class="[
+                      'cursor-pointer rounded-lg px-3 py-1.5 hover:bg-primary/70 hover:text-primary-foreground dark:hover:bg-primary/70 dark:hover:text-primary-foreground',
+                      selectedAttributes[attributeName] === value
+                        ? 'border-primary bg-primary text-primary-foreground hover:bg-primary dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary'
+                        : '',
+                    ]"
+                    @click="selectAttribute(attributeName, value)"
+                  >
+                    {{ value }}
+                  </Button>
+                </div>
+              </div>
 
               <div class="mt-4 flex flex-wrap items-center gap-4 text-sm">
                 <div class="flex items-center gap-1 text-amber-400">
-                  <Star v-for="i in 5" :key="i" class="h-4 w-4 fill-current" />
-                  <span class="ml-1 font-black text-zinc-900 dark:text-white">{{
-                    productData.rating || '5.0'
-                  }}</span>
+                  <StarIcon
+                    v-for="i in 5"
+                    :key="i"
+                    class="h-4 w-4 fill-current"
+                  />
+                  <span class="ml-1 font-black text-zinc-900 dark:text-white"
+                    >5</span
+                  >
                 </div>
                 <div class="h-3 w-px bg-zinc-300 dark:bg-zinc-700"></div>
                 <span class="font-bold text-zinc-500 dark:text-zinc-400"
-                  >{{ productData.sold_count || '0' }} Sold</span
+                  >123 Sold</span
                 >
               </div>
             </div>
@@ -163,18 +405,30 @@ onMounted(() => {
             <div
               class="mb-8 rounded-3xl border border-zinc-200 bg-zinc-50 p-6 transition-colors dark:border-zinc-800 dark:bg-zinc-800/50"
             >
-              <div class="flex flex-wrap items-end gap-3">
+              <div class="flex items-center gap-3">
                 <span
-                  class="text-4xl font-black tracking-tighter text-[#009933] md:text-5xl"
+                  v-if="currentPrice"
+                  class="text-4xl font-semibold text-[#009933]"
                 >
-                  ₱{{ currentPrice }}
+                  ₱ {{ currentPrice }}
+                </span>
+
+                <span v-else class="text-4xl font-semibold text-[#009933]">
+                  ₱ {{ priceRange.min }} - {{ priceRange.max }}
+                </span>
+
+                <span
+                  v-if="currentComparePrice"
+                  class="text-lg text-muted-foreground line-through"
+                >
+                  ₱{{ currentComparePrice }}
                 </span>
               </div>
 
               <div
                 class="mt-4 flex items-center gap-2 text-xs font-bold text-[#009933]"
               >
-                <ShieldCheck class="h-4 w-4" />
+                <ShieldCheckIcon class="h-4 w-4" />
                 100% Authentic Guarantee
               </div>
             </div>
@@ -193,7 +447,7 @@ onMounted(() => {
                     @click="decreaseQuantity"
                     class="flex h-10 w-10 items-center justify-center rounded-xl text-zinc-600 transition-all hover:bg-white active:scale-90 dark:text-zinc-300 dark:hover:bg-zinc-700"
                   >
-                    <Minus class="h-5 w-5" />
+                    <MinusIcon class="h-5 w-5" />
                   </button>
                   <div
                     class="w-14 text-center font-black text-zinc-900 dark:text-white"
@@ -204,11 +458,11 @@ onMounted(() => {
                     @click="increaseQuantity"
                     class="flex h-10 w-10 items-center justify-center rounded-xl text-zinc-600 transition-all hover:bg-white active:scale-90 dark:text-zinc-300 dark:hover:bg-zinc-700"
                   >
-                    <Plus class="h-5 w-5" />
+                    <PlusIcon class="h-5 w-5" />
                   </button>
                 </div>
                 <span class="text-xs font-bold text-zinc-400 dark:text-zinc-500"
-                  >{{ productData.stock || 100 }} pieces available</span
+                  >{{ currentStock }} available</span
                 >
               </div>
             </div>
@@ -217,27 +471,15 @@ onMounted(() => {
             <div class="mt-auto flex flex-col gap-4 sm:flex-row">
               <button
                 @click="handleAddToCart"
-                :disabled="isComingSoon"
-                class="flex flex-1 items-center justify-center gap-3 rounded-2xl border-2 border-[#009933] py-4 font-black tracking-widest text-[#009933] uppercase shadow-sm transition-all"
-                :class="
-                  isComingSoon
-                    ? 'cursor-not-allowed border-zinc-300 text-zinc-400 opacity-50'
-                    : 'hover:bg-green-50 active:scale-95 dark:hover:bg-green-900/10'
-                "
+                class="flex flex-1 items-center justify-center gap-3 rounded-2xl border-2 border-[#009933] py-4 font-black tracking-widest text-[#009933] uppercase shadow-sm transition-all hover:bg-green-50 active:scale-95 dark:hover:bg-green-900/10"
               >
-                <ShoppingCart class="h-5 w-5" /> Add To Cart
+                <ShoppingCartIcon class="h-5 w-5" /> Add To Cart
               </button>
               <button
                 @click="handleBuyNow"
-                :disabled="isComingSoon"
-                class="flex flex-1 items-center justify-center gap-3 rounded-2xl py-4 font-black tracking-widest text-white uppercase transition-all"
-                :class="
-                  isComingSoon
-                    ? 'cursor-not-allowed bg-zinc-300'
-                    : 'bg-[#009933] shadow-lg shadow-green-900/20 hover:bg-green-700 active:scale-95'
-                "
+                class="flex flex-1 items-center justify-center gap-3 rounded-2xl bg-[#009933] py-4 font-black tracking-widest text-white uppercase shadow-lg shadow-green-900/20 transition-all hover:bg-green-700 active:scale-95"
               >
-                <Zap class="h-5 w-5 fill-current" /> Buy Now
+                <ZapIcon class="h-5 w-5 fill-current" /> Buy Now
               </button>
             </div>
           </div>
@@ -246,7 +488,7 @@ onMounted(() => {
 
       <!-- Description -->
       <div
-        class="mt-8 rounded-[2rem] border border-zinc-200 bg-white p-8 shadow-sm transition-colors md:p-12 dark:border-zinc-800 dark:bg-zinc-900"
+        class="mt-8 rounded-4xl border border-zinc-200 bg-white p-8 shadow-sm transition-colors md:p-12 dark:border-zinc-800 dark:bg-zinc-900"
       >
         <div class="mb-8 flex items-center gap-4">
           <div class="h-8 w-1.5 rounded-full bg-[#009933]"></div>
@@ -259,11 +501,20 @@ onMounted(() => {
         <div
           class="max-w-4xl text-lg leading-relaxed font-medium whitespace-pre-wrap text-zinc-600 dark:text-zinc-300"
         >
-          {{ productData.description }}
+          {{ product.description }}
         </div>
       </div>
     </main>
 
     <Footer />
   </div>
+
+  <Dialog v-model:open="imageDialogOpen">
+    <DialogContent class="max-w-6xl border-0 bg-transparent p-0 shadow-none">
+      <img
+        :src="selectedImage"
+        class="max-h-[90vh] w-full rounded-xl object-contain"
+      />
+    </DialogContent>
+  </Dialog>
 </template>
