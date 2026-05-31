@@ -11,16 +11,25 @@ import {
   PlusIcon,
   VideoIcon,
   BadgeCheckIcon,
+  LogOutIcon,
 } from 'lucide-vue-next';
 import { ref, computed, onMounted } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import shop from '@/routes/shop';
+import { logout, login } from '@/routes';
 import type { ProductShow, ProductVariant } from '@/types';
 
 const props = defineProps<{
@@ -182,12 +191,41 @@ const decreaseQuantity = () => {
   quantity.value--;
 };
 
+const showRoleMismatchDialog = ref(false);
+const checkUserAccess = (): boolean => {
+  if (!user.value) {
+    router.get(login());
+    return false;
+  }
+  if (user.value.user_type?.slug !== 'customer') {
+    showRoleMismatchDialog.value = true;
+    return false;
+  }
+  return true;
+};
+const handleLogoutAndRedirect = () => {
+  router.post(
+    logout(),
+    {},
+    {
+      onSuccess: () => {
+        showRoleMismatchDialog.value = false;
+        router.get(login());
+      },
+    },
+  );
+};
+
 const handleAddToCart = () => {
-  //
+  if (!checkUserAccess()) return;
+
+  // route to cart
 };
 
 const handleBuyNow = () => {
-  //
+  if (!checkUserAccess()) return;
+
+  // route to checkout
 };
 
 onMounted(() => {
@@ -473,13 +511,13 @@ onMounted(() => {
             <div class="mt-auto flex flex-col gap-4 sm:flex-row">
               <button
                 @click="handleAddToCart"
-                class="flex flex-1 items-center justify-center gap-3 rounded-2xl border-2 border-[#009933] py-4 font-black tracking-widest text-[#009933] uppercase shadow-sm transition-all hover:bg-green-50 active:scale-95 dark:hover:bg-green-900/10"
+                class="flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-2xl border-2 border-[#009933] py-4 font-black tracking-widest text-[#009933] uppercase shadow-sm transition-all hover:bg-green-50 active:scale-95 dark:hover:bg-green-900/10"
               >
                 <ShoppingCartIcon class="h-5 w-5" /> Add To Cart
               </button>
               <button
                 @click="handleBuyNow"
-                class="flex flex-1 items-center justify-center gap-3 rounded-2xl bg-[#009933] py-4 font-black tracking-widest text-white uppercase shadow-lg shadow-green-900/20 transition-all hover:bg-green-700 active:scale-95"
+                class="flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-2xl bg-[#009933] py-4 font-black tracking-widest text-white uppercase shadow-lg shadow-green-900/20 transition-all hover:bg-green-700 active:scale-95"
               >
                 <ZapIcon class="h-5 w-5 fill-current" /> Buy Now
               </button>
@@ -546,6 +584,58 @@ onMounted(() => {
         :src="selectedImage"
         class="max-h-[90vh] w-full rounded-xl object-contain"
       />
+    </DialogContent>
+  </Dialog>
+
+  <Dialog v-model:open="imageDialogOpen">
+    <DialogContent class="max-w-6xl border-0 bg-transparent p-0 shadow-none">
+      <img
+        :src="selectedImage"
+        class="max-h-[90vh] w-full rounded-xl object-contain"
+      />
+    </DialogContent>
+  </Dialog>
+
+  <Dialog v-model:open="showRoleMismatchDialog">
+    <DialogContent
+      class="rounded-3xl border border-zinc-200 bg-white p-6 sm:max-w-[425px] dark:border-zinc-800 dark:bg-zinc-900"
+    >
+      <DialogHeader class="space-y-3 text-center sm:text-left">
+        <DialogTitle
+          class="flex items-center gap-2 text-xl font-black text-zinc-900 dark:text-white"
+        >
+          Customer Account Required
+        </DialogTitle>
+        <DialogDescription
+          class="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400"
+        >
+          You are currently logged in as an
+          <span class="font-bold text-red-600 capitalize dark:text-red-400"
+            >"{{ user?.user_type?.name }}"</span
+          >. To add retail items to your cart or finalize a direct order, you
+          need to sign in using a dedicated
+          <span class="font-bold text-zinc-900 dark:text-white">customer</span>
+          profile.
+        </DialogDescription>
+      </DialogHeader>
+
+      <DialogFooter class="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end">
+        <Button
+          variant="outline"
+          class="order-2 cursor-pointer rounded-xl sm:order-1"
+          @click="showRoleMismatchDialog = false"
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="destructive"
+          class="order-1 flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 font-bold tracking-wide text-white hover:bg-red-700 sm:order-2"
+          @click="handleLogoutAndRedirect"
+        >
+          <LogOutIcon class="h-4 w-4" />
+          Logout & Sign In
+        </Button>
+      </DialogFooter>
     </DialogContent>
   </Dialog>
 </template>
