@@ -57,11 +57,11 @@ class StoreController extends Controller
         $store->description = $validated['description'];
 
         if ($request->hasFile('logo')) {
-            $store->logo = $request->file('logo')->store('store_logos', 'public');
+            $store->logo = $request->file('logo')->store('stores/logos', 'public');
         }
 
         if ($request->hasFile('banner')) {
-            $store->banner = $request->file('banner')->store('store_banners', 'public');
+            $store->banner = $request->file('banner')->store('stores/banners', 'public');
         }
 
         $store->save();
