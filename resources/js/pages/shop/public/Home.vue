@@ -33,9 +33,9 @@ const navigateToProduct = (type: string) => {
   );
 };
 
-onMounted(() => {
-  document.documentElement.classList.remove('dark');
-});
+// onMounted(() => {
+//   document.documentElement.classList.remove('dark');
+// });
 </script>
 
 <template>
@@ -50,26 +50,26 @@ onMounted(() => {
     <main class="flex-grow pb-20">
       <section class="flex w-full justify-center p-4">
         <div
-          class="group relative flex w-full max-w-7xl items-center justify-center overflow-hidden rounded-3xl border border-zinc-200 shadow-sm dark:border-zinc-800"
+          class="group relative flex w-full max-w-7xl items-center justify-center overflow-hidden rounded-3xl border border-zinc-200 shadow-sm"
         >
           <img
             src="/assets/store/online-store.jpg"
             alt="Store Background"
-            class="h-40 w-full object-cover brightness-75 transition-all duration-500 group-hover:brightness-90 md:h-52 dark:brightness-50 dark:group-hover:brightness-75"
+            class="h-40 w-full object-cover brightness-75 transition-all duration-500 group-hover:brightness-90 md:h-52"
           />
 
           <div
             class="absolute inset-0 flex flex-col items-center justify-center p-4 text-center"
           >
             <h1
-              class="absolute mb-4 text-5xl font-black tracking-normal text-[#009933] drop-shadow-2xl transition-all [text-shadow:2px_2px_0_#fff,-1px_-1px_0_#fff,1px_-1px_0_#fff,-1px_1px_0_#fff,1px_1px_0_#fff] md:text-7xl dark:[text-shadow:2px_2px_0_#18181b,-1px_-1px_0_#18181b,1px_-1px_0_#18181b,-1px_1px_0_#18181b,1px_1px_0_#18181b]"
+              class="absolute mb-4 text-5xl font-black tracking-normal text-[#009933] drop-shadow-2xl transition-all [text-shadow:2px_2px_0_#fff,-1px_-1px_0_#fff,1px_-1px_0_#fff,-1px_1px_0_#fff,1px_1px_0_#fff] md:text-7xl"
             >
               ONLINE STORE
             </h1>
           </div>
         </div>
       </section>
-        <StoreAds />
+      <StoreAds />
 
       <!-- Top Deals Section -->
       <section class="mt-8 flex w-full justify-center px-4">

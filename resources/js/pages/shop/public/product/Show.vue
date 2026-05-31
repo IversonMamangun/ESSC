@@ -228,9 +228,9 @@ const handleBuyNow = () => {
   // route to checkout
 };
 
-onMounted(() => {
-  document.documentElement.classList.remove('dark');
-});
+// onMounted(() => {
+//   document.documentElement.classList.remove('dark');
+// });
 </script>
 
 <template>
