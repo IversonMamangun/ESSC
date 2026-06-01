@@ -201,6 +201,7 @@ const navLinks = [
                 </div>
 
                 <Link
+                  v-if="user.user_type?.slug === 'customer'"
                   href="/account"
                   class="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-neutral-700 hover:bg-neutral-50 hover:text-[#009933] dark:text-gray-300 dark:hover:bg-neutral-800"
                 >
@@ -208,22 +209,14 @@ const navLinks = [
                 </Link>
 
                 <Link
-                  v-if="user.user_type?.slug === 'buyer' || !user.user_type"
+                  v-if="user.user_type?.slug === 'customer'"
                   href="/purchases"
                   class="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-neutral-700 hover:bg-neutral-50 hover:text-[#009933] dark:text-gray-300 dark:hover:bg-neutral-800"
                 >
                   <Package class="h-4 w-4 text-[#009933]" /> My Purchases
                 </Link>
 
-                <template
-                  v-if="
-                    user.user_type?.slug === 'seller' ||
-                    user.user_type?.slug === 'admin'
-                  "
-                >
-                  <div
-                    class="my-2 h-px bg-neutral-100 dark:bg-neutral-800"
-                  ></div>
+                <template v-if="user.user_type?.slug === 'seller'">
                   <Link
                     href="/seller/dashboard"
                     class="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-neutral-700 transition-colors hover:bg-neutral-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-neutral-800"
@@ -386,6 +379,7 @@ const navLinks = [
               </div>
 
               <Link
+                v-if="user.user_type?.slug === 'customer'"
                 href="/account"
                 class="flex items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm font-bold text-neutral-700 transition-colors hover:border-[#009933] dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300"
               >
@@ -393,7 +387,7 @@ const navLinks = [
               </Link>
 
               <Link
-                v-if="user.user_type?.slug === 'buyer' || !user.user_type"
+                v-if="user.user_type?.slug === 'customer'"
                 href="/purchases"
                 class="flex items-center gap-3 rounded-xl border border-green-100 bg-green-50 px-4 py-3 text-sm font-bold text-[#009933] transition-colors hover:bg-green-100 dark:border-green-900 dark:bg-green-900/20"
               >
@@ -401,10 +395,7 @@ const navLinks = [
               </Link>
 
               <Link
-                v-if="
-                  user.user_type?.slug === 'seller' ||
-                  user.user_type?.slug === 'admin'
-                "
+                v-if="user.user_type?.slug === 'seller'"
                 href="/seller/dashboard"
                 class="flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-bold text-blue-600 transition-colors hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-900/20"
               >
