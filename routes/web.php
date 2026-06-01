@@ -13,6 +13,7 @@ use App\Http\Controllers\BuyerController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Shop\HomeController as ShopHomeController;
 use App\Http\Controllers\Shop\ProductController as ShopProductController;
+use App\Http\Controllers\Shop\ProfileController as CustomerProfileController;
 use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
 use App\Http\Controllers\Seller\StoreController as SellerStoreController;
 use App\Http\Controllers\Seller\ProductController as SellerProductController;
@@ -51,11 +52,13 @@ Route::middleware([
     'auth', 
     'role:' . UserType::CUSTOMER
 ])
-->prefix('shop')
 ->name('shop.')
 ->group(function () {
+    Route::get('/account/profile/edit', [CustomerProfileController::class, 'edit'])
+        ->name('account.profile.edit');
 
-
+    Route::patch('/account/profile', [CustomerProfileController::class, 'update'])
+        ->name('account.profile.update');
 });
 
 // dedicated seller routes
