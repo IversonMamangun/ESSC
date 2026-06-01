@@ -9,6 +9,7 @@ import {
 } from 'lucide-vue-next';
 import { ref, onMounted, computed } from 'vue';
 import { logout, login, register } from '@/routes';
+import shop from '@/routes/shop';
 
 const isMenuOpen = ref(false);
 const activeLink = ref('Home');
@@ -202,7 +203,7 @@ const navLinks = [
 
                 <Link
                   v-if="user.user_type?.slug === 'customer'"
-                  href="/account"
+                  :href="shop.account.profile.edit()"
                   class="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-neutral-700 hover:bg-neutral-50 hover:text-[#009933] dark:text-gray-300 dark:hover:bg-neutral-800"
                 >
                   <User class="h-4 w-4 text-neutral-400" /> My Profile
@@ -380,7 +381,7 @@ const navLinks = [
 
               <Link
                 v-if="user.user_type?.slug === 'customer'"
-                href="/account"
+                :href="shop.account.profile.edit()"
                 class="flex items-center gap-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-sm font-bold text-neutral-700 transition-colors hover:border-[#009933] dark:border-neutral-700 dark:bg-neutral-800 dark:text-gray-300"
               >
                 <User class="h-5 w-5 text-neutral-400" /> My Profile
