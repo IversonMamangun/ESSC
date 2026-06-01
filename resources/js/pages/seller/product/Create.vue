@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { Head, useForm, Link } from '@inertiajs/vue3';
 import { ArrowLeftIcon, PackageIcon, PackagePlusIcon } from 'lucide-vue-next';
-import { Button } from '@/components/ui/button';
 import ProductInfoSection from '@/components/products/ProductInfoSection.vue';
 import ProductMediaSection from '@/components/products/ProductMediaSection.vue';
 import ProductVariantsSection from '@/components/products/ProductVariantsSection.vue';
+import { Button } from '@/components/ui/button';
 import seller from '@/routes/seller';
 import type { ProductForm, FormAttribute, Category } from '@/types';
 
