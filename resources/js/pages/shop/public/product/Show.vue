@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, usePage, router } from '@inertiajs/vue3';
+import { Head, Link, usePage, router, useForm } from '@inertiajs/vue3';
 import {
   StarIcon,
   ShoppingCartIcon,
@@ -16,6 +16,7 @@ import {
 import { ref, computed, onMounted } from 'vue';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import InputError from '@/components/InputError.vue';
 import {
   Dialog,
   DialogContent,
@@ -216,10 +217,21 @@ const handleLogoutAndRedirect = () => {
   );
 };
 
+const cartForm = useForm({
+  product_variant_id: null as number | null,
+  quantity: 1,
+});
+
 const handleAddToCart = () => {
   if (!checkUserAccess()) return;
+  if (!selectedVariant.value) return;
 
-  // route to cart
+  cartForm.product_variant_id = selectedVariant.value.id;
+  cartForm.quantity = quantity.value;
+
+  cartForm.post(shop.cart.items.store.url(), {
+    preserveScroll: true,
+  });
 };
 
 const handleBuyNow = () => {
@@ -507,11 +519,17 @@ const handleBuyNow = () => {
               </div>
             </div>
 
+            <div class="mb-10 space-y-2">
+              <InputError :message="cartForm.errors.product_variant_id" />
+              <InputError :message="cartForm.errors.quantity" />
+            </div>
+
             <!-- Action Buttons -->
             <div class="mt-auto flex flex-col gap-4 sm:flex-row">
               <button
+                :disabled="!selectedVariant || selectedVariant.stock <= 0"
                 @click="handleAddToCart"
-                class="flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-2xl border-2 border-[#009933] py-4 font-black tracking-widest text-[#009933] uppercase shadow-sm transition-all hover:bg-green-50 active:scale-95 dark:hover:bg-green-900/10"
+                class="flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-2xl border-2 border-[#009933] py-4 font-black tracking-widest text-[#009933] uppercase shadow-sm transition-all hover:bg-green-50 active:scale-95 disabled:cursor-not-allowed disabled:opacity-20 disabled:active:scale-100 dark:hover:bg-green-900/10"
               >
                 <ShoppingCartIcon class="h-5 w-5" /> Add To Cart
               </button>

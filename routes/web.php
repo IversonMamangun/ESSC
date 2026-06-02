@@ -61,7 +61,13 @@ Route::middleware([
         ->name('account.profile.update');
 
     Route::get('/cart', [CustomerCartController::class, 'index'])
-        ->name('cart.index');  
+        ->name('cart.index');
+    Route::post('/cart/items', [CustomerCartController::class, 'store'])
+        ->name('cart.items.store');
+    Route::patch('/cart/items/{cartItem}', [CustomerCartController::class, 'update'])
+        ->name('cart.items.update');
+    Route::delete('/cart/items/{cartItem}', [CustomerCartController::class, 'destroy'])
+        ->name('cart.items.destroy');
 });
 
 // dedicated seller routes
