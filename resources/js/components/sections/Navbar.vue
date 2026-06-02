@@ -138,6 +138,7 @@ const navLinks = [
 
       <div class="z-20 flex shrink-0 items-center gap-1 sm:gap-2">
         <Link
+          v-if="user && user.user_type?.slug === 'customer'"
           href="/cart"
           class="relative rounded-xl p-2 text-neutral-600 transition-colors hover:bg-neutral-100 focus:ring-2 focus:ring-[#009933] focus:outline-none dark:text-gray-300 dark:hover:bg-neutral-800"
         >
