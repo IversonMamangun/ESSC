@@ -48,4 +48,9 @@ class ProductVariant extends Model
         ->using(ProductVariantAttributeValue::class)
         ->withTimestamps();
     }
+
+    public function cartItems(): HasMany
+    {
+        return $this->hasMany(CartItem::class);
+    }
 }
