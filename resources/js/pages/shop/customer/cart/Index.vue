@@ -9,9 +9,19 @@ import {
   ShoppingBagIcon,
   ArrowRightIcon,
   BadgeCheckIcon,
+  Loader2Icon,
 } from 'lucide-vue-next';
 import { ref, computed, onMounted } from 'vue';
 import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import Footer from '@/components/sections/Footer.vue';
@@ -106,15 +116,68 @@ const getDiscountPercent = (
   return Math.round(((comparePrice - price) / comparePrice) * 100);
 };
 
+// state update & delete
+const updatingItems = ref<Set<number>>(new Set());
+const deletingItemId = ref<number | null>(null);
+const isDeleteDialogOpen = ref(false);
+
+// update & delete helper
+const startUpdating = (itemId: number) => {
+  updatingItems.value.add(itemId);
+};
+const stopUpdating = (itemId: number) => {
+  updatingItems.value.delete(itemId);
+};
+
+// update logic
+const isItemUpdating = (itemId: number) => updatingItems.value.has(itemId);
+const updateQuantity = (
+  itemId: number,
+  currentQuantity: number,
+  increment: number,
+) => {
+  if (isItemUpdating(itemId)) return;
+
+  const newQuantity = currentQuantity + increment;
+  if (newQuantity < 1) return;
+
+  startUpdating(itemId);
+
+  router.patch(
+    shop.cart.items.update(itemId),
+    {
+      quantity: newQuantity,
+    },
+    {
+      preserveScroll: true,
+      onFinish: () => setTimeout(() => stopUpdating(itemId), 500),
+    },
+  );
+};
+
+// delete logic
+const openRemoveDialog = (itemId: number) => {
+  deletingItemId.value = itemId;
+  isDeleteDialogOpen.value = true;
+};
+const removeItem = () => {
+  if (!deletingItemId.value) return;
+
+  const itemId = deletingItemId.value;
+  startUpdating(itemId);
+
+  router.delete(shop.cart.items.destroy(itemId), {
+    preserveScroll: true,
+    onFinish: () => {
+      stopUpdating(itemId);
+
+      deletingItemId.value = null;
+      isDeleteDialogOpen.value = false;
+    },
+  });
+};
+
 const proceedToCheckout = () => {
-  //
-};
-
-const updateQuantity = (id: number, quantity: number, increment: number) => {
-  //
-};
-
-const removeItem = (id: number) => {
   //
 };
 
@@ -315,26 +378,36 @@ const total = computed(() => subtotal.value + delivery.value);
                   >
                     <button
                       @click="updateQuantity(item.id, item.quantity, -1)"
-                      :disabled="item.quantity <= 1"
-                      class="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-zinc-600 shadow-sm transition-colors hover:text-[#009933] disabled:opacity-40 dark:bg-zinc-700 dark:text-zinc-300"
+                      :disabled="item.quantity <= 1 || isItemUpdating(item.id)"
+                      class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-white text-zinc-600 shadow-sm transition-colors hover:text-[#009933] disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-700 dark:text-zinc-300"
                     >
                       <MinusIcon class="h-4 w-4" />
                     </button>
                     <span
                       class="w-10 text-center text-sm font-black text-zinc-800 dark:text-white"
-                      >{{ item.quantity }}</span
                     >
+                      <Loader2Icon
+                        v-if="isItemUpdating(item.id)"
+                        class="mx-auto h-4 w-4 animate-spin"
+                      />
+
+                      <template v-else>
+                        {{ item.quantity }}
+                      </template>
+                    </span>
+
                     <button
                       @click="updateQuantity(item.id, item.quantity, 1)"
-                      class="flex h-8 w-8 items-center justify-center rounded-lg bg-white text-zinc-600 shadow-sm transition-colors hover:text-[#009933] dark:bg-zinc-700 dark:text-zinc-300"
+                      :disabled="isItemUpdating(item.id)"
+                      class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-white text-zinc-600 shadow-sm transition-colors hover:text-[#009933] disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-700 dark:text-zinc-300"
                     >
                       <PlusIcon class="h-4 w-4" />
                     </button>
                   </div>
 
                   <button
-                    @click="removeItem(item.id)"
-                    class="hidden rounded-xl p-2.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-500 sm:flex dark:hover:bg-red-900/20"
+                    @click="openRemoveDialog(item.id)"
+                    class="hidden cursor-pointer rounded-xl p-2.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-500 sm:flex dark:hover:bg-red-900/20"
                     title="Remove item"
                   >
                     <Trash2Icon class="h-5 w-5" />
@@ -393,13 +466,13 @@ const total = computed(() => subtotal.value + delivery.value);
               @click="proceedToCheckout"
               class="flex w-full items-center justify-center gap-2 rounded-2xl py-5 text-lg font-black tracking-wide uppercase shadow-lg transition-all"
               :class="
-                selectedItems.length > 0
-                  ? 'bg-[#009933] text-white shadow-green-900/10 hover:bg-green-700 active:scale-[0.98]'
+                selectedQuantityCount > 0
+                  ? 'cursor-pointer bg-[#009933] text-white shadow-green-900/10 hover:bg-green-700 active:scale-[0.98]'
                   : 'cursor-not-allowed bg-zinc-100 text-zinc-400 shadow-none dark:bg-zinc-800'
               "
-              :disabled="selectedItems.length === 0"
+              :disabled="selectedQuantityCount <= 0"
             >
-              Checkout ({{ selectedItems.length }})
+              Checkout ({{ selectedQuantityCount }})
             </button>
           </div>
         </div>
@@ -407,4 +480,41 @@ const total = computed(() => subtotal.value + delivery.value);
     </main>
     <Footer />
   </div>
+
+  <Dialog v-model:open="isDeleteDialogOpen">
+    <DialogContent
+      class="rounded-3xl border border-zinc-200 bg-white p-6 sm:max-w-[425px] dark:border-zinc-800 dark:bg-zinc-900"
+    >
+      <DialogHeader class="space-y-3 text-center sm:text-left">
+        <DialogTitle
+          class="flex items-center gap-2 text-xl font-black text-zinc-900 dark:text-white"
+        >
+          Remove Item
+        </DialogTitle>
+        <DialogDescription
+          class="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400"
+        >
+          Are you sure you want to remove this item from your cart?
+        </DialogDescription>
+      </DialogHeader>
+
+      <DialogFooter class="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end">
+        <Button
+          variant="outline"
+          class="order-2 cursor-pointer rounded-xl sm:order-1"
+          @click="isDeleteDialogOpen = false"
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="destructive"
+          class="order-1 flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 font-bold tracking-wide text-white hover:bg-red-700 sm:order-2"
+          @click="removeItem"
+        >
+          <Trash2Icon class="h-4 w-4" />
+          Remove
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
 </template>
