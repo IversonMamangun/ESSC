@@ -18,6 +18,7 @@ class CartController extends Controller
         $user = $request->user();
         $cart = $user->cart()->firstOrCreate();
         $cart->loadMissing([
+            'items.productVariant.product.store',
             'items.productVariant.product.images',
             'items.productVariant.attributeValues.attribute'
         ]);
