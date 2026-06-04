@@ -22,7 +22,7 @@ const props = defineProps<{
 }>();
 
 const showProduct = (slug: string) => {
-  router.visit(shop.products.show(slug));
+  router.visit(shop.products.show(slug).url + '?ref=store');
 };
 </script>
 

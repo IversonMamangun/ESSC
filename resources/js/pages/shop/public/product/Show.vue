@@ -29,6 +29,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
+import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import shop from '@/routes/shop';
 import { logout, login } from '@/routes';
 import type { ProductShow, ProductVariant } from '@/types';
@@ -36,6 +37,29 @@ import type { ProductShow, ProductVariant } from '@/types';
 const props = defineProps<{
   product: ProductShow;
 }>();
+
+const breadcrumbs = computed(() => {
+  const base = [{ title: 'Home', href: shop.home() }];
+  const urlParams = new URLSearchParams(window.location.search);
+  const referrer = urlParams.get('ref');
+
+  if (referrer === 'store') {
+    return [
+      ...base,
+      {
+        title: props.product.store.name,
+        href: shop.stores.show(props.product.store.slug),
+      },
+      { title: props.product.name, href: '#' },
+    ];
+  }
+
+  return [
+    ...base,
+    { title: 'Online Store', href: shop.products.index() },
+    { title: props.product.name, href: '#' },
+  ];
+});
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user || null);
@@ -258,24 +282,9 @@ const handleBuyNow = () => {
       class="mx-auto mb-20 w-full max-w-7xl grow px-4 py-8 sm:px-6 md:py-12 lg:px-8"
     >
       <!-- Breadcrumbs -->
-      <nav
-        class="mb-8 flex items-center gap-2 text-sm font-medium text-zinc-500 dark:text-zinc-400"
-      >
-        <Link :href="shop.home()" class="transition-colors hover:text-[#009933]"
-          >Home</Link
-        >
-        <ChevronRightIcon class="h-4 w-4" />
-        <Link
-          :href="shop.products.index()"
-          class="transition-colors hover:text-[#009933]"
-          >Online Store</Link
-        >
-        <ChevronRightIcon class="h-4 w-4" />
-        <span
-          class="max-w-[200px] truncate text-zinc-900 md:max-w-none dark:text-white"
-          >{{ product.name }}</span
-        >
-      </nav>
+      <div class="mx-auto mb-8 max-w-7xl px-5">
+        <Breadcrumbs :breadcrumbs="breadcrumbs" />
+      </div>
 
       <div
         class="overflow-hidden rounded-4xl border border-zinc-200 bg-white shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900"
