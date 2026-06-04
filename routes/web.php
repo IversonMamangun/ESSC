@@ -13,6 +13,7 @@ use App\Http\Controllers\BuyerController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Shop\HomeController as ShopHomeController;
 use App\Http\Controllers\Shop\ProductController as ShopProductController;
+use App\Http\Controllers\Shop\StoreController as ShopStoreController;
 use App\Http\Controllers\Shop\ProfileController as CustomerProfileController;
 use App\Http\Controllers\Shop\CartController as CustomerCartController;
 use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
@@ -45,7 +46,8 @@ Route::name('shop.')
     Route::get('/products/{product:slug}', [ShopProductController::class, 'show'])
         ->name('products.show');
 
-    Route::inertia('/store/{id}', 'shop/public/Store')->name('store');
+    Route::get('/stores/{store:slug}', [ShopStoreController::class, 'show'])
+        ->name('stores.show');
 });
 
 // dedicated customer shop routes (customer experience)
