@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Shop;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class ProductCardResource extends JsonResource
@@ -18,7 +19,9 @@ class ProductCardResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
-            'image' => $this->images->first()?->image,
+            'image' => $this->images->first()
+                ? Storage::url($this->images->first()->image)
+                : null,
             'price' => $this->defaultVariant?->price,
             'compare_price' => $this->defaultVariant?->compare_price,
             'stock' => (int) ($this->total_stock ?? 0),
