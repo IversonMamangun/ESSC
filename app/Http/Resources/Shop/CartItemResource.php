@@ -34,6 +34,7 @@ class CartItemResource extends JsonResource
                     ),
                 'store' => [
                     'name' => $store?->name,
+                    'slug' => $store?->slug,
                     'is_official' => $store?->is_official,
                     'logo' => $store?->logo
                         ? Storage::url($store->logo)

@@ -12,6 +12,7 @@ export interface CartItem {
     image: string;
     store: {
       name: string;
+      slug: string;
       is_official: boolean;
       logo: string | null;
     };
@@ -41,6 +42,7 @@ export interface Cart {
 
 export interface CartStoreGroup {
   storeName: string;
+  storeSlug: string;
   storeLogo: string | null;
   isOfficial: boolean;
   items: CartItem[];

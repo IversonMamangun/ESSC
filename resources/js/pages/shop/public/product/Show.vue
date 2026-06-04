@@ -548,28 +548,33 @@ const handleBuyNow = () => {
       <div
         class="mt-8 rounded-4xl border border-zinc-200 bg-white p-5 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900"
       >
-        <div class="flex items-center gap-4">
-          <div
-            class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#009933] text-3xl font-black text-white shadow-md"
-            :class="{
-              'bg-transparent': product.store.logo,
-            }"
+        <div class="flex justify-between gap-4">
+          <Link
+            :href="shop.stores.show(product.store.slug)"
+            class="flex items-center gap-4"
           >
-            <img
-              v-if="product.store.logo"
-              :src="product.store.logo"
-              class="h-full w-full object-cover"
-            />
-            <span v-else>{{ product.store.name.charAt(0) }}</span>
-          </div>
-          <div class="flex flex-col gap-1">
-            <h3 class="text-lg font-black text-zinc-900 dark:text-white">
-              {{ product.store.name }}
-            </h3>
-            <Badge v-if="product.store.is_official"
-              ><BadgeCheckIcon /> Official Store</Badge
+            <div
+              class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#009933] text-3xl font-black text-white shadow-md"
+              :class="{
+                'bg-transparent': product.store.logo,
+              }"
             >
-          </div>
+              <img
+                v-if="product.store.logo"
+                :src="product.store.logo"
+                class="h-full w-full object-cover"
+              />
+              <span v-else>{{ product.store.name.charAt(0) }}</span>
+            </div>
+            <div class="flex flex-col gap-1">
+              <h3 class="text-lg font-black text-zinc-900 dark:text-white">
+                {{ product.store.name }}
+              </h3>
+              <Badge v-if="product.store.is_official"
+                ><BadgeCheckIcon /> Official Store</Badge
+              >
+            </div>
+          </Link>
         </div>
       </div>
 

@@ -46,6 +46,7 @@ const groupedItems = computed<CartStoreGroup[]>(() => {
     if (!groups.has(key)) {
       groups.set(key, {
         storeName: item.product.store.name,
+        storeSlug: item.product.store.slug,
         storeLogo: item.product.store.logo,
         isOfficial: item.product.store.is_official,
         items: [],
@@ -263,7 +264,7 @@ const total = computed(() => subtotal.value + delivery.value);
               class="overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
             >
               <div
-                class="flex items-center gap-3 border-b border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/50"
+                class="flex items-center gap-4 border-b border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900/50"
               >
                 <input
                   type="checkbox"
@@ -271,27 +272,31 @@ const total = computed(() => subtotal.value + delivery.value);
                   @change="toggleStoreSelection(store.items)"
                   class="h-5 w-5 cursor-pointer"
                 />
-
-                <div
-                  class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-[#009933] text-sm font-black text-white"
+                <Link
+                  :href="shop.stores.show(store.storeSlug)"
+                  class="flex items-center gap-2"
                 >
-                  <img
-                    v-if="store.storeLogo"
-                    :src="store.storeLogo"
-                    class="h-full w-full object-cover"
-                  />
-
-                  <span v-else>
-                    {{ store.storeName.charAt(0) }}
-                  </span>
-                </div>
-
-                <span class="flex flex-col gap-1 font-bold">
-                  {{ store.storeName }}
-                  <Badge v-if="store.isOfficial"
-                    ><BadgeCheckIcon /> Official Store</Badge
+                  <div
+                    class="flex h-10 w-10 items-center justify-center overflow-hidden rounded-full bg-[#009933] text-sm font-black text-white"
                   >
-                </span>
+                    <img
+                      v-if="store.storeLogo"
+                      :src="store.storeLogo"
+                      class="h-full w-full object-cover"
+                    />
+
+                    <span v-else>
+                      {{ store.storeName.charAt(0) }}
+                    </span>
+                  </div>
+
+                  <span class="flex flex-col gap-1 font-bold">
+                    {{ store.storeName }}
+                    <Badge v-if="store.isOfficial"
+                      ><BadgeCheckIcon /> Official Store</Badge
+                    >
+                  </span>
+                </Link>
               </div>
 
               <div
