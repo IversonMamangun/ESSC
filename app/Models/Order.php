@@ -3,26 +3,28 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Casts;
+use App\Enums\OrderStatus;
 
-#[Table('orders')]
-#[Fillable(['user_id', 'total_price', 'status', 'tracking_number', 'shipping_address', 'payment_method'])]
-#[Casts(['total_price' => 'decimal:2'])]
+#[Fillable([
+    //
+])]
 class Order extends Model
 {
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
+    use HasFactory;
 
-    public function products(): BelongsToMany
+    protected $fillable = [
+        //
+    ];
+
+    protected function casts(): array
     {
-        return $this->belongsToMany(Product::class, 'order_product')
-            ->withPivot(['quantity', 'price_at_time'])
-            ->withTimestamps();
+        return [
+            'status' => OrderStatus::class,
+        ];
     }
+    
 }
