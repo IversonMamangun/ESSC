@@ -50,11 +50,6 @@ class User extends Authenticatable
         return $this->belongsTo(UserType::class);
     }
 
-    public function orders(): HasMany
-    {
-        return $this->hasMany(Order::class);
-    }
-
     public function store(): HasOne
     {
         return $this->hasOne(Store::class);
@@ -65,8 +60,13 @@ class User extends Authenticatable
         return $this->hasOne(Cart::class);
     }
 
-    public function addresses()
+    public function addresses(): HasMany
     {
-        return $this->hasMany(Address::class);
+        return $this->hasMany(UserAddress::class);
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
     }
 }
