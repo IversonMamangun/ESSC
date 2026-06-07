@@ -59,4 +59,9 @@ class Product extends Model
         return $this->hasOne(ProductVariant::class)
             ->where('is_default', true);
     }
+
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
 }
