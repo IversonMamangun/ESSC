@@ -52,7 +52,7 @@ Route::name('shop.')
 
 // dedicated customer shop routes (customer experience)
 Route::middleware([
-    'auth', 
+    'auth',
     'role:' . UserType::CUSTOMER
 ])
 ->name('shop.')
@@ -70,6 +70,15 @@ Route::middleware([
         ->name('cart.items.update');
     Route::delete('/cart/items/{cartItem}', [CustomerCartController::class, 'destroy'])
         ->name('cart.items.destroy');
+
+    Route::get('/checkout', [CheckoutController::class, 'index'])
+        ->name('checkout.index');
+
+    Route::post('/checkout', [CheckoutController::class, 'store'])
+        ->name('checkout.store');
+
+    Route::get('/checkout/success/{tracking}', [CheckoutController::class, 'success'])
+        ->name('checkout.success');
 });
 
 // dedicated seller routes

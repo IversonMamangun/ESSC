@@ -20,7 +20,7 @@ class CheckoutController extends Controller
         $selectedIds = $request->query('selected_ids', []);
 
         if (empty($cart) || empty($selectedIds)) {
-            return redirect()->route('cart.index')->with('error', 'No items selected for checkout.');
+            return redirect()->route('shop.cart.index')->with('error', 'No items selected for checkout.');
         }
 
         $products = Product::whereIn('id', $selectedIds)->get();
@@ -46,7 +46,7 @@ class CheckoutController extends Controller
         
         $user = Auth::user();
 
-        return Inertia::render('store/Checkout', [
+        return Inertia::render('shop/customer/checkout/Index', [
             'orderSummary' => [
                 'subtotal' => $subtotal,
                 'tax' => $tax,
@@ -157,7 +157,7 @@ class CheckoutController extends Controller
             ->where('user_id', Auth::id()) 
             ->firstOrFail();
 
-        return Inertia::render('store/OrderSuccess', [
+        return Inertia::render('shop/customer/checkout/Success', [
             'order' => [
                 'tracking_number' => $order->tracking_number,
                 'total_price' => (float) $order->total_price,
