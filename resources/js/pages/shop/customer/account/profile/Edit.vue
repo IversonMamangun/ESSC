@@ -9,6 +9,7 @@ import {
   CheckCircle2,
 } from 'lucide-vue-next';
 import { ref } from 'vue';
+import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
@@ -64,46 +65,7 @@ const submitProfile = () => {
       class="mx-auto w-full max-w-7xl flex-grow px-4 py-8 sm:px-6 md:py-12 lg:px-8"
     >
       <div class="flex flex-col gap-8 lg:flex-row">
-        <div class="w-full shrink-0 lg:w-64">
-          <div class="mb-8 flex items-center gap-4">
-            <div
-              class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-zinc-200 shadow-sm dark:border-zinc-900 dark:bg-zinc-800"
-            >
-              <img
-                v-if="avatarPreview"
-                :src="avatarPreview"
-                class="h-full w-full object-cover"
-              />
-              <UserIcon v-else class="h-6 w-6 text-zinc-500" />
-            </div>
-            <div>
-              <p class="leading-tight font-black text-zinc-900 dark:text-white">
-                {{ props.user.name || 'User' }}
-              </p>
-            </div>
-          </div>
-
-          <nav class="space-y-1">
-            <Link
-              :href="shop.account.profile.edit()"
-              class="flex items-center gap-3 rounded-xl bg-green-50 px-4 py-3 font-black text-[#009933] transition-colors dark:bg-green-900/10"
-            >
-              <UserIcon class="h-5 w-5" /> My Profile
-            </Link>
-            <Link
-              href="/account/address"
-              class="flex items-center gap-3 rounded-xl px-4 py-3 font-bold text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800/50"
-            >
-              <MapPin class="h-5 w-5" /> Addresses
-            </Link>
-            <Link
-              href="/purchases"
-              class="flex items-center gap-3 rounded-xl px-4 py-3 font-bold text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800/50"
-            >
-              <Package class="h-5 w-5" /> My Purchases
-            </Link>
-          </nav>
-        </div>
+        <UserAccountSidebar :name="user.name" :avatar="user.avatar" />
 
         <div class="min-w-0 flex-1">
           <!-- Adjusted card background to stand out from default bg -->
