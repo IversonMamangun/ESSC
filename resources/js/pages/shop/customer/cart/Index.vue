@@ -12,7 +12,11 @@ import {
   Loader2Icon,
 } from 'lucide-vue-next';
 import { ref, computed, onMounted } from 'vue';
+import Footer from '@/components/sections/Footer.vue';
+import Navbar from '@/components/sections/Navbar.vue';
+import TopBar from '@/components/sections/TopBar.vue';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -21,10 +25,6 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import Navbar from '@/components/sections/Navbar.vue';
-import TopBar from '@/components/sections/TopBar.vue';
-import Footer from '@/components/sections/Footer.vue';
 import shop from '@/routes/shop';
 import type { Cart, CartStoreGroup } from '@/types';
 
@@ -41,8 +41,10 @@ const selectedItems = ref<number[]>(cartItems.value.map((item) => item.id));
 // group items by store
 const groupedItems = computed<CartStoreGroup[]>(() => {
   const groups = new Map<string, CartStoreGroup>();
+
   for (const item of cartItems.value) {
     const key = item.product.store.name;
+
     if (!groups.has(key)) {
       groups.set(key, {
         storeName: item.product.store.name,
@@ -52,8 +54,10 @@ const groupedItems = computed<CartStoreGroup[]>(() => {
         items: [],
       });
     }
+
     groups.get(key)!.items.push(item);
   }
+
   return [...groups.values()];
 });
 
@@ -68,6 +72,7 @@ const selectedStoreCount = computed(() => {
   const stores = new Set(
     selectedCartItems.value.map((item) => item.product.store.name),
   );
+
   return stores.size;
 });
 const subtotal = computed(() =>
@@ -95,8 +100,11 @@ const toggleStoreSelection = (items: Cart['items']) => {
 
   if (allSelected) {
     selectedItems.value = selectedItems.value.filter((id) => !ids.includes(id));
+
     return;
   }
+
+
   selectedItems.value = [...new Set([...selectedItems.value, ...ids])];
 };
 
@@ -137,10 +145,15 @@ const updateQuantity = (
   currentQuantity: number,
   increment: number,
 ) => {
-  if (isItemUpdating(itemId)) return;
+  if (isItemUpdating(itemId)) {
+    return;
+  }
 
   const newQuantity = currentQuantity + increment;
-  if (newQuantity < 1) return;
+
+  if (newQuantity < 1) {
+    return;
+  }
 
   startUpdating(itemId);
 
@@ -162,7 +175,9 @@ const openRemoveDialog = (itemId: number) => {
   isDeleteDialogOpen.value = true;
 };
 const removeItem = () => {
-  if (!deletingItemId.value) return;
+  if (!deletingItemId.value) {
+    return;
+  }
 
   const itemId = deletingItemId.value;
   startUpdating(itemId);
@@ -179,7 +194,7 @@ const removeItem = () => {
 };
 
 const proceedToCheckout = () => {
-  //
+  router.get('/checkout');
 };
 
 const delivery = computed(() => {
