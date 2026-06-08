@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\UserAddressLabel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'city',
     'barangay',
     'street',
+    'unit_bldg_house',
     'postal_code',
     'landmark',
     'is_default',
@@ -29,6 +31,7 @@ class UserAddress extends Model
     {
         return [
             'user_id' => 'integer',
+            'label' => UserAddressLabel::class,
             'is_default' => 'boolean',
         ];
     }
