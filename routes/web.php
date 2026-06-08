@@ -15,6 +15,7 @@ use App\Http\Controllers\Shop\HomeController as ShopHomeController;
 use App\Http\Controllers\Shop\ProductController as ShopProductController;
 use App\Http\Controllers\Shop\StoreController as ShopStoreController;
 use App\Http\Controllers\Shop\ProfileController as CustomerProfileController;
+use App\Http\Controllers\Shop\UserAddressController as CustomerUserAddressController;
 use App\Http\Controllers\Shop\CartController as CustomerCartController;
 use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
 use App\Http\Controllers\Seller\StoreController as SellerStoreController;
@@ -62,6 +63,13 @@ Route::middleware([
     Route::patch('/account/profile', [CustomerProfileController::class, 'update'])
         ->name('account.profile.update');
 
+    Route::get('/account/addresses', [CustomerUserAddressController::class, 'index'])
+        ->name('account.addresses.index');
+    Route::get('/account/addresses/create', [CustomerUserAddressController::class, 'create'])
+        ->name('account.addresses.create');
+    Route::post('/account/addresses', [CustomerUserAddressController::class, 'store'])
+        ->name('account.addresses.store');
+
     Route::get('/cart', [CustomerCartController::class, 'index'])
         ->name('cart.index');
     Route::post('/cart/items', [CustomerCartController::class, 'store'])
@@ -80,7 +88,6 @@ Route::middleware([
 ->prefix('seller')
 ->name('seller.')
 ->group(function () {
-
     Route::get('/dashboard', [SellerDashboardController::class, 'index'])
         ->name('dashboard');
 
