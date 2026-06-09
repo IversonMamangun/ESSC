@@ -9,6 +9,8 @@ import {
   PhoneIcon,
   Building2Icon,
   UserIcon,
+  ChevronLeftIcon,
+  SaveIcon,
 } from 'lucide-vue-next';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -23,6 +25,7 @@ import {
 import { ref, watchEffect, reactive } from 'vue';
 import { useAddress } from '@/composables/useAddress';
 import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
+import InputError from '@/components/InputError.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
@@ -62,17 +65,6 @@ watchEffect(() => {
   form.city = userAddress.selectedCity;
   form.barangay = userAddress.selectedBarangay;
 });
-
-const breadcrumbs = [
-  {
-    title: 'My Addresses',
-    href: shop.account.addresses.index.url(),
-  },
-  {
-    title: 'Create Address',
-    href: shop.account.addresses.create.url(),
-  },
-];
 </script>
 
 <template>
@@ -93,7 +85,6 @@ const breadcrumbs = [
           <div
             class="rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm transition-colors md:p-10 dark:border-zinc-800 dark:bg-zinc-900"
           >
-            <Breadcrumbs :breadcrumbs="breadcrumbs" />
             <div
               class="mb-8 flex flex-col justify-between gap-4 border-b border-zinc-200 pb-6 sm:flex-row sm:items-center dark:border-zinc-800"
             >
@@ -105,6 +96,14 @@ const breadcrumbs = [
                   Add a new address to your account
                 </p>
               </div>
+
+              <Link
+                :href="shop.account.addresses.index.url()"
+                class="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg border bg-accent px-3 py-2 text-sm font-medium shadow transition-all hover:bg-accent-foreground/10 active:scale-95"
+              >
+                <ChevronLeftIcon class="h-4 w-4" />
+                <span>Back to Addresses</span>
+              </Link>
             </div>
 
             <form @submit.prevent="submitAddress" class="space-y-6">
@@ -149,6 +148,7 @@ const breadcrumbs = [
                     <span class="text-sm font-bold">Office</span>
                   </Label>
                 </div>
+                <InputError :message="form.errors.label" />
               </div>
 
               <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
@@ -157,34 +157,28 @@ const breadcrumbs = [
                     class="mb-2 block text-sm font-bold text-zinc-700 dark:text-zinc-300"
                     >Recipient Name</Label
                   >
-                  <input
+                  <Input
                     type="text"
                     v-model="form.recipient_name"
+                    placeholder="e.g. John Doe"
                     required
-                    class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-zinc-900 transition-all outline-none focus:border-[#009933] focus:ring-2 focus:ring-[#009933]/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                    class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                   />
-                  <span
-                    v-if="form.errors.recipient_name"
-                    class="mt-1 block text-xs font-bold text-red-500"
-                    >{{ form.errors.recipient_name }}</span
-                  >
+                  <InputError :message="form.errors.recipient_name" />
                 </div>
                 <div>
                   <Label
                     class="mb-2 block text-sm font-bold text-zinc-700 dark:text-zinc-300"
                     >Phone Number</Label
                   >
-                  <input
+                  <Input
                     type="text"
                     v-model="form.recipient_number"
+                    placeholder="e.g. 09123456789"
                     required
-                    class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-zinc-900 transition-all outline-none focus:border-[#009933] focus:ring-2 focus:ring-[#009933]/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                    class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                   />
-                  <span
-                    v-if="form.errors.recipient_number"
-                    class="mt-1 block text-xs font-bold text-red-500"
-                    >{{ form.errors.recipient_number }}</span
-                  >
+                  <InputError :message="form.errors.recipient_number" />
                 </div>
               </div>
 
@@ -194,17 +188,14 @@ const breadcrumbs = [
                     class="mb-2 block text-sm font-bold text-zinc-700 dark:text-zinc-300"
                     >House No. / Unit / Floor / Building / Blk & Lot</Label
                   >
-                  <input
+                  <Input
                     type="text"
                     v-model="form.unit_bldg_house"
+                    placeholder="e.g. Unit D, 2nd Floor, Blk 123, Lot 456"
                     required
-                    class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-zinc-900 transition-all outline-none focus:border-[#009933] focus:ring-2 focus:ring-[#009933]/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                    class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                   />
-                  <span
-                    v-if="form.errors.unit_bldg_house"
-                    class="mt-1 block text-xs font-bold text-red-500"
-                    >{{ form.errors.unit_bldg_house }}</span
-                  >
+                  <InputError :message="form.errors.unit_bldg_house" />
                 </div>
 
                 <div>
@@ -212,17 +203,14 @@ const breadcrumbs = [
                     class="mb-2 block text-sm font-bold text-zinc-700 dark:text-zinc-300"
                     >Street</Label
                   >
-                  <input
+                  <Input
                     type="text"
                     v-model="form.street"
+                    placeholder="e.g. 123 Main St"
                     required
-                    class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-zinc-900 transition-all outline-none focus:border-[#009933] focus:ring-2 focus:ring-[#009933]/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                    class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                   />
-                  <span
-                    v-if="form.errors.street"
-                    class="mt-1 block text-xs font-bold text-red-500"
-                    >{{ form.errors.street }}</span
-                  >
+                  <InputError :message="form.errors.street" />
                 </div>
               </div>
 
@@ -230,55 +218,176 @@ const breadcrumbs = [
                 <div>
                   <Label
                     class="mb-2 block text-sm font-bold text-zinc-700 dark:text-zinc-300"
-                    >City / Municipality</Label
+                    >Region</Label
                   >
-                  <input
-                    type="text"
-                    v-model="form.city"
-                    required
-                    class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-zinc-900 transition-all outline-none focus:border-[#009933] focus:ring-2 focus:ring-[#009933]/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-                  />
-                  <span
-                    v-if="form.errors.city"
-                    class="mt-1 block text-xs font-bold text-red-500"
-                    >{{ form.errors.city }}</span
-                  >
+                  <Select v-model="userAddress.selectedRegion">
+                    <SelectTrigger
+                      class="w-full cursor-pointer rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none focus:ring-2 focus:ring-ring/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                    >
+                      <SelectValue placeholder="Select region" />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      <SelectItem
+                        v-for="region in userAddress.regions"
+                        :key="region.code"
+                        :value="region.name"
+                        class="cursor-pointer"
+                      >
+                        {{ region.name }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <InputError :message="form.errors.region" />
                 </div>
                 <div>
                   <Label
                     class="mb-2 block text-sm font-bold text-zinc-700 dark:text-zinc-300"
                     >Province</Label
                   >
-                  <input
-                    type="text"
-                    v-model="form.province"
-                    required
-                    class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-zinc-900 transition-all outline-none focus:border-[#009933] focus:ring-2 focus:ring-[#009933]/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-                  />
-                  <span
-                    v-if="form.errors.province"
-                    class="mt-1 block text-xs font-bold text-red-500"
-                    >{{ form.errors.province }}</span
+                  <Select v-model="userAddress.selectedProvince">
+                    <SelectTrigger
+                      class="w-full cursor-pointer rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none focus:ring-2 focus:ring-ring/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                      :disabled="
+                        !userAddress.selectedRegion ||
+                        userAddress.selectedRegion === 'NCR'
+                      "
+                    >
+                      <SelectValue
+                        :placeholder="
+                          !userAddress.selectedRegion
+                            ? 'Select region first'
+                            : userAddress.selectedRegion === 'NCR'
+                              ? 'NCR has no province, proceed to city'
+                              : 'Select province'
+                        "
+                      />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      <SelectItem
+                        v-for="province in userAddress.provinces"
+                        :key="province.code"
+                        :value="province.name"
+                        class="cursor-pointer"
+                      >
+                        {{ province.name }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <InputError :message="form.errors.province" />
+                </div>
+
+                <div>
+                  <Label
+                    class="mb-2 block text-sm font-bold text-zinc-700 dark:text-zinc-300"
+                    >City</Label
                   >
+                  <Select v-model="userAddress.selectedCity">
+                    <SelectTrigger
+                      class="w-full cursor-pointer rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none focus:ring-2 focus:ring-ring/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                      :disabled="
+                        userAddress.selectedRegion !== 'NCR' &&
+                        !userAddress.selectedProvince
+                      "
+                    >
+                      <SelectValue
+                        :placeholder="
+                          userAddress.selectedRegion !== 'NCR' &&
+                          !userAddress.selectedProvince
+                            ? 'Select province first'
+                            : 'Select city'
+                        "
+                      />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      <SelectItem
+                        v-for="city in userAddress.cities"
+                        :key="city.code"
+                        :value="city.name"
+                        class="cursor-pointer"
+                      >
+                        {{ city.name }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <InputError :message="form.errors.city" />
+                </div>
+
+                <div>
+                  <Label
+                    class="mb-2 block text-sm font-bold text-zinc-700 dark:text-zinc-300"
+                    >Barangay</Label
+                  >
+                  <Select v-model="userAddress.selectedBarangay">
+                    <SelectTrigger
+                      class="w-full cursor-pointer rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none focus:ring-2 focus:ring-ring/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                      :disabled="!userAddress.selectedCity"
+                    >
+                      <SelectValue
+                        :placeholder="
+                          !userAddress.selectedCity
+                            ? 'Select city first'
+                            : 'Select barangay'
+                        "
+                      />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      <SelectItem
+                        v-for="barangay in userAddress.cities"
+                        :key="barangay.code"
+                        :value="barangay.name"
+                        class="cursor-pointer"
+                      >
+                        {{ barangay.name }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <InputError :message="form.errors.barangay" />
+                </div>
+                <div>
+                  <Label
+                    class="mb-2 block text-sm font-bold text-zinc-700 dark:text-zinc-300"
+                    >Postal Code</Label
+                  >
+                  <Input
+                    type="text"
+                    v-model="form.postal_code"
+                    placeholder="e.g. 1234"
+                    maxlength="4"
+                    required
+                    class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none focus:ring-2 focus:ring-ring/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                  />
+                  <InputError :message="form.errors.postal_code" />
+                </div>
+                <div>
+                  <Label
+                    class="mb-2 block text-sm font-bold text-zinc-700 dark:text-zinc-300"
+                    >Landmark</Label
+                  >
+                  <Input
+                    type="text"
+                    v-model="form.landmark"
+                    placeholder="e.g. near the mall"
+                    required
+                    class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none focus:ring-2 focus:ring-ring/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                  />
+                  <InputError :message="form.errors.landmark" />
                 </div>
               </div>
 
-              <div>
-                <Label
-                  class="mb-2 block text-sm font-bold text-zinc-700 dark:text-zinc-300"
-                  >Postal Code</Label
+              <div class="mt-6 flex justify-end">
+                <Button
+                  type="submit"
+                  :disabled="form.processing"
+                  :loading="form.processing"
+                  class="cursor-pointer"
                 >
-                <input
-                  type="text"
-                  v-model="form.postal_code"
-                  required
-                  class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-zinc-900 transition-all outline-none focus:border-[#009933] focus:ring-2 focus:ring-[#009933]/20 sm:w-1/2 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-                />
-                <span
-                  v-if="form.errors.postal_code"
-                  class="mt-1 block text-xs font-bold text-red-500"
-                  >{{ form.errors.postal_code }}</span
-                >
+                  <SaveIcon class="h-4 w-4" />
+                  {{ form.processing ? 'Creating...' : 'Create Address' }}
+                </Button>
               </div>
             </form>
           </div>
