@@ -7,14 +7,14 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use App\Enums\UserAddressLabel;
 
-class UserAddressUpdateRequest extends FormRequest
+class UserAddressRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**

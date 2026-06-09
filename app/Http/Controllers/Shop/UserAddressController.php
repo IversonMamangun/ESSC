@@ -4,8 +4,7 @@ namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Shop\UserAddressResource;
-use App\Http\Requests\Shop\UserAddressCreateRequest;
-use App\Http\Requests\Shop\UserAddressUpdateRequest;
+use App\Http\Requests\Shop\UserAddressRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +36,7 @@ class UserAddressController extends Controller
         ]);
     }
 
-    public function store(UserAddressCreateRequest $request)
+    public function store(UserAddressRequest $request)
     {
         $validated = $request->validated();
         $user = $request->user();
@@ -56,7 +55,7 @@ class UserAddressController extends Controller
             ->with('success', 'New address added successfully.');
     }
  
-    public function update(UserAddressUpdateRequest $request, UserAddress $address)
+    public function update(UserAddressRequest $request, UserAddress $address)
     {
         if ($address->user_id !== $request->user()->id) {
             abort(403);
