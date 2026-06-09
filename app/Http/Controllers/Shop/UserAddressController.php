@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Shop;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Shop\UserAddressResource;
 use App\Http\Requests\Shop\UserAddressCreateRequest;
+use App\Http\Requests\Shop\UserAddressUpdateRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\DB;
@@ -17,9 +18,14 @@ class UserAddressController extends Controller
     {
         $user = $request->user()->loadMissing('addresses');
 
+        $addresses = $user->addresses()
+            ->orderByDesc('is_default')
+            ->orderBy('id')
+            ->get();
+
         return Inertia::render('shop/customer/account/address/Index', [
             'user' => $user->only('name', 'phone', 'avatar'),
-            'addresses' => UserAddressResource::collection($user->addresses)->resolve(),
+            'addresses' => UserAddressResource::collection($addresses)->resolve(),
         ]);
     }
 
@@ -49,6 +55,34 @@ class UserAddressController extends Controller
         return redirect()->route('shop.account.addresses.index')
             ->with('success', 'New address added successfully.');
     }
+ 
+    public function update(UserAddressUpdateRequest $request, UserAddress $address)
+    {
+        if ($address->user_id !== $request->user()->id) {
+            abort(403);
+        }
+ 
+        $validated = $request->validated();
+        $user      = $request->user();
+ 
+        DB::transaction(function () use ($user, $address, $validated) {
+            if (! empty($validated['is_default'])) {
+                // Promote this address to default — demote all others
+                $user->addresses()
+                    ->where('id', '!=', $address->id)
+                    ->update(['is_default' => false]);
+ 
+                $validated['is_default'] = true;
+            } else {
+                // Demote this address
+                unset($validated['is_default']);
+            }
+ 
+            $address->update($validated);
+        });
+ 
+        return back()->with('success', 'Address updated successfully.');
+    }
 
     public function destroy(Request $request, UserAddress $address)
     {
@@ -56,7 +90,24 @@ class UserAddressController extends Controller
             abort(403);
         }
 
-        $address->delete();
+        DB::transaction(function () use ($address) {
+            $user = $address->user;
+            $wasDefault = $address->is_default;
+            $address->delete();
+
+            if ($wasDefault) {
+                $nextAddress = $user
+                    ->addresses()
+                    ->oldest('id')
+                    ->first();
+
+                if ($nextAddress) {
+                    $nextAddress->update([
+                        'is_default' => true,
+                    ]);
+                }
+            }
+        });
 
         return back()->with('success', 'Address removed successfully.');
     }
