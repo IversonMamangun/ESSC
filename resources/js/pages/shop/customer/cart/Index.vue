@@ -194,7 +194,12 @@ const removeItem = () => {
 };
 
 const proceedToCheckout = () => {
-  router.get('/checkout');
+  router.get(
+    shop.checkout.index(),
+    {
+      selected_ids: [...selectedItems.value], // Destructure to send raw array data
+    }
+  );
 };
 
 const delivery = computed(() => {
@@ -207,14 +212,14 @@ const total = computed(() => subtotal.value + delivery.value);
   <Head title="Shopping Cart" />
 
   <div
-    class="min-h-screen bg-gray-50 transition-colors duration-300 dark:bg-zinc-950"
+    class="min-h-screen flex flex-col bg-gray-50 transition-colors duration-300 dark:bg-[#29321F]"
   >
     <TopBar />
     <div class="sticky top-0 z-50 mt-8">
       <Navbar />
     </div>
 
-    <main class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <main class="mx-auto flex-1 max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
       <div class="flex flex-col gap-10 lg:flex-row">
         <div class="flex-1 space-y-6">
           <div class="mb-2 flex items-center justify-between pb-2">

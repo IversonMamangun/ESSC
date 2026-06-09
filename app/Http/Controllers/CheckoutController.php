@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Order;
-use App\Models\Address; 
+use App\Models\Cart;
+use App\Models\CartItem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -16,25 +16,47 @@ class CheckoutController extends Controller
 {
     public function index(Request $request): Response|RedirectResponse
     {
-        $cart = $request->session()->get('cart', []);
-        $selectedIds = $request->query('selected_ids', []);
+        // 1. Extract CartItem IDs sent from the Vue frontend
+        $selectedIds = $this->extractSelectedIds($request);
 
-        if (empty($cart) || empty($selectedIds)) {
+        if (empty($selectedIds)) {
             return redirect()->route('shop.cart.index')->with('error', 'No items selected for checkout.');
         }
 
-        $products = Product::whereIn('id', $selectedIds)->get();
+        $user = $request->user();
+
+        // 2. Find the user's database cart record
+        $cart = Cart::where('user_id', $user->id)->first();
+
+        if (!$cart) {
+            return redirect()->route('shop.cart.index')->with('error', 'Your cart is empty.');
+        }
+
+        // 3. Eager load the item variants and their parent products in one query
+        $cartItems = CartItem::with(['productVariant.product'])
+            ->where('cart_id', $cart->id)
+            ->whereIn('id', $selectedIds) // Matches your Vue map((item) => item.id)
+            ->get();
+
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('shop.cart.index')->with('error', 'Selected items were not found in your cart.');
+        }
+
         $subtotal = 0;
         $items = [];
 
-        foreach ($products as $product) {
-            if (!isset($cart[$product->id])) continue; 
+        // 4. Calculate prices using the relationships
+        foreach ($cartItems as $cartItem) {
+            $variant = $cartItem->productVariant;
+            if (!$variant || !$variant->product) continue;
 
-            $qty = $cart[$product->id]['quantity'];
+            $product = $variant->product;
+            $qty = $cartItem->quantity;
+            
             $subtotal += $product->price * $qty;
             
             $items[] = [
-                'name' => $product->title,
+                'name' => $product->title . ($variant->name ? " - {$variant->name}" : ""),
                 'qty' => $qty,
                 'price' => (float) $product->price * $qty,
             ];
@@ -44,8 +66,6 @@ class CheckoutController extends Controller
         $shipping = 150.00; 
         $total = $subtotal + $tax + $shipping;
         
-        $user = Auth::user();
-
         return Inertia::render('shop/customer/checkout/Index', [
             'orderSummary' => [
                 'subtotal' => $subtotal,
@@ -61,44 +81,63 @@ class CheckoutController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        $request->merge([
+            'selected_ids' => $this->extractSelectedIds($request)
+        ]);
+
         $request->validate([
             'selected_ids' => 'required|array',
-            'address_id' => 'required|exists:addresses,id',
+            'address_id' => 'required|exists:user_addresses,id',
             'paymentMethod' => 'required|string|in:credit_card,gcash,cod',
         ]);
 
-        $user = Auth::user();
-        
+        $user = $request->user();
         $address = $user->addresses()->findOrFail($request->address_id);
+        $selectedIds = $request->input('selected_ids');
 
-        $cart = $request->session()->get('cart', []);
-        $selectedIds = $request->selected_ids;
+        $cart = Cart::where('user_id', $user->id)->first();
+        if (!$cart) {
+            return redirect()->route('shop.cart.index')->with('error', 'Cart not found.');
+        }
 
-        $products = Product::whereIn('id', $selectedIds)->get();
+        // Fetch the cart items to be checked out
+        $cartItems = CartItem::with(['productVariant.product'])
+            ->where('cart_id', $cart->id)
+            ->whereIn('id', $selectedIds)
+            ->get();
 
-        foreach ($products as $product) {
-            $qty = $cart[$product->id]['quantity'];
-            if ($product->stock < $qty) {
+        // Pre-transaction stock check
+        foreach ($cartItems as $cartItem) {
+            $product = $cartItem->productVariant?->product;
+            if (!$product) continue;
+
+            if ($product->stock < $cartItem->quantity) {
                 return back()->withErrors([
                     'stock' => "Sorry, only {$product->stock} left for '{$product->title}'."
                 ]);
             }
         }
 
-        // Variable to hold the tracking number generated inside the transaction
         $trackingNumber = null;
 
-        DB::transaction(function () use ($cart, $request, $products, $selectedIds, $address, $user, &$trackingNumber) {
-            $lockedProducts = Product::whereIn('id', $selectedIds)->lockForUpdate()->get();
+        DB::transaction(function () use ($cartItems, $request, $selectedIds, $address, $user, $cart, &$trackingNumber) {
             $subtotal = 0;
             $pivotData = [];
 
-            foreach ($lockedProducts as $product) {
-                $qty = $cart[$product->id]['quantity'];
+            foreach ($cartItems as $cartItem) {
+                $variant = $cartItem->productVariant;
+                if (!$variant) continue;
+                
+                // Lock the parent product row to safely decrement stock under concurrent traffic
+                $product = Product::where('id', $variant->product_id)->lockForUpdate()->first();
+                if (!$product) continue;
+
+                $qty = $cartItem->quantity;
                 $subtotal += $product->price * $qty;
                 
                 $product->decrement('stock', $qty);
 
+                // Build pivot data for the order item record
                 $pivotData[$product->id] = [
                     'quantity' => $qty,
                     'price_at_time' => $product->price,
@@ -109,8 +148,6 @@ class CheckoutController extends Controller
             $shipping = 150.00;
             $total = $subtotal + $tax + $shipping;
 
-            $userEmail = $user->email ?? 'No Email Provided';
-
             $fullShippingAddress = sprintf(
                 "[%s] %s | %s | %s, %s, %s %s (Account: %s)",
                 $address->label,
@@ -120,8 +157,10 @@ class CheckoutController extends Controller
                 $address->city,
                 $address->province,
                 $address->zip,
-                $userEmail 
+                $user->email ?? 'No Email Provided'
             );
+
+            $trackingNumber = 'TRK-' . strtoupper(uniqid());
 
             $order = Order::create([
                 'user_id' => $user->id,
@@ -129,32 +168,25 @@ class CheckoutController extends Controller
                 'shipping_address' => $fullShippingAddress,
                 'payment_method' => $request->paymentMethod,
                 'status' => 'pending', 
-                'tracking_number' => 'TRK-' . strtoupper(uniqid()), 
+                'tracking_number' => $trackingNumber, 
             ]);
 
+            // Connects order items to your pivot table
             $order->products()->attach($pivotData);
 
-            // Assign the newly generated tracking number to our outside variable
-            $trackingNumber = $order->tracking_number;
+            // 5. Clean up your database: Delete only the items that were checked out
+            CartItem::where('cart_id', $cart->id)
+                ->whereIn('id', $selectedIds)
+                ->delete();
         });
 
-        foreach ($selectedIds as $id) {
-            unset($cart[$id]);
-        }
-        $request->session()->put('cart', $cart);
-
-        // Redirect directly to the success page, passing the tracking number in the URL
-        return redirect()->route('checkout.success', ['tracking' => $trackingNumber]);
+        return redirect()->route('shop.checkout.success', ['tracking' => $trackingNumber]);
     }
 
-    /**
-     * Show the Order Success / Payment Confirmation Page
-     */
     public function success($tracking): Response
     {
-        // Find the order by its tracking number securely
         $order = Order::where('tracking_number', $tracking)
-            ->where('user_id', Auth::id()) 
+            ->where('user_id', request()->user()->id) 
             ->firstOrFail();
 
         return Inertia::render('shop/customer/checkout/Success', [
@@ -166,5 +198,16 @@ class CheckoutController extends Controller
                 'created_at' => $order->created_at->format('F j, Y, g:i a'),
             ]
         ]);
+    }
+
+    private function extractSelectedIds(Request $request): array
+    {
+        $ids = $request->input('selected_ids', []);
+        
+        if (is_string($ids)) {
+            $ids = explode(',', $ids);
+        }
+        
+        return array_values(array_filter((array) $ids));
     }
 }
