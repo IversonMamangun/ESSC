@@ -69,6 +69,12 @@ Route::middleware([
         ->name('account.addresses.create');
     Route::post('/account/addresses', [CustomerUserAddressController::class, 'store'])
         ->name('account.addresses.store');
+    Route::get('/account/addresses/{address}/edit', [CustomerUserAddressController::class, 'edit'])
+        ->name('account.addresses.edit');
+    Route::patch('/account/addresses/{address}', [CustomerUserAddressController::class, 'update'])
+        ->name('account.addresses.update');
+    Route::delete('/account/addresses/{address}', [CustomerUserAddressController::class, 'destroy'])
+        ->name('account.addresses.destroy');
 
     Route::get('/cart', [CustomerCartController::class, 'index'])
         ->name('cart.index');
