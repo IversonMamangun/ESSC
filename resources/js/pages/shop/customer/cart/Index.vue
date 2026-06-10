@@ -104,7 +104,6 @@ const toggleStoreSelection = (items: Cart['items']) => {
     return;
   }
 
-
   selectedItems.value = [...new Set([...selectedItems.value, ...ids])];
 };
 
@@ -194,11 +193,14 @@ const removeItem = () => {
 };
 
 const proceedToCheckout = () => {
-  router.get(
-    shop.checkout.index(),
+  router.post(
+    shop.checkout.select(),
     {
-      selected_ids: [...selectedItems.value], // Destructure to send raw array data
-    }
+      cart_item_ids: selectedItems.value,
+    },
+    {
+      preserveScroll: true,
+    },
   );
 };
 
@@ -212,14 +214,14 @@ const total = computed(() => subtotal.value + delivery.value);
   <Head title="Shopping Cart" />
 
   <div
-    class="min-h-screen flex flex-col bg-gray-50 transition-colors duration-300 dark:bg-[#29321F]"
+    class="flex min-h-screen flex-col bg-gray-50 transition-colors duration-300 dark:bg-[#29321F]"
   >
     <TopBar />
     <div class="sticky top-0 z-50 mt-8">
       <Navbar />
     </div>
 
-    <main class="mx-auto flex-1 max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+    <main class="mx-auto max-w-7xl flex-1 px-4 py-10 sm:px-6 lg:px-8">
       <div class="flex flex-col gap-10 lg:flex-row">
         <div class="flex-1 space-y-6">
           <div class="mb-2 flex items-center justify-between pb-2">
