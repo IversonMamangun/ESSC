@@ -42,6 +42,10 @@ class DatabaseSeeder extends Seeder
 
         Product::factory(20)->create();
 
+        $this->call([
+            PaymentMethodSeeder::class,
+        ]);
+
         // // Create the Admin User
         // $admin = User::factory()->create([
         //     'name' => 'Iverson Mamangun',
