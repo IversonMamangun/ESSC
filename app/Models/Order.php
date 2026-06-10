@@ -19,6 +19,7 @@ use App\Enums\OrderStatus;
     'shipping_fee',
     'discount',
     'total',
+    'notes',
     'recipient_name',
     'recipient_phone',
     'region',
@@ -26,6 +27,7 @@ use App\Enums\OrderStatus;
     'city',
     'barangay',
     'street',
+    'unit_bldg_house',
     'postal_code',
     'landmark',
 ])]

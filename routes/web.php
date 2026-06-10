@@ -17,6 +17,7 @@ use App\Http\Controllers\Shop\StoreController as ShopStoreController;
 use App\Http\Controllers\Shop\ProfileController as CustomerProfileController;
 use App\Http\Controllers\Shop\UserAddressController as CustomerUserAddressController;
 use App\Http\Controllers\Shop\CartController as CustomerCartController;
+use App\Http\Controllers\Shop\CheckoutController as CustomerCheckoutController;
 use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
 use App\Http\Controllers\Seller\StoreController as SellerStoreController;
 use App\Http\Controllers\Seller\ProductController as SellerProductController;
@@ -85,14 +86,12 @@ Route::middleware([
     Route::delete('/cart/items/{cartItem}', [CustomerCartController::class, 'destroy'])
         ->name('cart.items.destroy');
 
-    Route::get('/checkout', [CheckoutController::class, 'index'])
+    Route::get('/checkout', [CustomerCheckoutController::class, 'index'])
         ->name('checkout.index');
-
-    Route::post('/checkout', [CheckoutController::class, 'store'])
+    Route::post('/checkout/select', [CustomerCheckoutController::class, 'select'])
+        ->name('checkout.select');
+    Route::post('/checkout', [CustomerCheckoutController::class, 'store'])
         ->name('checkout.store');
-
-    Route::get('/checkout/success/{tracking}', [CheckoutController::class, 'success'])
-        ->name('checkout.success');
 });
 
 // dedicated seller routes
