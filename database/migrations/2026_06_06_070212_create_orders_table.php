@@ -20,7 +20,8 @@ return new class extends Migration
             $table->decimal('subtotal', 12, 2);
             $table->decimal('shipping_fee', 12, 2)->default(0);
             $table->decimal('discount', 12, 2)->default(0);
-            $table->decimal('total', 12, 2);      
+            $table->decimal('total', 12, 2);
+            $table->text('notes')->nullable();
             // Shipping Address Reference
             $table->string('recipient_name');
             $table->string('recipient_phone');
@@ -29,6 +30,7 @@ return new class extends Migration
             $table->string('city');
             $table->string('barangay');
             $table->string('street');
+            $table->string('unit_bldg_house');
             $table->string('postal_code');
             $table->text('landmark')->nullable();
             $table->timestamps();
