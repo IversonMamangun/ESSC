@@ -28,6 +28,18 @@ class UserAddressResource extends JsonResource
             'landmark' => $this->landmark,
             'unit_bldg_house' => $this->unit_bldg_house,
             'is_default' => $this->is_default,
+
+            'full_address' => collect([
+                $this->unit_bldg_house,
+                $this->street,
+                $this->barangay,
+                $this->city,
+                $this->province,
+                $this->region,
+                $this->postal_code,
+            ])
+            ->filter()
+            ->implode(', '),
         ];
     }
 }
