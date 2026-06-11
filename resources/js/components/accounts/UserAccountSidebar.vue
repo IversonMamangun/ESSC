@@ -47,7 +47,7 @@ const isActive = (path: string) => page.url.startsWith(path);
         ]"
       >
         <UserIcon class="h-5 w-5" />
-        My Profile
+        Profile
       </Link>
 
       <Link
@@ -68,7 +68,7 @@ const isActive = (path: string) => page.url.startsWith(path);
         class="flex items-center gap-3 rounded-xl px-4 py-3 font-bold text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800/50"
       >
         <PackageIcon class="h-5 w-5" />
-        My Purchases
+        Purchases
       </Link>
     </nav>
   </div>
