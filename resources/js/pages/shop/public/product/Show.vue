@@ -506,7 +506,8 @@ const handleBuyNow = () => {
                 >
                   <button
                     @click="decreaseQuantity"
-                    class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-zinc-600 transition-all hover:bg-white active:scale-90 dark:text-zinc-300 dark:hover:bg-zinc-700"
+                    :disabled="quantity === 1"
+                    class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-zinc-600 transition-all hover:bg-white active:scale-90 disabled:cursor-not-allowed disabled:opacity-40 dark:text-zinc-300 dark:hover:bg-zinc-700"
                   >
                     <MinusIcon class="h-5 w-5" />
                   </button>

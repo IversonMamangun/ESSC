@@ -40,5 +40,6 @@ export type UserAddress = {
   unit_bldg_house: string;
   postal_code: string;
   landmark?: string;
+  full_address?: string;
   is_default: boolean;
 };

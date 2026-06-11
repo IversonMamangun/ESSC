@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
+import { toast } from 'vue-sonner';
 import shop from '@/routes/shop';
 import type { CheckoutPageProps, UserAddress } from '@/types';
 
@@ -45,7 +46,13 @@ const formatPrice = (price: number) => {
 };
 
 const placeOrder = () => {
-  // later
+  form.post(shop.checkout.store.url(), {
+    onError: (e) => {
+      if (e.checkout) {
+        toast.error(e.checkout);
+      }
+    },
+  });
 };
 
 // temporary
@@ -139,19 +146,7 @@ const getPaymentIcon = (methodSlug: string) => {
                   {{ addr.recipient_number }}
                 </div>
                 <div class="mt-1 text-sm text-zinc-600">
-                  {{
-                    [
-                      addr.unit_bldg_house,
-                      addr.street,
-                      addr.barangay,
-                      addr.city,
-                      addr.province,
-                      addr.region,
-                      addr.postal_code,
-                    ]
-                      .filter(Boolean)
-                      .join(', ')
-                  }}
+                  {{ addr.full_address }}
                 </div>
                 <div class="mt-1 text-sm text-zinc-500">
                   {{ addr.landmark }}
