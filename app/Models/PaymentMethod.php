@@ -15,6 +15,9 @@ class PaymentMethod extends Model
 {
     use HasFactory;
 
+    public const CASH_ON_DELIVERY = 1;
+    public const PAY_ONLINE = 2;
+
     // protected function casts(): array
     // {
     //     return [

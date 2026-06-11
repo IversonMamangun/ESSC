@@ -62,11 +62,8 @@ const getPaymentIcon = (methodSlug: string) => {
   if (slug.includes('cash-on-delivery')) {
     return HandCoinsIcon;
   }
-  if (slug.includes('paymaya')) {
+  if (slug.includes('pay-online')) {
     return SmartphoneIcon;
-  }
-  if (slug.includes('qr-ph')) {
-    return QrCodeIcon;
   }
 
   // Default fallback if no match is found
@@ -248,7 +245,12 @@ const getPaymentIcon = (methodSlug: string) => {
               Payment Method
             </h2>
 
-            <div class="grid gap-3 sm:grid-cols-3">
+            <div
+              class="grid gap-3"
+              :class="
+                paymentMethods.length > 2 ? 'sm:grid-cols-3' : 'sm:grid-cols-2'
+              "
+            >
               <label
                 v-for="method in paymentMethods"
                 :key="method.id"

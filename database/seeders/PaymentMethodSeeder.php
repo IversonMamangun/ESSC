@@ -20,13 +20,8 @@ class PaymentMethodSeeder extends Seeder
                 'gateway_type' => null,
             ],
             [
-                'name' => 'PayMaya',
-                'slug' => 'paymaya',
-                'gateway_type' => null,
-            ],
-            [
-                'name' => 'QR Ph',
-                'slug' => 'qr-ph',
+                'name' => 'Pay Online',
+                'slug' => 'pay-online',
                 'gateway_type' => null,
             ],
         ];
