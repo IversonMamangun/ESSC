@@ -12,6 +12,7 @@ import {
   SmartphoneIcon,
 } from 'lucide-vue-next';
 import { Badge } from '@/components/ui/badge';
+import InputError from '@/components/InputError.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
@@ -47,10 +48,8 @@ const formatPrice = (price: number) => {
 
 const placeOrder = () => {
   form.post(shop.checkout.store.url(), {
-    onError: (e) => {
-      if (e.checkout) {
-        toast.error(e.checkout);
-      }
+    onError: () => {
+      toast.error('Something went wrong. Please try again later.');
     },
   });
 };
@@ -166,12 +165,7 @@ const getPaymentIcon = (methodSlug: string) => {
               </Link>
             </div>
 
-            <div
-              v-if="form.errors.address_id"
-              class="mt-2 text-xs font-semibold text-red-500"
-            >
-              {{ form.errors.address_id }}
-            </div>
+            <InputError :message="form.errors.address_id" class="mt-3" />
           </div>
 
           <!-- Order Items Block (Fixed) -->
@@ -279,12 +273,7 @@ const getPaymentIcon = (methodSlug: string) => {
               </label>
             </div>
 
-            <div
-              v-if="form.errors.payment_method_id"
-              class="mt-2 text-xs font-semibold text-red-500"
-            >
-              {{ form.errors.payment_method_id }}
-            </div>
+            <InputError :message="form.errors.payment_method_id" class="mt-3" />
           </div>
 
           <!-- Notes Section -->
@@ -300,6 +289,7 @@ const getPaymentIcon = (methodSlug: string) => {
               placeholder="Add any instructions for your order shipment..."
               class="w-full resize-none rounded-xl border border-zinc-200 bg-transparent p-4 text-sm outline-none focus:border-[#009933] focus:ring-1 focus:ring-[#009933] dark:border-zinc-700"
             />
+            <InputError :message="form.errors.note" class="mt-1.5" />
           </div>
         </div>
 
@@ -337,6 +327,16 @@ const getPaymentIcon = (methodSlug: string) => {
                   {{ formatPrice(summary.total) }}
                 </span>
               </div>
+              <InputError :message="form.errors.address_id" class="mt-1.5" />
+              <InputError
+                :message="form.errors.payment_method_id"
+                class="mt-1.5"
+              />
+              <InputError :message="form.errors.note" class="mt-1.5" />
+              <InputError
+                :message="$page.props.errors.checkout"
+                class="mt-1.5"
+              />
             </div>
 
             <button
