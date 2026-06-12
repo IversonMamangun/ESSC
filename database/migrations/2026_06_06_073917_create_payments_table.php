@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->unique()->constrained()->cascadeOnDelete();
+            $table->foreignId('checkout_id')->unique()->constrained()->cascadeOnDelete();
             $table->foreignId('payment_method_id')->constrained()->restrictOnDelete();
             $table->boolean('is_paid')->default(false);
             $table->date('payment_date')->nullable();

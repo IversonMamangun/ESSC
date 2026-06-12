@@ -17,7 +17,9 @@ return new class extends Migration
             $table->foreignId('product_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('product_variant_id')->nullable()->constrained()->nullOnDelete();
             // Product Reference
-            $table->string('product_name'); 
+            $table->string('product_sku');
+            $table->string('product_name');
+            $table->string('product_image')->nullable();
             $table->string('variant_name')->nullable(); 
             $table->decimal('price', 12, 2); 
             $table->integer('quantity'); 
