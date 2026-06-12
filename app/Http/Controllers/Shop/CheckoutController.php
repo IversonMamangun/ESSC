@@ -188,12 +188,13 @@ class CheckoutController extends Controller
         ] = $this->getCheckoutData($request);
 
         $order = $this->checkoutService
-            ->createOrder(
+            ->createCheckout(
                 user: $request->user(),
                 address: $address,
                 paymentMethod: $paymentMethod,
                 cartItems: $cartItems,
                 note: $request->note,
+                decrementStock: true
             );
 
         foreach ($cartItems as $cartItem) {
@@ -222,7 +223,7 @@ class CheckoutController extends Controller
         // ] = $this->getCheckoutData($request);
 
         // $order = $this->checkoutService
-        //     ->createOrder(
+        //     ->createCheckout(
         //         user: $request->user(),
         //         address: $address,
         //         paymentMethod: $paymentMethod,
