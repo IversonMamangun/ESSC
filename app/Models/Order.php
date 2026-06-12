@@ -13,6 +13,8 @@ use App\Enums\OrderStatus;
 
 #[Fillable([
     'user_id',
+    'store_id',
+    'checkout_id',
     'order_number',
     'status',
     'subtotal',
@@ -39,6 +41,8 @@ class Order extends Model
     {
         return [
             'user_id' => 'integer',
+            'store_id' => 'integer',
+            'checkout_id' => 'integer',
             'status' => OrderStatus::class,
             'subtotal' => 'decimal:2',
             'shipping_fee' => 'decimal:2',
@@ -56,9 +60,14 @@ class Order extends Model
     {
         return $this->hasMany(OrderItem::class);
     }
-    
-    public function payment(): HasOne
+
+    public function store(): BelongsTo
     {
-        return $this->hasOne(Payment::class);
+        return $this->belongsTo(Store::class);
+    }
+
+    public function checkout(): BelongsTo
+    {
+        return $this->belongsTo(Checkout::class);
     }
 }

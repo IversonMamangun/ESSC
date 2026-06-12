@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
-    'order_id',
+    'checkout_id',
     'payment_method_id',
     'is_paid',
     'payment_date',
@@ -26,7 +26,7 @@ class Payment extends Model
     protected function casts(): array
     {
         return [
-            'order_id' => 'integer',
+            'checkout_id' => 'integer',
             'payment_method_id' => 'integer',
             'is_paid' => 'boolean',
             'payment_date' => 'date',
@@ -36,9 +36,9 @@ class Payment extends Model
         ];
     }
 
-    public function order(): BelongsTo
+    public function checkout(): BelongsTo
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Checkout::class);
     }
 
     public function method(): BelongsTo
