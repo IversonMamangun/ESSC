@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Shop\OrderIndexResource;
 use App\Models\Order;
 use Illuminate\Database\Eloquent\Builder;
 use App\Enums\OrderStatus;
@@ -14,8 +15,9 @@ class OrderController extends Controller
 {
     public function index(Request $request)
     {
+        $user = $request->user();
         $validated = $request->validate([
-            'status' => ['sometimes', 'string', Rule::in(['to-pay', 'to-ship', 'to-receive', 'completed', 'cancelled', 'returned'])],
+            'status' => ['sometimes', 'string', Rule::in(['all', 'to-pay', 'to-ship', 'to-receive', 'completed', 'cancelled', 'returned'])],
         ]);
 
         $filters = [
@@ -23,49 +25,68 @@ class OrderController extends Controller
         ];
 
         return Inertia::render('shop/customer/order/Index', [
+            'user' => $user->only('name', 'phone', 'avatar'),
             'orders' => OrderIndexResource::collection(
-                $this->buildBaseQuery($filters)
-                ->paginate(20)
+                $this->buildBaseQuery($user->id, $filters)
+                ->latest()
+                ->paginate(10)
                 ->withQueryString()
             ),
             'filters' => $filters,
         ]);
     }
 
-    private function buildBaseQuery(array $filters): Builder
+    private function buildBaseQuery(int $userId, array $filters): Builder
     {
-        // store name
-        // order status
-        // order shipping
-        // order total
-        // order item product name
-        // order item variant name
-        // order item price
-        // order item quantity
-
         return Order::query()
             ->select([
                 'id',
-                'name',
-                'slug',
-                'is_featured',
+                'store_id',
+                'status',
+                'shipping_fee',
+                'total',
                 'created_at',
             ])
+            ->where('user_id', $userId)
             ->with([
-                'images:id,product_id,image,sort_order',
-                'defaultVariant:id,product_id,price,compare_price',
+                'store:id,name',
+                'items:id,order_id,product_name,product_image,variant_name,price,quantity',
             ])
-            ->withSum('variants as total_stock', 'stock')
-            ->having('total_stock', '>', 0)
-            ->where('is_active', true)
             ->when(
-                $filters['type'] === 'top-deals',
-                fn (Builder $query) => $query
-                    ->where('is_featured', true)
-                    ->latest(),
-
-                fn (Builder $query) => $query
-                    ->latest()
+                $filters['status'] !== 'all',
+                fn (Builder $query) => $this->applyStatusFilter(
+                    $query,
+                    $filters['status']
+                )
             );
+    }
+
+    private function applyStatusFilter(Builder $query, string $status): Builder 
+    {
+        return match ($status) {
+            'to-pay' => $query->where('status', OrderStatus::PENDING),
+            'to-ship' => $query->whereIn('status', [
+                OrderStatus::CONFIRMED,
+                OrderStatus::PROCESSING,
+                OrderStatus::PACKED,
+            ]),
+            'to-receive' => $query->where(
+                'status',
+                OrderStatus::SHIPPED
+            ),
+            'completed' => $query->where(
+                'status',
+                OrderStatus::DELIVERED
+            ),
+            'cancelled' => $query->where(
+                'status',
+                OrderStatus::CANCELLED
+            ),
+            'returned' => $query->where(
+                'status',
+                OrderStatus::RETURNED
+            ),
+            default => $query,
+        };
     }
 }
