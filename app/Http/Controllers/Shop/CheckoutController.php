@@ -209,10 +209,9 @@ class CheckoutController extends Controller
 
         session()->forget('checkout');
 
-        return redirect()->route(
-            'shop.orders.show',
-            $order
-        );
+        return redirect()
+            ->route('shop.orders.index')
+            ->with('success', 'Order placed successfully via Cash on Delivery!');
     }
 
     private function checkoutPayMongo(CheckoutCreateRequest $request, PaymentMethod $paymentMethod) {
