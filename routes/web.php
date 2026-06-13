@@ -18,6 +18,7 @@ use App\Http\Controllers\Shop\ProfileController as CustomerProfileController;
 use App\Http\Controllers\Shop\UserAddressController as CustomerUserAddressController;
 use App\Http\Controllers\Shop\CartController as CustomerCartController;
 use App\Http\Controllers\Shop\CheckoutController as CustomerCheckoutController;
+use App\Http\Controllers\Shop\OrderController as CustomerOrderController;
 use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
 use App\Http\Controllers\Seller\StoreController as SellerStoreController;
 use App\Http\Controllers\Seller\ProductController as SellerProductController;
@@ -92,6 +93,9 @@ Route::middleware([
         ->name('checkout.select');
     Route::post('/checkout', [CustomerCheckoutController::class, 'store'])
         ->name('checkout.store');
+
+    Route::get('/orders', [CustomerOrderController::class, 'index'])
+        ->name('orders.index');
 });
 
 // dedicated seller routes
