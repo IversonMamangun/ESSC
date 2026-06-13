@@ -5,3 +5,4 @@ export * from './product';
 export * from './store';
 export * from './cart';
 export * from './checkout';
+export * from './order';
