@@ -10,6 +10,7 @@ import {
 import { ref, onMounted, computed } from 'vue';
 import { logout, login, register } from '@/routes';
 import shop from '@/routes/shop';
+import seller from '@/routes/seller';
 
 const isMenuOpen = ref(false);
 const activeLink = ref('Home');
@@ -158,7 +159,7 @@ const navLinks = [
           <template v-else>
             <button
               @click="isDropdownOpen = !isDropdownOpen"
-              class="ml-1 flex items-center justify-center rounded-full border-2 border-transparent p-0.5 transition-colors hover:border-[#009933] focus:ring-2 focus:ring-[#009933] focus:ring-offset-1 focus:outline-none dark:focus:ring-offset-neutral-900"
+              class="ml-1 flex cursor-pointer items-center justify-center rounded-full border-2 border-transparent p-0.5 transition-colors hover:border-[#009933] focus:ring-2 focus:ring-[#009933] focus:ring-offset-1 focus:outline-none dark:focus:ring-offset-neutral-900"
             >
               <div
                 class="flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-neutral-200 bg-green-100 dark:border-neutral-700"
@@ -212,7 +213,7 @@ const navLinks = [
 
                 <Link
                   v-if="user.user_type?.slug === 'customer'"
-                  href="/purchases"
+                  :href="shop.orders.index()"
                   class="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-neutral-700 hover:bg-neutral-50 hover:text-[#009933] dark:text-gray-300 dark:hover:bg-neutral-800"
                 >
                   <Package class="h-4 w-4 text-[#009933]" /> My Purchases
@@ -220,7 +221,7 @@ const navLinks = [
 
                 <template v-if="user.user_type?.slug === 'seller'">
                   <Link
-                    href="/seller/dashboard"
+                    :href="seller.dashboard()"
                     class="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-neutral-700 transition-colors hover:bg-neutral-50 hover:text-blue-600 dark:text-gray-300 dark:hover:bg-neutral-800"
                   >
                     <LayoutDashboard class="h-4 w-4 text-blue-600" /> Seller
@@ -234,7 +235,7 @@ const navLinks = [
                   :href="logout()"
                   method="post"
                   as="button"
-                  class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm font-bold text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-900/10"
+                  class="flex w-full cursor-pointer items-center gap-3 px-4 py-2.5 text-left text-sm font-bold text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-900/10"
                 >
                   <LogOut class="h-4 w-4" /> Log out
                 </Link>
@@ -246,7 +247,7 @@ const navLinks = [
         <button
           @click="toggleDarkMode"
           type="button"
-          class="inline-flex h-9 w-9 items-center justify-center rounded-lg p-2 transition-colors hover:bg-neutral-100 focus:ring-2 focus:ring-[#009933] focus:outline-none md:h-10 md:w-10 dark:hover:bg-neutral-800"
+          class="inline-flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg p-2 transition-colors hover:bg-neutral-100 focus:ring-2 focus:ring-[#009933] focus:outline-none md:h-10 md:w-10 dark:hover:bg-neutral-800"
         >
           <svg
             v-if="isDarkMode"
@@ -390,7 +391,7 @@ const navLinks = [
 
               <Link
                 v-if="user.user_type?.slug === 'customer'"
-                href="/purchases"
+                :href="shop.orders.index()"
                 class="flex items-center gap-3 rounded-xl border border-green-100 bg-green-50 px-4 py-3 text-sm font-bold text-[#009933] transition-colors hover:bg-green-100 dark:border-green-900 dark:bg-green-900/20"
               >
                 <Package class="h-5 w-5" /> My Purchases
@@ -398,7 +399,7 @@ const navLinks = [
 
               <Link
                 v-if="user.user_type?.slug === 'seller'"
-                href="/seller/dashboard"
+                :href="seller.dashboard()"
                 class="flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-bold text-blue-600 transition-colors hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-900/20"
               >
                 <LayoutDashboard class="h-5 w-5" /> Seller Dashboard
