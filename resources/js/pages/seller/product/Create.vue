@@ -4,6 +4,8 @@ import { ArrowLeftIcon, PackageIcon, PackagePlusIcon } from 'lucide-vue-next';
 import ProductInfoSection from '@/components/products/ProductInfoSection.vue';
 import ProductMediaSection from '@/components/products/ProductMediaSection.vue';
 import ProductVariantsSection from '@/components/products/ProductVariantsSection.vue';
+import Navbar from '@/components/sections/Navbar.vue';
+import TopBar from '@/components/sections/TopBar.vue';
 import { Button } from '@/components/ui/button';
 import seller from '@/routes/seller';
 import type { ProductForm, FormAttribute, Category } from '@/types';
@@ -30,10 +32,12 @@ const submit = () => {
 
 <template>
   <Head title="Create Product" />
-  <div class="min-h-screen py-10 transition-colors duration-300">
-    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+  <div class="min-h-screen transition-colors duration-300">
+    <TopBar />
+    <div class="sticky top-0 z-50 mt-8"><Navbar /></div>
+    <div class="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
       <div
-        class="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center"
+        class="mb-8 flex flex-col justify-between gap-4 px-5 sm:flex-row sm:items-center"
       >
         <div>
           <h1
@@ -46,10 +50,10 @@ const submit = () => {
           </p>
         </div>
         <Link
-          :href="seller.dashboard.url()"
+          :href="seller.products.index()"
           class="inline-flex items-center text-sm font-bold text-zinc-500 transition-colors hover:text-[#009933] dark:text-zinc-400"
         >
-          <ArrowLeftIcon class="mr-1 h-4 w-4" /> Back to Dashboard
+          <ArrowLeftIcon class="mr-1 h-4 w-4" /> Back to Products
         </Link>
       </div>
 
