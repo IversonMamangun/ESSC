@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\AttributeResource;
+use App\Http\Resources\Seller\ProductResource;
 use App\Http\Resources\Seller\ProductEditResource;
 use App\Http\Requests\Seller\ProductCreateRequest;
 use App\Models\Product;
@@ -20,6 +21,32 @@ use Inertia\Inertia;
 
 class ProductController extends Controller
 {
+    public function index(Request $request)
+    {
+        $user = $request->user()->loadMissing(['store']);
+
+        if (! $user->store) {
+            return redirect()->route('seller.store.create');
+        }
+
+        $products = Product::query()
+            ->where('store_id', $user->store->id)
+            ->with([
+                'categories',
+                'images',
+                'variants.attributeValues.attribute',
+            ])
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return Inertia::render('seller/product/Index', [
+            'store' => $user->store,
+            'products' => ProductResource::collection($products),
+        ]);
+        
+    } 
+
     public function create(Request $request)
     {
         $user = $request->user()->loadMissing(['store']);
