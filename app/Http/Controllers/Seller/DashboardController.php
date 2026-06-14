@@ -18,21 +18,8 @@ class DashboardController extends Controller
             return redirect()->route('seller.store.create');
         }
 
-        $products = Product::query()
-            ->where('store_id', $user->store->id)
-            ->with([
-                'categories',
-                'images',
-                'variants.attributeValues.attribute',
-            ])
-            ->latest()
-            ->paginate(10)
-            ->withQueryString();
-
         return Inertia::render('seller/dashboard/Index', [
-            'store' => $user->store,
-            'products' => ProductResource::collection($products),
+            'store' => $user->store
         ]);
-        
     }
 }
