@@ -20,19 +20,35 @@ import ProductVariantsTable from '@/components/products/ProductVariantsTable.vue
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
+import Pagination from '@/components/Pagination.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getSellerProductsColumns } from '@/features/seller/columns';
 import seller from '@/routes/seller';
-import type { Store, SellerProduct } from '@/types';
+import type { Store, PaginatedSellerProducts } from '@/types';
 
 const props = defineProps<{
   store: Store;
-  products: {
-    data: SellerProduct[];
+  products: PaginatedSellerProducts;
+  filters: {
+    tab: string;
+  };
+  counts: {
+    active: number;
+    inactive: number;
+    out_of_stock: number;
   };
 }>();
 
-const activeTab = ref('products');
+// tab state
+const activeTab = computed(() => props.filters.tab);
+const tabTitles: Record<string, string> = {
+  active: 'Active Products',
+  inactive: 'Inactive Products',
+  'out-of-stock': 'Out of Stock',
+};
+const currentTabLabel = computed(() => {
+  return tabTitles[props.filters.tab] || 'Products';
+});
 
 const viewProduct = (productSlug: string) => {
   // router.visit(seller.products.show(productSlug));
@@ -62,6 +78,20 @@ const breadcrumbs = [
     href: seller.products.index(),
   },
 ];
+
+function changeTab(tab: string) {
+  router.get(
+    seller.products.index(),
+    {
+      tab,
+    },
+    {
+      preserveState: true,
+      preserveScroll: true,
+      replace: true,
+    },
+  );
+}
 </script>
 
 <template>
@@ -123,79 +153,76 @@ const breadcrumbs = [
             class="flex border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/50"
           >
             <button
-              @click="activeTab = 'products'"
+              @click="changeTab('active')"
               :class="
-                activeTab === 'products'
+                activeTab === 'active'
                   ? 'border-[#009933] bg-green-50/50 text-[#009933] dark:bg-green-900/10'
-                  : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'
+                  : 'cursor-pointer border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'
               "
+              :disabled="activeTab === 'active'"
               class="flex flex-1 items-center justify-center gap-2 border-b-2 py-4 text-center font-black transition-all"
             >
-              Products
+              Active Products
               <span
                 class="rounded-full bg-zinc-200 px-2 py-0.5 text-xs text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300"
-                >{{ products.data.length }}</span
+                >{{ props.counts.active }}</span
               >
             </button>
             <button
-              @click="activeTab = 'sold'"
+              @click="changeTab('inactive')"
               :class="
-                activeTab === 'sold'
+                activeTab === 'inactive'
                   ? 'border-red-500 bg-red-50/50 text-red-600 dark:bg-red-900/10'
-                  : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'
+                  : 'cursor-pointer border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'
               "
+              :disabled="activeTab === 'inactive'"
               class="flex flex-1 items-center justify-center gap-2 border-b-2 py-4 text-center font-black transition-all"
             >
-              Sold Out
+              Inactive Products
               <span
                 class="rounded-full bg-red-100 px-2 py-0.5 text-xs text-red-600 dark:bg-red-900/30 dark:text-red-400"
-                >123</span
+                >{{ props.counts.inactive }}</span
               >
             </button>
             <button
-              @click="activeTab = 'orders'"
+              @click="changeTab('out-of-stock')"
               :class="
-                activeTab === 'orders'
+                activeTab === 'out-of-stock'
                   ? 'border-[#009933] bg-green-50/50 text-[#009933] dark:bg-green-900/10'
-                  : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'
+                  : 'cursor-pointer border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-300'
               "
+              :disabled="activeTab === 'out-of-stock'"
               class="flex flex-1 items-center justify-center gap-2 border-b-2 py-4 text-center font-black transition-all"
             >
-              Orders
+              Out of Stock
               <span
                 class="rounded-full bg-red-500 px-2 py-0.5 text-xs text-white"
-                >123</span
+                >{{ props.counts.out_of_stock }}</span
               >
             </button>
           </div>
 
-          <!-- PRODUCTS TAB -->
-          <div v-if="activeTab === 'products'">
-            <div v-if="products.data.length === 0" class="p-16 text-center">
-              <div
-                class="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-800"
-              >
-                <PackageIcon class="h-10 w-10 text-zinc-400" />
-              </div>
-              <h3 class="mb-2 text-xl font-bold text-zinc-800 dark:text-white">
-                No products
-              </h3>
+          <div v-if="products.data.length === 0" class="p-16 text-center">
+            <div
+              class="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-800"
+            >
+              <PackageIcon class="h-10 w-10 text-zinc-400" />
             </div>
-
-            <div v-else class="custom-scrollbar overflow-x-auto">
-              <DataTable :columns="productColumns" :data="products.data">
-                <template #expanded-row="{ row }">
-                  <ProductVariantsTable :variants="row.variants" />
-                </template>
-              </DataTable>
-            </div>
+            <h3 class="mb-2 text-xl font-bold text-zinc-800 dark:text-white">
+              No {{ currentTabLabel }}
+            </h3>
           </div>
 
-          <!-- SOLD OUT / ARCHIVED TAB -->
-          <div v-if="activeTab === 'sold'"></div>
-
-          <!-- ORDERS TAB -->
-          <div v-if="activeTab === 'orders'"></div>
+          <div v-else class="custom-scrollbar overflow-x-auto">
+            <DataTable :columns="productColumns" :data="products.data">
+              <template #expanded-row="{ row }">
+                <ProductVariantsTable :variants="row.variants" />
+              </template>
+            </DataTable>
+          </div>
+        </div>
+        <div class="-mt-4">
+          <Pagination :links="props.products.meta.links" />
         </div>
       </div>
 

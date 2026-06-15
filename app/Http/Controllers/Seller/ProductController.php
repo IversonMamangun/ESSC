@@ -8,11 +8,14 @@ use App\Http\Resources\AttributeResource;
 use App\Http\Resources\Seller\ProductResource;
 use App\Http\Resources\Seller\ProductEditResource;
 use App\Http\Requests\Seller\ProductCreateRequest;
+use App\Models\User;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Attribute;
 use App\Models\AttributeValue;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -23,29 +26,85 @@ class ProductController extends Controller
 {
     public function index(Request $request)
     {
+        $validated = $request->validate([
+            'tab' => ['sometimes', 'string', Rule::in(['active', 'inactive', 'out-of-stock'])],
+        ]);
+
+        $filters = [
+            'tab' => $validated['tab'] ?? 'active',
+        ];
+        
         $user = $request->user()->loadMissing(['store']);
 
         if (! $user->store) {
             return redirect()->route('seller.store.create');
         }
 
-        $products = Product::query()
-            ->where('store_id', $user->store->id)
-            ->with([
-                'categories',
-                'images',
-                'variants.attributeValues.attribute',
-            ])
-            ->latest()
+        $products = $this->buildBaseQuery($user, $filters)
             ->paginate(10)
             ->withQueryString();
 
         return Inertia::render('seller/product/Index', [
             'store' => $user->store,
             'products' => ProductResource::collection($products),
+            'counts' => $this->getSummaryCounts($user->store->id),
+            'filters' => $filters
         ]);
         
     } 
+
+    private function buildBaseQuery(User $user, array $filters): Builder
+    {
+        return Product::query()
+            ->where('store_id', $user->store->id)
+            ->with([
+                'categories',
+                'images',
+                'variants.attributeValues.attribute',
+            ])
+            ->when(
+                $filters['tab'] === 'active', 
+                fn ($query) => $query->where('is_active', true)
+                    ->whereHas('variants', fn ($q) => $q->where('stock', '>', 0))
+            )
+            ->when(
+                $filters['tab'] === 'inactive', 
+                fn ($query) => $query->where('is_active', false)
+            )
+            ->when(
+                $filters['tab'] === 'out-of-stock', 
+                fn ($query) => $query->where('is_active', true)
+                    ->whereHas('variants')
+                    ->whereDoesntHave('variants', fn ($q) => $q->where('stock', '>', 0))
+            )
+            ->latest();
+    }
+
+    private function getSummaryCounts(int $storeId): array
+    {
+        $counts = Product::query()
+            ->where('store_id', $storeId)
+            ->selectRaw("
+                SUM(CASE WHEN is_active = 1 AND EXISTS (
+                    SELECT 1 FROM product_variants WHERE product_variants.product_id = products.id AND stock > 0
+                ) THEN 1 ELSE 0 END) as active,
+                
+                SUM(CASE WHEN is_active = 0 THEN 1 ELSE 0 END) as inactive,
+                
+                SUM(CASE WHEN is_active = 1 AND NOT EXISTS (
+                    SELECT 1 FROM product_variants WHERE product_variants.product_id = products.id AND stock > 0
+                ) AND EXISTS (
+                    SELECT 1 FROM product_variants WHERE product_variants.product_id = products.id
+                ) THEN 1 ELSE 0 END) as out_of_stock
+            ")
+            ->first();
+
+        return [
+            'active' => (int) ($counts->active ?? 0),
+            'inactive' => (int) ($counts->inactive ?? 0),
+            'out_of_stock' => (int) ($counts->out_of_stock ?? 0),
+        ];
+    }
 
     public function create(Request $request)
     {
