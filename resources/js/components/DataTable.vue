@@ -77,7 +77,7 @@ const isExpanded = (row: Row<T>) => row.getIsExpanded();
             <!-- EXPAND BUTTON -->
             <TableCell>
               <button
-                class="flex h-8 w-8 items-center justify-center rounded-md transition hover:bg-muted"
+                class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-md transition hover:bg-muted"
                 @click="row.toggleExpanded()"
               >
                 <ChevronDown v-if="isExpanded(row)" class="h-4 w-4" />

@@ -642,7 +642,7 @@ const handleBuyNow = () => {
         <DialogDescription
           class="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400"
         >
-          You are currently logged in as an
+          You are currently logged in as
           <span class="font-bold text-red-600 capitalize dark:text-red-400"
             >"{{ user?.user_type?.name }}"</span
           >. To add retail items to your cart or finalize a direct order, you
