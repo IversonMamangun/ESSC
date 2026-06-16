@@ -11,6 +11,7 @@ import {
 } from 'lucide-vue-next';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
+import SellerStoreHeader from '@/components/SellerStoreHeader.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import seller from '@/routes/seller';
 import type { Store } from '@/types';
@@ -52,45 +53,19 @@ const deleteProduct = (productSlug: string) => {
       </div>
 
       <div v-if="props.store.is_active" class="flex flex-col gap-8">
-        <div
-          class="flex flex-col justify-between gap-6 rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm transition-colors md:flex-row md:items-center dark:border-zinc-800 dark:bg-zinc-900"
+        <SellerStoreHeader
+          :store="props.store"
+          :edit-store-href="seller.store.edit.url(props.store.slug)"
         >
-          <div class="flex items-center gap-6">
-            <div
-              class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[#009933] text-3xl font-black text-white shadow-md"
-              :class="{
-                'bg-transparent': props.store.logo,
-              }"
+          <template #actions>
+            <Link
+              :href="seller.products.create()"
+              class="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#009933] px-6 py-3.5 font-bold text-white shadow-md transition-colors hover:bg-green-700 active:scale-95"
             >
-              <img
-                v-if="props.store.logo"
-                :src="'/storage/' + props.store.logo"
-                class="h-full w-full object-cover"
-              />
-              <span v-else>{{ props.store.name.charAt(0) }}</span>
-            </div>
-            <div>
-              <h2 class="text-2xl font-black text-zinc-900 dark:text-white">
-                {{ props.store.name }}
-              </h2>
-              <Link
-                :href="seller.store.edit(props.store.slug)"
-                class="mt-1 flex items-center gap-1 text-sm font-medium text-zinc-500 transition-colors hover:text-[#009933] dark:text-zinc-400"
-              >
-                Edit Store Profile
-
-                <ExternalLinkIcon class="h-3 w-3" />
-              </Link>
-            </div>
-          </div>
-
-          <Link
-            :href="seller.products.create()"
-            class="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#009933] px-6 py-3.5 font-bold text-white shadow-md transition-colors hover:bg-green-700 active:scale-95"
-          >
-            <PlusIcon class="h-5 w-5" /> Add New Product
-          </Link>
-        </div>
+              <PlusIcon class="h-5 w-5" /> Add New Product
+            </Link>
+          </template>
+        </SellerStoreHeader>
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
           <div
