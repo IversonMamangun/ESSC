@@ -11,8 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import type { SellerProduct } from '@/types';
-
+import type { SellerProduct, SellerOrder } from '@/types';
 
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('en-PH', {
@@ -136,6 +135,105 @@ export const getSellerProductsColumns = ({
                 onClick: () => deleteProduct(product.slug),
               },
               () => 'Delete Product',
+            ),
+          ]),
+        ]),
+      ]);
+    },
+  },
+];
+
+export const getSellerOrdersColumns = ({
+  viewOrder,
+  editOrder,
+}: {
+  viewOrder: (orderNo: string) => void;
+  editOrder: (orderNo: string) => void;
+}): ColumnDef<SellerOrder>[] => [
+  {
+    accessorKey: 'order_number',
+    header: 'Order',
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ row }) => {
+      return h(
+        Badge,
+        {
+          variant: 'default',
+        },
+        () => row.original.status,
+      );
+    },
+  },
+  {
+    accessorKey: 'items_count',
+    header: 'Items',
+  },
+  {
+    id: 'subtotal',
+    header: 'Subtotal',
+    cell: ({ row }) => {
+      return formatPrice(row.original.subtotal);
+    },
+  },
+  {
+    id: 'shipping_fee',
+    header: 'Shipping Fee',
+    cell: ({ row }) => {
+      return formatPrice(row.original.shipping_fee);
+    },
+  },
+  {
+    id: 'discount',
+    header: 'Discount',
+    cell: ({ row }) => {
+      return formatPrice(row.original.discount);
+    },
+  },
+  {
+    id: 'total',
+    header: 'Total',
+    cell: ({ row }) => {
+      return formatPrice(row.original.total);
+    },
+  },
+  {
+    id: 'actions',
+    header: () => h('div', { class: 'text-center' }, 'Actions'),
+    cell: ({ row }) => {
+      const order = row.original;
+
+      return h('div', { class: 'relative text-center' }, [
+        h(DropdownMenu, null, () => [
+          h(
+            DropdownMenuTrigger,
+            { asChild: true, class: 'cursor-pointer' },
+            () =>
+              h(Button, { variant: 'ghost', class: 'h-8 w-8 p-0' }, () => [
+                h('span', { class: 'sr-only' }, 'Open menu'),
+                h(MoreHorizontal, { class: 'h-4 w-4' }),
+              ]),
+          ),
+          h(DropdownMenuContent, { align: 'end', class: 'border-2' }, () => [
+            h(DropdownMenuLabel, { class: 'text-gray-500' }, () => 'Actions'),
+            h(
+              DropdownMenuItem,
+              {
+                class: 'cursor-pointer',
+                onClick: () => viewOrder(order.order_number),
+              },
+              () => 'View Order Details',
+            ),
+            h(DropdownMenuSeparator),
+            h(
+              DropdownMenuItem,
+              {
+                class: 'cursor-pointer text-blue-500 focus:text-blue-600',
+                onClick: () => editOrder(order.order_number),
+              },
+              () => 'Edit Order',
             ),
           ]),
         ]),
