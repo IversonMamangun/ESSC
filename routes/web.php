@@ -22,6 +22,7 @@ use App\Http\Controllers\Shop\OrderController as CustomerOrderController;
 use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
 use App\Http\Controllers\Seller\StoreController as SellerStoreController;
 use App\Http\Controllers\Seller\ProductController as SellerProductController;
+use App\Http\Controllers\Seller\OrderController as SellerOrderController;
 
 Route::inertia('/', 'Welcome', [
     'canRegister' => Features::enabled(Features::registration()),
@@ -118,6 +119,8 @@ Route::middleware([
     Route::post('/store/{store:slug}', [SellerStoreController::class, 'update'])
         ->name('store.update');
 
+    Route::get('/products', [SellerProductController::class, 'index'])
+        ->name('products.index');
     Route::get('/products/create', [SellerProductController::class, 'create'])
         ->name('products.create');
     Route::post('/products', [SellerProductController::class, 'store'])
@@ -126,6 +129,9 @@ Route::middleware([
         ->name('products.edit');
     Route::post('/products/{product:slug}', [SellerProductController::class, 'update'])
         ->name('products.update');
+
+    Route::get('/orders', [SellerOrderController::class, 'index'])
+        ->name('orders.index');
 });
 
 // dedicated admin routes
