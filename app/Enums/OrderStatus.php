@@ -27,3 +27,18 @@ enum OrderStatus: string
         };
     }
 }
+
+// ---- seller order side ----
+/**
+ * -- cod
+ * to confirm (pending) -> fn to confirm / cancel
+ * to ship (processing) -> fn to pack
+ * to deliver (packed) -> fn to ship
+ * cancelation
+ * 
+ * -- online
+ * to confirm (confirmed) -> fn to process / cancel, if cancelled return the payment?
+ * to ship (processing) -> fn to pack
+ * to deliver (packed) -> fn to ship
+ * cancelation
+ */
