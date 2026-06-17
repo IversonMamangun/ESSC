@@ -145,10 +145,14 @@ export const getSellerProductsColumns = ({
 
 export const getSellerOrdersColumns = ({
   viewOrder,
-  editOrder,
+  handleAction,
+  declineOrder,
+  activeTab,
 }: {
   viewOrder: (orderNo: string) => void;
-  editOrder: (orderNo: string) => void;
+  handleAction: (orderNo: string, actionType: string) => void;
+  declineOrder: (orderNo: string) => void;
+  activeTab: string;
 }): ColumnDef<SellerOrder>[] => [
   {
     accessorKey: 'order_number',
@@ -205,6 +209,50 @@ export const getSellerOrdersColumns = ({
     cell: ({ row }) => {
       const order = row.original;
 
+      let primaryActionLabel = '';
+      let actionType = '';
+
+      if (activeTab === 'to-confirm') {
+        primaryActionLabel = 'Accept Order';
+        actionType = 'accept';
+      } else if (activeTab === 'to-ship') {
+        primaryActionLabel = 'Ship Order';
+        actionType = 'ship';
+      }
+
+      const menuItems = [
+        h(DropdownMenuLabel, { class: 'text-gray-500' }, () => 'Actions'),
+        h(
+          DropdownMenuItem,
+          {
+            class: 'cursor-pointer',
+            onClick: () => viewOrder(order.order_number),
+          },
+          () => 'View Order Details',
+        ),
+
+        primaryActionLabel && h(DropdownMenuSeparator),
+        primaryActionLabel &&
+          h(
+            DropdownMenuItem,
+            {
+              class: 'cursor-pointer text-blue-500 focus:text-blue-600',
+              onClick: () => handleAction(order.order_number, actionType),
+            },
+            () => primaryActionLabel,
+          ),
+
+        activeTab === 'to-confirm' &&
+          h(
+            DropdownMenuItem,
+            {
+              class: 'cursor-pointer text-rose-500 focus:text-rose-600',
+              onClick: () => declineOrder(order.order_number),
+            },
+            () => 'Decline Order',
+          ),
+      ].filter(Boolean);
+
       return h('div', { class: 'relative text-center' }, [
         h(DropdownMenu, null, () => [
           h(
@@ -216,26 +264,11 @@ export const getSellerOrdersColumns = ({
                 h(MoreHorizontal, { class: 'h-4 w-4' }),
               ]),
           ),
-          h(DropdownMenuContent, { align: 'end', class: 'border-2' }, () => [
-            h(DropdownMenuLabel, { class: 'text-gray-500' }, () => 'Actions'),
-            h(
-              DropdownMenuItem,
-              {
-                class: 'cursor-pointer',
-                onClick: () => viewOrder(order.order_number),
-              },
-              () => 'View Order Details',
-            ),
-            h(DropdownMenuSeparator),
-            h(
-              DropdownMenuItem,
-              {
-                class: 'cursor-pointer text-blue-500 focus:text-blue-600',
-                onClick: () => editOrder(order.order_number),
-              },
-              () => 'Edit Order',
-            ),
-          ]),
+          h(
+            DropdownMenuContent,
+            { align: 'end', class: 'border-2' },
+            () => menuItems,
+          ),
         ]),
       ]);
     },

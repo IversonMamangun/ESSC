@@ -77,14 +77,22 @@ const viewOrder = (orderNo: string) => {
   // router.visit(seller.orders.show(orderNo));
 };
 
-const editOrder = (orderNo: string) => {
-  // router.visit(seller.orders.edit(orderNo));
+const handleOrderAction = (orderNo: string, actionType: string) => {
+  //
 };
 
-const orderColumns = getSellerOrdersColumns({
-  viewOrder,
-  editOrder,
-});
+const declineOrder = (orderNo: string) => {
+  //
+};
+
+const orderColumns = computed(() =>
+  getSellerOrdersColumns({
+    viewOrder,
+    handleAction: handleOrderAction,
+    declineOrder,
+    activeTab: activeTab.value,
+  }),
+);
 
 const breadcrumbs = [
   {
