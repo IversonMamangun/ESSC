@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { Order } from '@/types';
+import { Link } from '@inertiajs/vue3';
+
 import {
   Accordion,
   AccordionContent,
@@ -12,6 +13,8 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
+import shop from '@/routes/shop';
+import type { Order } from '@/types';
 import OrderStatusBadge from './OrderStatusBadge.vue';
 
 const props = defineProps<{
@@ -30,9 +33,12 @@ const formatPrice = (value: number) => {
   <Card>
     <CardHeader class="flex flex-row items-center justify-between">
       <div>
-        <p class="font-semibold">
+        <Link 
+          :href="shop.orders.show.url({ order: order.id })" 
+          class="font-semibold hover:text-[#009933] transition-colors hover:underline"
+        >
           {{ order.store_name }}
-        </p>
+        </Link>
       </div>
 
       <OrderStatusBadge :status="order.status" />
@@ -53,17 +59,25 @@ const formatPrice = (value: number) => {
                 :key="index"
                 class="flex gap-4"
               >
-                <img
-                  :src="item.product_image ?? '/images/placeholder-product.png'"
-                  :alt="item.product_name"
-                  class="h-20 w-20 rounded-lg border object-cover"
-                />
+                <Link 
+                  :href="shop.orders.show.url({ order: order.id })" 
+                  class="shrink-0 hover:opacity-80 transition-opacity"
+                >
+                  <img
+                    :src="item.product_image ?? '/images/placeholder-product.png'"
+                    :alt="item.product_name"
+                    class="h-20 w-20 rounded-lg border object-cover"
+                  />
+                </Link>
 
                 <div class="flex flex-1 justify-between">
                   <div>
-                    <p class="font-medium">
+                    <Link 
+                      :href="shop.orders.show.url({ order: order.id })" 
+                      class="font-medium hover:text-[#009933] transition-colors line-clamp-1 hover:underline"
+                    >
                       {{ item.product_name }}
-                    </p>
+                    </Link>
 
                     <p
                       v-if="item.variant_name"

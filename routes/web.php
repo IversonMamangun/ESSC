@@ -95,8 +95,10 @@ Route::middleware([
     Route::post('/checkout', [CustomerCheckoutController::class, 'store'])
         ->name('checkout.store');
 
-    Route::get('/orders', [CustomerOrderController::class, 'index'])
+        Route::get('/orders', [CustomerOrderController::class, 'index'])
         ->name('orders.index');
+    Route::get('/orders/{order}', [CustomerOrderController::class, 'show'])
+        ->name('orders.show');
 });
 
 // dedicated seller routes
