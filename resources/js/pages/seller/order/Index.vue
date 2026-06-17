@@ -34,11 +34,12 @@ const props = defineProps<{
   filters: {
     tab: string;
   };
-  //   counts: {
-  //     active: number;
-  //     inactive: number;
-  //     out_of_stock: number;
-  //   };
+  counts: {
+    to_confirm: number;
+    to_ship: number;
+    to_deliver: number;
+    cancellation: number;
+  };
 }>();
 
 // tab state
@@ -47,18 +48,22 @@ const orderTabs = computed<SellerTabItem[]>(() => [
   {
     label: 'To Confirm Orders',
     value: 'to-confirm',
+    count: props.counts.to_confirm,
   },
   {
     label: 'To Ship Orders',
     value: 'to-ship',
+    count: props.counts.to_ship,
   },
   {
     label: 'To Deliver Orders',
     value: 'to-deliver',
+    count: props.counts.to_deliver,
   },
   {
     label: 'Cancelled Orders',
-    value: 'cancelled',
+    value: 'cancellation',
+    count: props.counts.cancellation,
   },
 ]);
 const currentTabLabel = computed(() => {

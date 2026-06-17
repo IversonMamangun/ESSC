@@ -133,15 +133,18 @@ const deleteProduct = (productSlug: string) => {
               </div>
             </div>
           </Link>
-          <div
-            class="gap-5 rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-          >
-            <div>
-              <h3 class="text-sm font-bold text-zinc-500 dark:text-zinc-400">
-                Orders Summary
-              </h3>
+
+          <Link :href="seller.orders.index()">
+            <div
+              class="rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+            >
+              <div>
+                <h3 class="text-sm font-bold text-zinc-500 dark:text-zinc-400">
+                  Orders Summary
+                </h3>
+              </div>
             </div>
-          </div>
+          </Link>
           <div
             class="flex items-center gap-5 rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900"
           >
