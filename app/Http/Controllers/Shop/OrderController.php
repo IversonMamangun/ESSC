@@ -89,4 +89,22 @@ class OrderController extends Controller
             default => $query,
         };
     }
+
+    public function show(Request $request, Order $order)
+{
+    if ($order->user_id !== $request->user()->id) {
+        abort(403, 'Unauthorized action.');
+    }
+
+    $order->load([
+        'store:id,name',
+        'items:id,order_id,product_name,product_image,variant_name,price,quantity',
+        // 'shippingAddress' // Uncomment if you have a separate address relationship
+    ]);
+
+    return Inertia::render('shop/customer/order/Show', [
+        'user' => $request->user()->only('name', 'phone', 'avatar'),
+        'order' => $order,
+    ]);
+}
 }
