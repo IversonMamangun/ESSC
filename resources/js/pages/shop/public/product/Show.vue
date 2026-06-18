@@ -30,6 +30,7 @@ import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import shop from '@/routes/shop';
 import { logout, login } from '@/routes';
 import type { ProductShow, ProductVariant } from '@/types';
@@ -629,46 +630,22 @@ const handleBuyNow = () => {
     </DialogContent>
   </Dialog>
 
-  <Dialog v-model:open="showRoleMismatchDialog">
-    <DialogContent
-      class="rounded-3xl border border-zinc-200 bg-white p-6 sm:max-w-[425px] dark:border-zinc-800 dark:bg-zinc-900"
-    >
-      <DialogHeader class="space-y-3 text-center sm:text-left">
-        <DialogTitle
-          class="flex items-center gap-2 text-xl font-black text-zinc-900 dark:text-white"
-        >
-          Customer Account Required
-        </DialogTitle>
-        <DialogDescription
-          class="text-sm leading-relaxed text-zinc-500 dark:text-zinc-400"
-        >
-          You are currently logged in as
-          <span class="font-bold text-red-600 capitalize dark:text-red-400"
-            >"{{ user?.user_type?.name }}"</span
-          >. To add retail items to your cart or finalize a direct order, you
-          need to sign in using a dedicated
-          <span class="font-bold text-zinc-900 dark:text-white">customer</span>
-          profile.
-        </DialogDescription>
-      </DialogHeader>
-
-      <DialogFooter class="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-end">
-        <Button
-          variant="outline"
-          class="order-2 cursor-pointer rounded-xl sm:order-1"
-          @click="showRoleMismatchDialog = false"
-        >
-          Cancel
-        </Button>
-        <Button
-          variant="destructive"
-          class="order-1 flex cursor-pointer items-center gap-2 rounded-xl bg-red-600 font-bold tracking-wide text-white hover:bg-red-700 sm:order-2"
-          @click="handleLogoutAndRedirect"
-        >
-          <LogOutIcon class="h-4 w-4" />
-          Logout & Sign In
-        </Button>
-      </DialogFooter>
-    </DialogContent>
-  </Dialog>
+  <ConfirmDialog
+    v-model:open="showRoleMismatchDialog"
+    title="Customer Account Required"
+    confirm-text="Logout & Sign In"
+    confirm-variant="destructive"
+    :icon="LogOutIcon"
+    @confirm="handleLogoutAndRedirect"
+  >
+    <template #description>
+      You are currently logged in as
+      <span class="font-bold text-red-600 capitalize dark:text-red-400"
+        >"{{ user?.user_type?.name }}"</span
+      >. To add retail items to your cart or finalize a direct order, you need
+      to sign in using a dedicated
+      <span class="font-bold text-zinc-900 dark:text-white">customer</span>
+      profile.
+    </template>
+  </ConfirmDialog>
 </template>
