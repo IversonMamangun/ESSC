@@ -26,6 +26,7 @@ export interface OrderItem {
   variant_name: string | null;
   price: number;
   quantity: number;
+  total: number;
 }
 
 export interface Order {

@@ -35,6 +35,7 @@ const formatPrice = (price: number) => {
             <TableHead>Variant</TableHead>
             <TableHead>Price</TableHead>
             <TableHead>Quantity</TableHead>
+            <TableHead>Total</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -80,6 +81,10 @@ const formatPrice = (price: number) => {
 
             <TableCell>
               {{ item.quantity }}
+            </TableCell>
+
+            <TableCell>
+              {{ formatPrice(item.total) }}
             </TableCell>
           </TableRow>
         </TableBody>
