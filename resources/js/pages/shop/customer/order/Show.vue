@@ -36,11 +36,12 @@ interface OrderDetails {
     name: string;
   };
   items: OrderItem[];
-  // If you pass down address fields dynamically, declare them here:
   shipping_name?: string;
   paid_at?: string;
-  shipping_phone?: string;
-  shipping_address?: string;
+  shipped_at: string;
+  completed_at: string;
+  shipping_phone: string;
+  shipping_address: string;
 }
 
 const props = defineProps<{

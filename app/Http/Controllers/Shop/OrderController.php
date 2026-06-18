@@ -90,21 +90,55 @@ class OrderController extends Controller
         };
     }
 
-    public function show(Request $request, Order $order)
+   public function show(Request $request, Order $order)
 {
+    // Ensure the customer owns this order record
     if ($order->user_id !== $request->user()->id) {
         abort(403, 'Unauthorized action.');
     }
 
+    // 1. Load relationships
     $order->load([
         'store:id,name',
         'items:id,order_id,product_name,product_image,variant_name,price,quantity',
-        // 'shippingAddress' // Uncomment if you have a separate address relationship
     ]);
+
+    // 2. Format a comprehensive address string out of your granular database columns
+    $fullAddress = collect([
+        $order->unit_bldg_house,
+        $order->street,
+        $order->barangay,
+        $order->city,
+        $order->province,
+        $order->region,
+        $order->postal_code,
+    ])->filter()->implode(', ');
+
+    $isPaid = !in_array($order->status, [OrderStatus::PENDING]);
+    $isShipped = in_array($order->status, [OrderStatus::SHIPPED, OrderStatus::DELIVERED]);
+    $isCompleted = $order->status === OrderStatus::DELIVERED;
 
     return Inertia::render('shop/customer/order/Show', [
         'user' => $request->user()->only('name', 'phone', 'avatar'),
-        'order' => $order,
+        'order' => [
+            'id' => $order->id,
+            'order_number' => $order->order_number,
+            'status' => $order->status->value ?? $order->status,
+            'shipping_fee' => (float) $order->shipping_fee,
+            'total' => (float) $order->total,
+            'created_at' => $order->created_at->toIso8601String(),
+            'store' => $order->store,
+            'items' => $order->items,
+            
+            'shipping_name' => $order->recipient_name,
+            'shipping_phone' => $order->recipient_phone,
+            'shipping_address' => $fullAddress ?: 'No shipping address provided.',
+            
+            // Timeline dates
+            'paid_at' => $isPaid ? $order->created_at->addMinutes(5)->toIso8601String() : null,
+            'shipped_at' => $isShipped ? $order->updated_at->toIso8601String() : null,
+            'completed_at' => $isCompleted ? $order->updated_at->toIso8601String() : null,
+        ],
     ]);
 }
 }
