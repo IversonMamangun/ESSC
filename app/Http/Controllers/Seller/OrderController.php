@@ -16,7 +16,7 @@ class OrderController extends Controller
     public function index(Request $request)
     {
         $validated = $request->validate([
-            'tab' => ['sometimes', 'string', Rule::in(['to-confirm', 'to-ship', 'to-deliver', 'cancellation'])],
+            'tab' => ['sometimes', 'string', Rule::in(['to-confirm', 'to-pack', 'to-ship', 'cancellation'])],
         ]);
 
         $filters = [
@@ -63,8 +63,8 @@ class OrderController extends Controller
                 OrderStatus::PENDING,
                 OrderStatus::CONFIRMED,
             ]),
-            'to-ship' => $query->where('status', OrderStatus::PROCESSING),
-            'to-deliver' => $query->where('status', OrderStatus::PACKED),
+            'to-pack' => $query->where('status', OrderStatus::PROCESSING),
+            'to-ship' => $query->where('status', OrderStatus::PACKED),
             'cancellation' => $query->where('status', OrderStatus::CANCELLED),
             default => $query,
         };
@@ -81,8 +81,8 @@ class OrderController extends Controller
         return [
             'to_confirm'   => ($counts->get(OrderStatus::PENDING->value, 0)) 
                             + ($counts->get(OrderStatus::CONFIRMED->value, 0)),
-            'to_ship'      => $counts->get(OrderStatus::PROCESSING->value, 0),
-            'to_deliver'   => $counts->get(OrderStatus::PACKED->value, 0),
+            'to_pack'      => $counts->get(OrderStatus::PROCESSING->value, 0),
+            'to_ship'   => $counts->get(OrderStatus::PACKED->value, 0),
             'cancellation' => $counts->get(OrderStatus::CANCELLED->value, 0),
         ];
     }

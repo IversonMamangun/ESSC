@@ -36,8 +36,8 @@ const props = defineProps<{
   };
   counts: {
     to_confirm: number;
+    to_pack: number;
     to_ship: number;
-    to_deliver: number;
     cancellation: number;
   };
 }>();
@@ -51,14 +51,14 @@ const orderTabs = computed<SellerTabItem[]>(() => [
     count: props.counts.to_confirm,
   },
   {
+    label: 'To Pack Orders',
+    value: 'to-pack',
+    count: props.counts.to_pack,
+  },
+  {
     label: 'To Ship Orders',
     value: 'to-ship',
     count: props.counts.to_ship,
-  },
-  {
-    label: 'To Deliver Orders',
-    value: 'to-deliver',
-    count: props.counts.to_deliver,
   },
   {
     label: 'Cancelled Orders',

@@ -215,9 +215,12 @@ export const getSellerOrdersColumns = ({
       if (activeTab === 'to-confirm') {
         primaryActionLabel = 'Accept Order';
         actionType = 'accept';
+      } else if (activeTab === 'to-pack') {
+        primaryActionLabel = 'Mark as Packed';
+        actionType = 'pack';
       } else if (activeTab === 'to-ship') {
-        primaryActionLabel = 'Ship Order';
         actionType = 'ship';
+        primaryActionLabel = 'Mark as Shipped';
       }
 
       const menuItems = [
