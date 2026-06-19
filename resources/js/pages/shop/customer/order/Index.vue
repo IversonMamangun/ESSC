@@ -14,11 +14,11 @@ import {
 } from 'lucide-vue-next';
 import { ref, computed } from 'vue';
 import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
+import OrderCard from '@/components/orders/OrderCard.vue';
+import Pagination from '@/components/Pagination.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import OrderCard from '@/components/orders/OrderCard.vue';
-import Pagination from '@/components/Pagination.vue';
 import shop from '@/routes/shop';
 import type { User, OrderDisplayStatus, PaginatedOrders } from '@/types';
 
@@ -88,6 +88,21 @@ const cancelOrder = (orderId: string | number) => {
 
 const completeOrder = (orderId: string | number) => {
   //
+};
+
+const handleBuyAgain = (orderId: string | number) => {
+  console.log('Repurchasing order items for ID:', orderId);
+};
+
+const handleRateOrder = (orderId: string | number) => {
+  router.get(`/orders/${orderId}/rate`);
+  // console.log('Opening rating form modal/page for order:', orderId);
+  
+  // Redirect to rating page or trigger local display dialog
+};
+
+const handleViewRating = (orderId: string | number) => {
+  console.log('Showing existing submission score for order:', orderId);
 };
 </script>
 
@@ -162,6 +177,9 @@ const completeOrder = (orderId: string | number) => {
                 v-for="order in orders.data"
                 :key="order.id"
                 :order="order"
+                @buyAgain="handleBuyAgain"
+                @rate="handleRateOrder"
+                @viewRating="handleViewRating"
               />
             </div>
 

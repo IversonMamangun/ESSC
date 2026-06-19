@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use App\Models\UserType;
 use App\Http\Controllers\StoreController;
@@ -99,6 +100,15 @@ Route::middleware([
         ->name('orders.index');
     Route::get('/orders/{order}', [CustomerOrderController::class, 'show'])
         ->name('orders.show');
+
+        Route::get('/orders/{order}/rate', [CustomerOrderController::class, 'rate'])
+            ->name('orders.rate');
+        Route::post('/orders/{order}/rate', [CustomerOrderController::class, 'storeRating'])
+            ->name('orders.store-rating');
+
+        // Route::get('/customer/chat', function () {
+        //     return Inertia::render('shop/customer/chat/Index');
+        // })->name('customer.chat.Index');
 });
 
 // dedicated seller routes
