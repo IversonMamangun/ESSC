@@ -26,21 +26,33 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
-        $sellers = User::factory(3)->create([
+        User::factory()->create([
             'user_type_id' => UserType::SELLER,
+            'name' => 'Seller Test',
+            'email' => 'seller@example.com',
         ]);
 
-        User::factory(5)->create([
+        User::factory()->create([
             'user_type_id' => UserType::CUSTOMER,
+            'name' => 'Customer Test',
+            'email' => 'customer@example.com',
         ]);
 
-        foreach ($sellers as $seller) {
-            Store::factory()->create([
-                'user_id' => $seller->id,
-            ]);
-        }
+        // $sellers = User::factory(3)->create([
+        //     'user_type_id' => UserType::SELLER,
+        // ]);
 
-        Product::factory(20)->create();
+        // User::factory(5)->create([
+        //     'user_type_id' => UserType::CUSTOMER,
+        // ]);
+
+        // foreach ($sellers as $seller) {
+        //     Store::factory()->create([
+        //         'user_id' => $seller->id,
+        //     ]);
+        // }
+
+        // Product::factory(20)->create();
 
         $this->call([
             PaymentMethodSeeder::class,

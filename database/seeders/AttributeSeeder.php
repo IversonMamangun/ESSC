@@ -33,6 +33,11 @@ class AttributeSeeder extends Seeder
                 'Aluminum',
                 'Carbon Fiber',
             ],
+            'Capacity' => [
+                '1 Liter',
+                '4 Liters',
+                '20 Liters',
+            ],
         ];
 
         foreach ($attributes as $attributeName => $values) {
