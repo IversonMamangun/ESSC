@@ -95,7 +95,7 @@ Route::middleware([
     Route::post('/checkout', [CustomerCheckoutController::class, 'store'])
         ->name('checkout.store');
 
-        Route::get('/orders', [CustomerOrderController::class, 'index'])
+    Route::get('/orders', [CustomerOrderController::class, 'index'])
         ->name('orders.index');
     Route::get('/orders/{order}', [CustomerOrderController::class, 'show'])
         ->name('orders.show');
@@ -134,6 +134,10 @@ Route::middleware([
 
     Route::get('/orders', [SellerOrderController::class, 'index'])
         ->name('orders.index');
+    Route::patch('/orders/{order}/action', [SellerOrderController::class, 'action'])
+        ->name('orders.action');
+    Route::patch('/orders/{order}/cancel', [SellerOrderController::class, 'cancel'])
+        ->name('orders.cancel');
 });
 
 // dedicated admin routes
