@@ -47,6 +47,8 @@ class ProductController extends Controller
                 'images:id,product_id,image,sort_order',
                 'defaultVariant:id,product_id,price,compare_price',
             ])
+            ->withCount('reviews')
+            ->withAvg('reviews', 'rating')
             ->withSum('variants as total_stock', 'stock')
             ->having('total_stock', '>', 0)
             ->where('is_active', true)
@@ -69,6 +71,9 @@ class ProductController extends Controller
             'images',
             'variants.attributeValues.attribute',
         ]);
+
+        // $product->loadCount('reviews'); // 👈 ADDED: Computes 'reviews_count' for detail view
+        // $product->loadAvg('reviews', 'rating'); // 👈 ADDED: Computes 'reviews_avg_rating' for detail view
 
         return Inertia::render('shop/public/product/Show', [
             'product' => ProductShowResource::make($product)->resolve(),
