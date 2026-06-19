@@ -70,4 +70,17 @@ class Order extends Model
     {
         return $this->belongsTo(Checkout::class);
     }
+
+    // cod helper method
+    public function isCod(): bool
+    {
+        return $this->checkout?->payment?->payment_method_id === PaymentMethod::CASH_ON_DELIVERY;
+    }
+
+    // online helper method
+    public function isOnline(): bool
+    {
+        return $this->checkout?->payment?->payment_method_id === PaymentMethod::PAY_ONLINE;
+    }
+
 }
