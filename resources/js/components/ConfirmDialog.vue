@@ -74,7 +74,7 @@ const handleConfirm = () => {
 
           <Button
             :variant="confirmVariant"
-            class="order-1 flex cursor-pointer items-center gap-2 rounded-xl font-bold tracking-wide text-white sm:order-2"
+            class="order-1 flex cursor-pointer items-center gap-2 rounded-xl font-bold tracking-wide sm:order-2"
             :class="{
               'bg-red-600 hover:bg-red-700': confirmVariant === 'destructive',
             }"

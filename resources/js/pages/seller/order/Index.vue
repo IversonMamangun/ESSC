@@ -23,10 +23,11 @@ import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import Pagination from '@/components/Pagination.vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getSellerOrdersColumns } from '@/features/seller/columns';
 import seller from '@/routes/seller';
-import type { Store, PaginatedSellerOrders } from '@/types';
+import type { Store, PaginatedSellerOrders, SellerOrder } from '@/types';
 
 const props = defineProps<{
   store: Store;
@@ -77,12 +78,47 @@ const viewOrder = (orderNo: string) => {
   // router.visit(seller.orders.show(orderNo));
 };
 
-const handleOrderAction = (orderNo: string, actionType: string) => {
-  //
+// state for action & cancel logic
+const confirmOpen = ref(false);
+const selectedOrder = ref<SellerOrder | null>(null);
+const selectedAction = ref<'accept' | 'pack' | 'ship' | 'cancel' | null>(null);
+
+const handleOrderAction = (order: SellerOrder, actionType: string) => {
+  selectedOrder.value = order;
+  selectedAction.value = actionType as any;
+  confirmOpen.value = true;
 };
 
-const declineOrder = (orderNo: string) => {
-  //
+const declineOrder = (order: SellerOrder) => {
+  selectedOrder.value = order;
+  selectedAction.value = 'cancel';
+  confirmOpen.value = true;
+};
+
+// submit action
+const actionForm = useForm({
+  action: '',
+});
+const processOrderAction = () => {
+  if (!selectedOrder.value || !selectedAction.value) return;
+
+  if (selectedAction.value === 'cancel') {
+    actionForm.patch(seller.orders.cancel.url(selectedOrder.value.id), {
+      preserveScroll: true,
+      onSuccess: () => {
+        confirmOpen.value = false;
+      },
+    });
+
+    return;
+  }
+  actionForm.action = selectedAction.value;
+  actionForm.patch(seller.orders.action.url(selectedOrder.value.id), {
+    preserveScroll: true,
+    onSuccess: () => {
+      confirmOpen.value = false;
+    },
+  });
 };
 
 const orderColumns = computed(() =>
@@ -191,6 +227,25 @@ function changeTab(tab: string) {
       </div>
     </main>
   </div>
+
+  <ConfirmDialog
+    v-if="selectedAction && selectedOrder"
+    v-model:open="confirmOpen"
+    :title="
+      selectedAction === 'cancel' ? 'Cancel Order' : 'Update Order Status'
+    "
+    :confirm-variant="selectedAction === 'cancel' ? 'destructive' : 'default'"
+    confirm-text="Confirm"
+    @confirm="processOrderAction"
+  >
+    <template #description>
+      Are you sure you want to {{ selectedAction }}
+      <span class="font-bold text-blue-600 capitalize dark:text-blue-400">{{
+        selectedOrder.order_number
+      }}</span
+      >?
+    </template>
+  </ConfirmDialog>
 </template>
 
 <style scoped>

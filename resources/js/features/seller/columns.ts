@@ -150,8 +150,8 @@ export const getSellerOrdersColumns = ({
   activeTab,
 }: {
   viewOrder: (orderNo: string) => void;
-  handleAction: (orderNo: string, actionType: string) => void;
-  declineOrder: (orderNo: string) => void;
+  handleAction: (order: SellerOrder, actionType: string) => void;
+  declineOrder: (order: SellerOrder) => void;
   activeTab: string;
 }): ColumnDef<SellerOrder>[] => [
   {
@@ -240,7 +240,7 @@ export const getSellerOrdersColumns = ({
             DropdownMenuItem,
             {
               class: 'cursor-pointer text-blue-500 focus:text-blue-600',
-              onClick: () => handleAction(order.order_number, actionType),
+              onClick: () => handleAction(order, actionType),
             },
             () => primaryActionLabel,
           ),
@@ -250,7 +250,7 @@ export const getSellerOrdersColumns = ({
             DropdownMenuItem,
             {
               class: 'cursor-pointer text-rose-500 focus:text-rose-600',
-              onClick: () => declineOrder(order.order_number),
+              onClick: () => declineOrder(order),
             },
             () => 'Decline Order',
           ),
