@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\Rule;
 use App\Http\Resources\Seller\OrderIndexResource;
+use App\Http\Requests\Seller\OrderActionRequest;
 use App\Models\Order;
+use App\Models\PaymentMethod;
 use App\Enums\OrderStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -79,11 +81,97 @@ class OrderController extends Controller
             ->pluck('total', 'status');
 
         return [
-            'to_confirm'   => ($counts->get(OrderStatus::PENDING->value, 0)) 
+            'to_confirm'   => (int) ($counts->get(OrderStatus::PENDING->value, 0)) 
                             + ($counts->get(OrderStatus::CONFIRMED->value, 0)),
-            'to_pack'      => $counts->get(OrderStatus::PROCESSING->value, 0),
-            'to_ship'   => $counts->get(OrderStatus::PACKED->value, 0),
-            'cancellation' => $counts->get(OrderStatus::CANCELLED->value, 0),
+            'to_pack'      =>(int) $counts->get(OrderStatus::PROCESSING->value, 0),
+            'to_ship'   => (int) $counts->get(OrderStatus::PACKED->value, 0),
+            'cancellation' => (int) $counts->get(OrderStatus::CANCELLED->value, 0),
         ];
+    }
+
+    public function action(OrderActionRequest $request, Order $order) {
+        $user = $request->user();
+
+        abort_unless(
+            $order->store_id === $user->store?->id,
+            403
+        );
+
+        $order->loadMissing('checkout.payment.method');
+        $action = $request->validated('action');
+        $payment = $order->checkout?->payment; 
+        
+        if (!$payment || $payment->payment_method_id !== PaymentMethod::CASH_ON_DELIVERY) {
+            return back()->with(
+                'error',
+                'Online payment workflow is not yet implemented.'
+            );
+        }
+
+        match ($action) {
+            'accept' => $this->acceptCodOrder($order),
+            'pack' => $this->packCodOrder($order),
+            'ship' => $this->shipCodOrder($order),
+        };
+
+        return back()->with(
+            'success',
+            'Order updated successfully.'
+        );
+    }
+
+    private function acceptCodOrder(Order $order): void
+    {
+        if ($order->status !== OrderStatus::PENDING) {
+            abort(422, 'Invalid order state');
+        }
+
+        $order->update([
+            'status' => OrderStatus::PROCESSING,
+        ]);
+    }
+
+    private function packCodOrder(Order $order): void
+    {
+        if ($order->status !== OrderStatus::PROCESSING) {
+            abort(422, 'Invalid order state');
+        }
+
+        $order->update([
+            'status' => OrderStatus::PACKED,
+        ]);
+    }
+
+    private function shipCodOrder(Order $order): void
+    {
+        if ($order->status !== OrderStatus::PACKED) {
+            abort(422, 'Invalid order state');
+        }
+
+        $order->update([
+            'status' => OrderStatus::SHIPPED,
+        ]);
+    }
+
+    public function cancel(Request $request, Order $order) {
+        $user = $request->user();
+
+        abort_unless(
+            $order->store_id === $user->store?->id,
+            403
+        );
+
+        if ($order->status !== OrderStatus::PENDING) {
+            abort(422, 'Invalid order state');
+        }
+
+        $order->update([
+            'status' => OrderStatus::CANCELLED,
+        ]);
+
+        return back()->with(
+            'success',
+            'Order cancelled successfully.'
+        );
     }
 }
