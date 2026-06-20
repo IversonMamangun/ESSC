@@ -11,7 +11,6 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\BuyerController; 
-use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Shop\HomeController as ShopHomeController;
 use App\Http\Controllers\Shop\ProductController as ShopProductController;
 use App\Http\Controllers\Shop\StoreController as ShopStoreController;
@@ -30,14 +29,8 @@ Route::inertia('/', 'Welcome', [
 ])->name('landing');
 
 Route::middleware('guest')->group(function () {
-    Route::get('/auth/google/redirect', [GoogleAuthController::class, 'redirect'])->name('google.redirect');
-    Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback'])->name('google.callback');
-
-    Route::inertia('/register', 'auth/Register')->name('register');
-    Route::post('/register/initiate', [RegisterController::class, 'initiate'])->name('register.initiate');
-    Route::post('/register/verify', [RegisterController::class, 'verify'])->name('register.verify');
-    Route::post('/register/resend', [RegisterController::class, 'initiate'])->name('register.resend'); 
-    Route::post('/register/complete', [RegisterController::class, 'complete'])->name('register.complete');
+    
+    
 });
 
 // dedicated guest shop routes
