@@ -36,9 +36,9 @@ return [
     ],
 
     'movider' => [
-        'key' => env('MOVIDER_API_KEY'),
-        'secret' => env('MOVIDER_API_SECRET'),
-        'sender_id' => env('MOVIDER_SENDER_ID', 'MOVIDER'), // Optional custom sender name
+        'api_key' => env('MOVIDER_API_KEY'),
+        'api_secret' => env('MOVIDER_API_SECRET'),
+        'sender' => env('MOVIDER_SENDER'),
     ],
 
     'google' => [
