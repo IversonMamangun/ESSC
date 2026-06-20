@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('target');
             $table->string('otp');
             $table->timestamp('expires_at');
+            $table->string('verification_token')->nullable();
             $table->timestamp('verified_at')->nullable();
             $table->unsignedTinyInteger('attempts')->default(0);
             $table->timestamps();
