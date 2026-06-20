@@ -28,7 +28,7 @@ enum OrderStatus: string
     }
 }
 
-// ---- seller order side ----
+// ---- seller orders side ----
 /**
  * -- cod
  * to confirm (pending) -> fn to confirm / cancel
@@ -41,4 +41,14 @@ enum OrderStatus: string
  * to ship (processing) -> fn to pack
  * to deliver (packed) -> fn to ship
  * cancelation
+ */
+
+// ---- seller sales side ----
+/**
+ * -- on the way
+ * to deliver (shipped) -> fn to deliver
+ * delivered orders -> fn view order
+ * sales report -> fn to view sales per product 
+ * return request (delivered) -> fn to return
+ * 
  */
