@@ -27,6 +27,10 @@ class CreateVerifiedUser
                 $input['password']
             ),
         ]);
+        
+        $this->verification->consumeToken(
+            $input['verification_token']
+        );
 
         return $user;
     }

@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\VerificationCode;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Hash;
@@ -82,24 +81,26 @@ class VerificationService
         return $token;
     }
 
-    public function validateToken(string $token, string $purpose): array 
-    {
-        $data = Cache::get(
-            "verification:{$token}"
-        );
+    public function validateToken(string $token, string $purpose): VerificationCode {
+        $verification = VerificationCode::query()
+            ->where('verification_token', $token)
+            ->where('purpose', $purpose)
+            ->first();
 
-        if (! $data) {
+        if (! $verification) {
             throw ValidationException::withMessages([
                 'verification_token' => 'Invalid verification token.',
             ]);
         }
 
-        if ($data['purpose'] !== $purpose) {
-            throw ValidationException::withMessages([
-                'verification_token' => 'Invalid verification token.',
-            ]);
-        }
+        return $verification;
+    }
 
-        return $data;
+    public function consumeToken(string $token): void {
+        VerificationCode::query()
+            ->where('verification_token', $token)
+            ->update([
+                'verification_token' => null,
+            ]);
     }
 }
