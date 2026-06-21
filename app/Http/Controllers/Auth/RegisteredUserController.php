@@ -8,7 +8,7 @@ use App\Http\Requests\Auth\CompleteRegistrationRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Actions\Auth\CreateVerifiedUser;
 
-class RegisteredUserController extends Controller
+class RegistrationController extends Controller
 {
     public function store(CompleteRegistrationRequest $request, CreateVerifiedUser $action) 
     {

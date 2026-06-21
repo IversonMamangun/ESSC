@@ -11,6 +11,8 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\BuyerController; 
+use App\Http\Controllers\Auth\RegistrationController;
+use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Shop\HomeController as ShopHomeController;
 use App\Http\Controllers\Shop\ProductController as ShopProductController;
 use App\Http\Controllers\Shop\StoreController as ShopStoreController;
@@ -25,15 +27,31 @@ use App\Http\Controllers\Seller\ProductController as SellerProductController;
 use App\Http\Controllers\Seller\OrderController as SellerOrderController;
 
 Route::inertia('/', 'Welcome', [
-    'canRegister' => Features::enabled(Features::registration()),
+    'canRegister' => true,
 ])->name('landing');
 
-Route::middleware('guest')->group(function () {
-    
-    
+// dedicated only guest routes
+Route::middleware('guest')
+->group(function () {
+
+    Route::inertia('/register', 'auth/Register')
+        ->name('register');
+
+    Route::post('/register', [RegistrationController::class, 'store'])
+        ->name('register.store');
 });
 
-// dedicated guest shop routes
+// both guest & auth routes (verifications logic)
+Route::prefix('verifications')
+->name('verifications.')
+->group(function () {
+    Route::post('/send', [VerificationController::class, 'send'])
+        ->name('send');
+    Route::post('/verify', [VerificationController::class, 'verify'])
+        ->name('verify');
+});
+
+// both guest & auth shop routes (public experience)
 Route::name('shop.')
 ->group(function () {
     Route::get('/home', [ShopHomeController::class, 'index'])
