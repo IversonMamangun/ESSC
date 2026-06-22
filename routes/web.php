@@ -12,6 +12,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\BuyerController; 
 use App\Http\Controllers\Auth\RegistrationController;
+use App\Http\Controllers\Shop\ChatController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Shop\HomeController as ShopHomeController;
 use App\Http\Controllers\Shop\ProductController as ShopProductController;
@@ -112,14 +113,14 @@ Route::middleware([
     Route::get('/orders/{order}', [CustomerOrderController::class, 'show'])
         ->name('orders.show');
 
-        Route::get('/orders/{order}/rate', [CustomerOrderController::class, 'rate'])
-            ->name('orders.rate');
-        Route::post('/orders/{order}/rate', [CustomerOrderController::class, 'storeRating'])
-            ->name('orders.store-rating');
+    Route::get('/orders/{order}/rate', [CustomerOrderController::class, 'rate'])
+        ->name('orders.rate');
+    Route::post('/orders/{order}/rate', [CustomerOrderController::class, 'storeRating'])
+        ->name('orders.store-rating');
 
-        // Route::get('/customer/chat', function () {
-        //     return Inertia::render('shop/customer/chat/Index');
-        // })->name('customer.chat.Index');
+    Route::get('/chat/{store:slug?}', [ChatController::class, 'index'])
+    ->name('chat.index');
+
 });
 
 // dedicated seller routes
