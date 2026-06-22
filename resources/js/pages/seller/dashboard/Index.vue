@@ -60,9 +60,9 @@ const deleteProduct = (productSlug: string) => {
           <template #actions>
             <Link
               :href="seller.products.create()"
-              class="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#009933] px-6 py-3.5 font-bold text-white shadow-md transition-colors hover:bg-green-700 active:scale-95"
+              class="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-transparent border border-[#009933] px-6 py-3.5 font-bold text-[#009933] shadow-sm transition-colors hover:bg-[#009933]/20 active:scale-95 dark:text-[#00cc44] dark:hover:bg-[009933]"
             >
-              <PlusIcon class="h-5 w-5" /> Add New Product
+              Chat
             </Link>
           </template>
         </SellerStoreHeader>
