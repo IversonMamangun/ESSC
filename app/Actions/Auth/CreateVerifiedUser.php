@@ -8,26 +8,26 @@ use Illuminate\Support\Facades\Hash;
 
 class CreateVerifiedUser
 {
-    public function __construct(protected VerificationService $verification) 
+    public function __construct(protected VerificationService $verification)
     {
         //
     }
 
-    public function create(array $input): User 
+    public function create(array $input): User
     {
-        $data = $this->verification
-            ->validateToken(
-                $input['verification_token'],
-                'registration'
-            );
+        $verification = $this->verification->validateToken(
+            $input['verification_token'],
+            'registration'
+        );
 
         $user = User::create([
-            'phone' => $data['phone'],
-            'password' => Hash::make(
-                $input['password']
-            ),
+            'name' => $input['name'],
+            'email' => $input['email'],
+            'phone' => $verification->target,
+            'user_type_id' => $input['user_type_id'],
+            'password' => Hash::make($input['password']),
         ]);
-        
+
         $this->verification->consumeToken(
             $input['verification_token']
         );
