@@ -47,8 +47,11 @@ Route::prefix('verifications')
 ->name('verifications.')
 ->group(function () {
     Route::post('/send', [VerificationController::class, 'send'])
+        ->middleware('throttle:otp-send')
         ->name('send');
+
     Route::post('/verify', [VerificationController::class, 'verify'])
+        ->middleware('throttle:otp-verify')
         ->name('verify');
 });
 
