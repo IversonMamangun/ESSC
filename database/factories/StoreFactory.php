@@ -35,6 +35,7 @@ class StoreFactory extends Factory
             'slug' => Str::slug($name),
             'description' => fake()->paragraph(),
             'is_active' => true,
+            'is_official' => fake()->boolean(20),
         ];
     }
 }

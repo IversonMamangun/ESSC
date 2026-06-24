@@ -36,17 +36,21 @@ class AttributeSeeder extends Seeder
             'Capacity' => [
                 '1 Liter',
                 '4 Liters',
+                '10 Liters',
                 '20 Liters',
+            ],
+            'Quantity' => [
+                '100 Tablets',
             ],
         ];
 
         foreach ($attributes as $attributeName => $values) {
-            $attribute = Attribute::create([
-                'name' => $attributeName,
+            $attribute = Attribute::firstOrCreate([
+                'name' => $attributeName
             ]);
 
             foreach ($values as $value) {
-                AttributeValue::create([
+                AttributeValue::firstOrCreate([
                     'attribute_id' => $attribute->id,
                     'value' => $value,
                 ]);

@@ -21,19 +21,17 @@ class CategorySeeder extends Seeder
             'Electrical Supplies',
             'Hardware & Fasteners',
             'Home Appliances',
-            'Cooling & Air Heating or Kitchen Appliances',
+            'Cooling & Air Heating / Kitchen Appliances',
             'Water Dispensers, Purifiers & Filters',
             'Home & Living',
-            'Houseware or Home Care',
             'Pest Control',
             'Cleaning Agent / Disinfectant',
             'Houseware / Home Care',
-            'All Purpose Cleaners or Dishwashing / Kitchen Cleaners',
-            'Home Care or Automotive Care',
-            'Polishes, Waxes & Conditioners or Car Polish & Waxes',
+            'All Purpose Cleaners / Dishwashing & Kitchen Cleaners',
+            'Home Care / Automotive Care',
             'Motors',
             'Automotive Care',
-            'Polish, Waxes & Sealants / Car Polishes & Waxes',
+            'Polishes, Waxes & Sealants / Car Polishes & Waxes',
         ];
 
         foreach ($categories as $name) {
