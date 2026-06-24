@@ -63,6 +63,12 @@ class VerificationService
             ]);
         }
 
+        if ($verification->attempts >= 5) {
+            throw ValidationException::withMessages([
+                'otp' => 'Too many incorrect attempts. Please request a new code.',
+            ]);
+        }
+
         if (! Hash::check($otp, $verification->otp)) {
             $verification->increment('attempts');
 
