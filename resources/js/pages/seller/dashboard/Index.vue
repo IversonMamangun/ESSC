@@ -12,12 +12,16 @@ import {
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import SellerStoreHeader from '@/components/SellerStoreHeader.vue';
+import ProductsSummaryCard from '@/components/dashboard/ProductsSummaryCard.vue';
+import OrdersSummaryCard from '@/components/dashboard/OrdersSummaryCard.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import seller from '@/routes/seller';
-import type { Store } from '@/types';
+import type { Store, ProductsSummary, OrdersSummary } from '@/types';
 
 const props = defineProps<{
   store: Store;
+  productsSummary: ProductsSummary;
+  ordersSummary: OrdersSummary;
 }>();
 
 const viewProduct = (productSlug: string) => {
@@ -60,7 +64,7 @@ const deleteProduct = (productSlug: string) => {
           <template #actions>
             <Link
               :href="seller.products.create()"
-              class="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-transparent border border-[#009933] px-6 py-3.5 font-bold text-[#009933] shadow-sm transition-colors hover:bg-[#009933]/20 active:scale-95 dark:text-[#00cc44] dark:hover:bg-[009933]"
+              class="flex shrink-0 items-center justify-center gap-2 rounded-xl border border-[#009933] bg-transparent px-6 py-3.5 font-bold text-[#009933] shadow-sm transition-colors hover:bg-[#009933]/20 active:scale-95 dark:text-[#00cc44] dark:hover:bg-[009933]"
             >
               Chat
             </Link>
@@ -81,7 +85,7 @@ const deleteProduct = (productSlug: string) => {
                 Total Products
               </h3>
               <p class="text-3xl font-black text-zinc-900 dark:text-white">
-                123
+                {{ productsSummary.total }}
               </p>
             </div>
           </div>
@@ -98,7 +102,7 @@ const deleteProduct = (productSlug: string) => {
                 Total Orders
               </h3>
               <p class="text-3xl font-black text-zinc-900 dark:text-white">
-                123
+                {{ ordersSummary.total }}
               </p>
             </div>
           </div>
@@ -122,31 +126,10 @@ const deleteProduct = (productSlug: string) => {
         </div>
 
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
-          <Link :href="seller.products.index()">
-            <div
-              class="rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-            >
-              <div>
-                <h3 class="text-sm font-bold text-zinc-500 dark:text-zinc-400">
-                  Products Summary
-                </h3>
-              </div>
-            </div>
-          </Link>
-
-          <Link :href="seller.orders.index()">
-            <div
-              class="rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-            >
-              <div>
-                <h3 class="text-sm font-bold text-zinc-500 dark:text-zinc-400">
-                  Orders Summary
-                </h3>
-              </div>
-            </div>
-          </Link>
+          <ProductsSummaryCard v-bind="props.productsSummary" />
+          <OrdersSummaryCard v-bind="props.ordersSummary" />
           <div
-            class="flex items-center gap-5 rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900"
+            class="flex gap-5 rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900"
           >
             <div>
               <h3 class="text-sm font-bold text-zinc-500 dark:text-zinc-400">
