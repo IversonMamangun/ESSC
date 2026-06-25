@@ -23,11 +23,11 @@ const formatPrice = (price: number) => {
 export const getSellerProductsColumns = ({
   viewProduct,
   editProduct,
-  deleteProduct,
+  // deleteProduct,
 }: {
   viewProduct: (slug: string) => void;
   editProduct: (slug: string) => void;
-  deleteProduct: (slug: string) => void;
+  // deleteProduct: (slug: string) => void;
 }): ColumnDef<SellerProduct>[] => [
   {
     accessorKey: 'name',
@@ -128,14 +128,14 @@ export const getSellerProductsColumns = ({
               },
               () => 'Edit Product',
             ),
-            h(
-              DropdownMenuItem,
-              {
-                class: 'cursor-pointer text-rose-500 focus:text-rose-600',
-                onClick: () => deleteProduct(product.slug),
-              },
-              () => 'Delete Product',
-            ),
+            // h(
+            //   DropdownMenuItem,
+            //   {
+            //     class: 'cursor-pointer text-rose-500 focus:text-rose-600',
+            //     onClick: () => deleteProduct(product.slug),
+            //   },
+            //   () => 'Delete Product',
+            // ),
           ]),
         ]),
       ]);

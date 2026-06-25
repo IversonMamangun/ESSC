@@ -66,14 +66,9 @@ const editProduct = (productSlug: string) => {
   router.visit(seller.products.edit(productSlug));
 };
 
-const deleteProduct = (productSlug: string) => {
-  // router.visit(seller.products.destroy(productSlug));
-};
-
 const productColumns = getSellerProductsColumns({
   viewProduct,
   editProduct,
-  deleteProduct,
 });
 
 const breadcrumbs = [
