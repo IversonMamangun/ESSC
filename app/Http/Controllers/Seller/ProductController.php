@@ -8,6 +8,7 @@ use App\Http\Resources\AttributeResource;
 use App\Http\Resources\Seller\ProductResource;
 use App\Http\Resources\Seller\ProductEditResource;
 use App\Http\Requests\Seller\ProductCreateRequest;
+use App\Http\Requests\Seller\ProductUpdateRequest;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Category;
@@ -289,9 +290,153 @@ class ProductController extends Controller
         ]);
     }
 
-    public function update(Request $request, Product $product)
+    public function update(ProductUpdateRequest $request, Product $product)
     {
+        $validated = $request->validated();
 
+        DB::transaction(function () use ($validated, $product, $request) {
+
+            // ── core fields ──────────────────────────────────────────────────
+            $product->update([
+                'name'        => $validated['name'],
+                'slug'        => $product->name !== $validated['name']
+                    ? $this->generateUniqueSlug($validated['name'], $product->id)
+                    : $product->slug,
+                'description' => $validated['description'] ?? null,
+                'is_active'   => $validated['is_active'],
+                'is_featured' => $validated['is_featured'],
+            ]);
+
+            // ── categories ───────────────────────────────────────────────────
+            $product->categories()->sync($validated['category_ids']);
+
+            // ── delete removed images ─────────────────────────────────────────
+            if (!empty($validated['deleted_image_ids'])) {
+                $product->images()
+                    ->whereIn('id', $validated['deleted_image_ids'])
+                    ->get()
+                    ->each(function ($img) {
+                        // Storage::disk('public')->delete($img->image);
+                        $img->delete();
+                    });
+            }
+
+            // ── add new images ────────────────────────────────────────────────
+            if ($request->hasFile('images')) {
+                $nextOrder = ($product->images()->max('sort_order') ?? -1) + 1;
+
+                foreach ($request->file('images') as $i => $file) {
+                    $product->images()->create([
+                        'image'      => $file->store('products/images', 'public'),
+                        'sort_order' => $nextOrder + $i,
+                    ]);
+                }
+            }
+
+            // ── video ─────────────────────────────────────────────────────────
+            if ($request->boolean('delete_video') && $product->video) {
+                // Storage::disk('public')->delete($product->video);
+                $product->update(['video' => null]);
+            }
+
+            if ($request->hasFile('video')) {
+                if ($product->video) {
+                    Storage::disk('public')->delete($product->video);
+                }
+                $product->update([
+                    'video' => $request->file('video')->store('products/videos', 'public'),
+                ]);
+            }
+
+            // ── delete removed variants ───────────────────────────────────────
+            if (!empty($validated['deleted_variant_ids'])) {
+                $product->variants()
+                    ->whereIn('id', $validated['deleted_variant_ids'])
+                    ->get()
+                    ->each(function ($v) {
+                        if ($v->image) Storage::disk('public')->delete($v->image);
+                        $v->delete();
+                    });
+            }
+
+            // ── upsert variants ───────────────────────────────────────────────
+            foreach ($validated['variants'] as $index => $variantData) {
+                $variantId  = $variantData['id'] ?? null;
+                $variantFile = $request->file("variants.$index.image");
+
+                if ($variantId) {
+                    // update existing
+                    $variant = $product->variants()->findOrFail($variantId);
+
+                    if (!empty($variantData['delete_image']) && $variant->image) {
+                        // Storage::disk('public')->delete($variant->image);
+                        $variant->image = null;
+                    }
+
+                    if ($variantFile) {
+                        // if ($variant->image) Storage::disk('public')->delete($variant->image);
+                        $variant->image = $variantFile->store('products/variants', 'public');
+                    }
+
+                    $variant->update([
+                        'sku'           => $variantData['sku'],
+                        'is_default'    => $variantData['is_default'],
+                        'price'         => $variantData['price'],
+                        'compare_price' => $variantData['compare_price'] ?? null,
+                        'stock'         => $variantData['stock'],
+                        'weight'        => $variantData['weight'] ?? null,
+                        'image'         => $variant->image,
+                    ]);
+                } else {
+                    // create new
+                    $imagePath = $variantFile
+                        ? $variantFile->store('products/variants', 'public')
+                        : null;
+
+                    $variant = $product->variants()->create([
+                        'sku'           => $variantData['sku'],
+                        'is_default'    => $variantData['is_default'],
+                        'price'         => $variantData['price'],
+                        'compare_price' => $variantData['compare_price'] ?? null,
+                        'stock'         => $variantData['stock'],
+                        'weight'        => $variantData['weight'] ?? null,
+                        'image'         => $imagePath,
+                    ]);
+                }
+
+                // ── sync attributes ───────────────────────────────────────────
+                $attributeValueIds = [];
+
+                foreach ($variantData['attributes'] as $attr) {
+                    $attribute = Attribute::findOrFail($attr['attribute_id']);
+
+                    if (!empty($attr['value_id']) && empty($attr['is_new'])) {
+                        $av = AttributeValue::query()
+                            ->where('id', $attr['value_id'])
+                            ->where('attribute_id', $attribute->id)
+                            ->first();
+
+                        if (!$av) {
+                            throw ValidationException::withMessages([
+                                'variants' => ['Invalid attribute value selected.'],
+                            ]);
+                        }
+                    } else {
+                        $av = AttributeValue::firstOrCreate([
+                            'attribute_id' => $attribute->id,
+                            'value'        => trim($attr['value']),
+                        ]);
+                    }
+
+                    $attributeValueIds[] = $av->id;
+                }
+
+                $variant->attributeValues()->sync($attributeValueIds);
+            }
+        });
+
+        return redirect()->route('seller.products.index')
+            ->with('success', 'Product updated successfully!');
     }
 
     protected function generateUniqueSlug(string $name): string 
