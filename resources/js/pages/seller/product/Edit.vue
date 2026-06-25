@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { Head, useForm, Link } from '@inertiajs/vue3';
-import { ArrowLeftIcon, PackageIcon } from 'lucide-vue-next';
+import { ArrowLeftIcon, PackageIcon, SquarePenIcon } from 'lucide-vue-next';
 import ProductInfoSection from '@/components/products/ProductInfoSection.vue';
 import ProductMediaSection from '@/components/products/ProductMediaSection.vue';
 import ProductVariantsSection from '@/components/products/ProductVariantsSection.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
+import { Button } from '@/components/ui/button';
 import seller from '@/routes/seller';
 import type {
   ExistingProductData,
@@ -41,7 +42,7 @@ const form = useForm<ProductUpdateForm>({
     weight: v.weight ?? undefined,
     is_default: v.is_default,
     image: null,
-    existingImageUrl: v.image,
+    existingImageUrl: v.image_url,
     delete_image: false,
     attributes: v.attributes,
   })),
@@ -54,7 +55,7 @@ const submit = () => {
       ...data,
       variants: data.variants.map(({ existingImageUrl, ...rest }) => rest),
     }))
-    .post(seller.products.update.url(props.product.slug));
+    .post(seller.products.update.url({ product: props.product.slug }));
 };
 </script>
 
@@ -116,18 +117,15 @@ const submit = () => {
             :attributes="attributes"
           />
 
-          <div class="flex items-center gap-4">
-            <button
+          <div class="flex items-center justify-end gap-4">
+            <Button
               type="submit"
-              class="rounded-xl bg-black px-6 py-3 text-white disabled:opacity-50"
+              class="cursor-pointer rounded-xl"
               :disabled="form.processing"
             >
+              <SquarePenIcon />
               Save Changes
-            </button>
-
-            <span v-if="form.recentlySuccessful" class="text-sm text-green-600">
-              Saved!
-            </span>
+            </Button>
           </div>
         </form>
       </div>

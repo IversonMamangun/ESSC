@@ -18,6 +18,7 @@ class ProductEditResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'slug' => $this->slug,
             'description' => $this->description,
             'is_featured' => $this->is_featured,
             'is_active' => $this->is_active,
