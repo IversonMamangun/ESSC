@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\AttributeResource;
 use App\Http\Resources\Seller\ProductResource;
+use App\Http\Resources\Seller\ProductShowResource;
 use App\Http\Resources\Seller\ProductEditResource;
 use App\Http\Requests\Seller\ProductCreateRequest;
 use App\Http\Requests\Seller\ProductUpdateRequest;
@@ -126,6 +127,17 @@ class ProductController extends Controller
                 Attribute::with('values')->get()
             )->resolve(),
         ]);
+    }
+
+    public function show(Product $product)
+    {
+        $product->loadMissing([
+            'categories',
+            'images',
+            'variants.attributeValues.attribute',
+        ]);
+
+        return ProductShowResource::make($product);
     }
 
     public function store(ProductCreateRequest $request)
