@@ -129,13 +129,19 @@ class ProductController extends Controller
         ]);
     }
 
-    public function show(Product $product)
+    public function show(Request $request, Product $product)
     {
         $product->loadMissing([
+            'store',
             'categories',
             'images',
             'variants.attributeValues.attribute',
         ]);
+
+        abort_unless(
+            $request->user()->id === $product->store->user_id,
+            403
+        );
 
         return ProductShowResource::make($product);
     }

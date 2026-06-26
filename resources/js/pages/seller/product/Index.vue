@@ -70,7 +70,7 @@ const isDetailsOpen = ref(false);
 // inertia http
 const http = useHttp();
 
-// fetch user
+// fetch product
 const viewProduct = async (slug: string) => {
   isDetailsOpen.value = true;
   selectedProduct.value = null;
