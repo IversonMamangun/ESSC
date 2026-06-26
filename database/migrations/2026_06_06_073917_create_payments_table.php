@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use App\Enums\PaymentStatus;
 
 return new class extends Migration
 {
@@ -15,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('checkout_id')->unique()->constrained()->cascadeOnDelete();
             $table->foreignId('payment_method_id')->constrained()->restrictOnDelete();
-            $table->boolean('is_paid')->default(false);
+            $table->string('status')->default(PaymentStatus::PENDING->value);
             $table->date('payment_date')->nullable();
             $table->unsignedBigInteger('amount');
             

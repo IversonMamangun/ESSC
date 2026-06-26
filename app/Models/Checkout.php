@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Enums\CheckoutStatus;
 
 #[Fillable([
     'user_id',
@@ -23,6 +24,7 @@ class Checkout extends Model
     {
         return [
             'user_id' => 'integer',
+            'status' => CheckoutStatus::class,
             'grand_total' => 'decimal:2',
         ];
     }
