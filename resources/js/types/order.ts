@@ -93,3 +93,23 @@ export interface PaginatedSellerOrders {
     total: number;
   };
 }
+
+export interface ShippingAddress {
+  recipient_name: string;
+  recipient_phone: string;
+  region: string;
+  province: string;
+  city: string;
+  barangay: string;
+  street: string;
+  unit_bldg_house: string;
+  postal_code: string;
+  landmark: string | null;
+}
+
+export interface SellerOrderShow extends SellerOrder {
+  status_label: string;
+  notes: string | null;
+  shipping_address: ShippingAddress;
+  created_at: string;
+}

@@ -149,7 +149,7 @@ export const getSellerOrdersColumns = ({
   declineOrder,
   activeTab,
 }: {
-  viewOrder: (orderNo: string) => void;
+  viewOrder: (orderNumber: string) => void;
   handleAction: (order: SellerOrder, actionType: string) => void;
   declineOrder: (order: SellerOrder) => void;
   activeTab: string;
