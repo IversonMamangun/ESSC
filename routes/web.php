@@ -150,6 +150,8 @@ Route::middleware([
         ->name('products.index');
     Route::get('/products/create', [SellerProductController::class, 'create'])
         ->name('products.create');
+    Route::get('/products/{product:slug}', [SellerProductController::class, 'show'])
+        ->name('products.show');
     Route::post('/products', [SellerProductController::class, 'store'])
         ->name('products.store');
     Route::get('/products/{product:slug}/edit', [SellerProductController::class, 'edit'])

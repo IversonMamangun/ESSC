@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { Head, useForm, Link, router } from '@inertiajs/vue3';
+import { Head, useForm, useHttp, Link, router } from '@inertiajs/vue3';
 import { PackageIcon, PlusIcon, AlertCircleIcon } from 'lucide-vue-next';
 import { ref, computed, h } from 'vue';
 import DataTable from '@/components/DataTable.vue';
 import ProductVariantsTable from '@/components/products/ProductVariantsTable.vue';
+import SellerProductDetailsDilaog from '@/components/products/SellerProductDetailsDilaog.vue';
 import SellerTab, { type SellerTabItem } from '@/components/SellerTab.vue';
 import SellerStoreHeader from '@/components/SellerStoreHeader.vue';
 import Navbar from '@/components/sections/Navbar.vue';
@@ -13,7 +14,12 @@ import Pagination from '@/components/Pagination.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getSellerProductsColumns } from '@/features/seller/columns';
 import seller from '@/routes/seller';
-import type { Store, PaginatedSellerProducts } from '@/types';
+import type {
+  Store,
+  PaginatedSellerProducts,
+  ProductShow,
+  ApiResponse,
+} from '@/types';
 
 const props = defineProps<{
   store: Store;
@@ -58,8 +64,26 @@ const currentTabLabel = computed(() => {
   return currentTab ? currentTab.label : 'Products';
 });
 
-const viewProduct = (productSlug: string) => {
-  // router.visit(seller.products.show(productSlug));
+// state for details
+const selectedProduct = ref<ProductShow | null>(null);
+const isDetailsOpen = ref(false);
+// inertia http
+const http = useHttp();
+
+// fetch user
+const viewProduct = async (slug: string) => {
+  isDetailsOpen.value = true;
+  selectedProduct.value = null;
+
+  try {
+    const response = (await http.get(
+      seller.products.show.url(slug),
+    )) as ApiResponse<ProductShow>;
+
+    selectedProduct.value = response.data;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const editProduct = (productSlug: string) => {
@@ -167,6 +191,11 @@ function changeTab(tab: string) {
       </div>
     </main>
   </div>
+
+  <SellerProductDetailsDilaog
+    v-model:open="isDetailsOpen"
+    :product="selectedProduct"
+  />
 </template>
 
 <style scoped>
