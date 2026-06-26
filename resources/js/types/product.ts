@@ -93,7 +93,7 @@ export interface SellerProduct extends Product {
   total_stock: number;
   min_price: number;
   max_price: number;
-  variants: any[];
+  variants: ProductVariant[];
 }
 
 export interface PaginatedSellerProducts {
