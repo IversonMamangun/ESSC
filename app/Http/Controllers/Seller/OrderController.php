@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use Illuminate\Validation\Rule;
 use App\Http\Resources\Seller\OrderIndexResource;
+use App\Http\Resources\Seller\OrderShowResource;
 use App\Http\Requests\Seller\OrderActionRequest;
 use App\Models\Order;
 use App\Models\PaymentMethod;
@@ -87,6 +88,21 @@ class OrderController extends Controller
             'to_ship'   => (int) $counts->get(OrderStatus::PACKED->value, 0),
             'cancellation' => (int) $counts->get(OrderStatus::CANCELLED->value, 0),
         ];
+    }
+
+    public function show(Request $request, Order $order)
+    {
+        $order->loadMissing([
+            'store',
+            'items',
+        ]);
+
+        abort_unless(
+            $request->user()->id === $order->store->user_id,
+            403
+        );
+
+        return OrderShowResource::make($order);
     }
 
     public function action(OrderActionRequest $request, Order $order) {
@@ -174,6 +190,7 @@ class OrderController extends Controller
             'Order cancelled successfully.'
         );
     }
+
 public function rate(Request $request, Order $order)
 {
     if ($order->user_id !== $request->user()->id) {
