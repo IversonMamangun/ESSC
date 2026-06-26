@@ -1,24 +1,12 @@
 <script setup lang="ts">
-import { Head, useForm, Link, router } from '@inertiajs/vue3';
-import {
-  StoreIcon,
-  PackageIcon,
-  TrendingUpIcon,
-  ShoppingBagIcon,
-  PlusIcon,
-  AlertCircleIcon,
-  Edit,
-  Trash2,
-  ExternalLinkIcon,
-  Clock,
-  Truck,
-  CheckCircle2,
-} from 'lucide-vue-next';
+import { Head, useHttp, useForm, Link, router } from '@inertiajs/vue3';
+import { PackageIcon, PlusIcon, AlertCircleIcon } from 'lucide-vue-next';
 import { ref, computed, h } from 'vue';
 import DataTable from '@/components/DataTable.vue';
 import OrderItemsTable from '@/components/orders/OrderItemsTable.vue';
 import SellerTab, { type SellerTabItem } from '@/components/SellerTab.vue';
 import SellerStoreHeader from '@/components/SellerStoreHeader.vue';
+import SellerOrderDetailsDialog from '@/components/orders/SellerOrderDetailsDialog.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
@@ -27,7 +15,13 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getSellerOrdersColumns } from '@/features/seller/columns';
 import seller from '@/routes/seller';
-import type { Store, PaginatedSellerOrders, SellerOrder } from '@/types';
+import type {
+  Store,
+  PaginatedSellerOrders,
+  SellerOrder,
+  ApiResponse,
+  SellerOrderShow,
+} from '@/types';
 
 const props = defineProps<{
   store: Store;
@@ -74,9 +68,45 @@ const currentTabLabel = computed(() => {
   return currentTab ? currentTab.label : 'Orders';
 });
 
-const viewOrder = (orderNo: string) => {
-  // router.visit(seller.orders.show(orderNo));
+// state for details
+const isDetailsOpen = ref(false);
+const detailsOrder = ref<SellerOrderShow | null>(null);
+let detailsCloseTimeout: ReturnType<typeof setTimeout> | null = null;
+// inertia http
+const http = useHttp();
+
+// fetch order
+const viewOrder = async (orderNumber: string) => {
+  if (detailsCloseTimeout) {
+    clearTimeout(detailsCloseTimeout);
+    detailsCloseTimeout = null;
+  }
+
+  isDetailsOpen.value = true;
+  detailsOrder.value = null;
+
+  try {
+    const response = (await http.get(
+      seller.orders.show.url(orderNumber),
+    )) as ApiResponse<SellerOrderShow>;
+
+    detailsOrder.value = response.data;
+  } catch (error) {
+    console.error(error);
+  }
 };
+
+function handleDetailsOpenChange(value: boolean) {
+  isDetailsOpen.value = value;
+
+  if (!value) {
+    if (detailsCloseTimeout) clearTimeout(detailsCloseTimeout);
+    detailsCloseTimeout = setTimeout(() => {
+      detailsOrder.value = null;
+      detailsCloseTimeout = null;
+    }, 300);
+  }
+}
 
 // state for action & cancel logic
 const confirmOpen = ref(false);
@@ -108,6 +138,10 @@ const processOrderAction = () => {
       onSuccess: () => {
         confirmOpen.value = false;
       },
+      onFinish: () => {
+        selectedOrder.value = null;
+        selectedAction.value = null;
+      },
     });
 
     return;
@@ -117,6 +151,10 @@ const processOrderAction = () => {
     preserveScroll: true,
     onSuccess: () => {
       confirmOpen.value = false;
+    },
+    onFinish: () => {
+      selectedOrder.value = null;
+      selectedAction.value = null;
     },
   });
 };
@@ -246,6 +284,12 @@ function changeTab(tab: string) {
       >?
     </template>
   </ConfirmDialog>
+
+  <SellerOrderDetailsDialog
+    :open="isDetailsOpen"
+    :order="detailsOrder"
+    @update:open="handleDetailsOpenChange"
+  />
 </template>
 
 <style scoped>

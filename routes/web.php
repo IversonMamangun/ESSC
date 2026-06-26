@@ -161,6 +161,8 @@ Route::middleware([
 
     Route::get('/orders', [SellerOrderController::class, 'index'])
         ->name('orders.index');
+    Route::get('/orders/{order:order_number}', [SellerOrderController::class, 'show'])
+        ->name('orders.show');
     Route::patch('/orders/{order}/action', [SellerOrderController::class, 'action'])
         ->name('orders.action');
     Route::patch('/orders/{order}/cancel', [SellerOrderController::class, 'cancel'])
