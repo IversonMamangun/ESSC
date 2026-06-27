@@ -85,6 +85,11 @@ class Order extends Model
         return $this->belongsTo(Checkout::class);
     }
 
+    public function return(): HasOne
+    {
+        return $this->hasOne(OrderReturn::class);
+    }
+
     // cod helper method
     public function isCod(): bool
     {
