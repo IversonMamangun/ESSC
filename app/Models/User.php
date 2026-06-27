@@ -10,7 +10,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use App\Models\Address;
 
 #[Table('users')]
 #[Hidden(['password', 'remember_token'])]
@@ -26,10 +25,6 @@ class User extends Authenticatable
         'user_type_id',
         'google_id', 
         'avatar',
-        'address',
-        'city',
-        'province',
-        'zip'
     ];
  
     /**

@@ -210,16 +210,7 @@ function changeTab(tab: string) {
         <SellerStoreHeader
           :store="props.store"
           :edit-store-href="seller.store.edit.url(props.store.slug)"
-        >
-          <template #actions>
-            <Link
-              :href="seller.products.create()"
-              class="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#009933] px-6 py-3.5 font-bold text-white shadow-md transition-colors hover:bg-green-700 active:scale-95"
-            >
-              <PlusIcon class="h-5 w-5" /> Add New Product
-            </Link>
-          </template>
-        </SellerStoreHeader>
+        />
         <div
           class="overflow-hidden rounded-3xl border border-zinc-200 bg-zinc-50 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900"
         >
