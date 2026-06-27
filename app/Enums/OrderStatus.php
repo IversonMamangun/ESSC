@@ -11,6 +11,8 @@ enum OrderStatus: string
     case SHIPPED = 'shipped';
     case DELIVERED = 'delivered';
     case CANCELLED = 'cancelled';
+    case RETURN_REQUESTED = 'return_requested';
+    case RETURN_APPROVED = 'return_approved';
     case RETURNED = 'returned';
 
     public function label(): string
@@ -23,6 +25,8 @@ enum OrderStatus: string
             self::SHIPPED => 'In Transit',
             self::DELIVERED => 'Delivered',
             self::CANCELLED => 'Cancelled',
+            self::RETURN_REQUESTED => 'Return Requested',
+            self::RETURN_APPROVED => 'Return Approved',
             self::RETURNED => 'Returned / Refunded',
         };
     }
@@ -48,7 +52,11 @@ enum OrderStatus: string
  * -- on the way
  * to deliver (shipped) -> fn to deliver
  * delivered orders -> fn view order
- * sales report -> fn to view sales per product 
- * return request (delivered) -> fn to return
+ * return request (delivered) -> fn to return_requested
+ * seller can accept or reject refund request 
+ *      if accepted -> fn to return_approved
+ *      if return_approved buyer can ship item back to seller, 
+ *          seller will wait for items to be returned -> fn to returned
+ *      if rejected -> fn to delivered, add rejection note
  * 
  */
