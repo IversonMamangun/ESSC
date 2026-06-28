@@ -22,6 +22,7 @@ interface Props {
     | 'ghost'
     | 'link';
   icon?: Component;
+  confirmDisabled?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -78,6 +79,7 @@ const handleConfirm = () => {
             :class="{
               'bg-red-600 hover:bg-red-700': confirmVariant === 'destructive',
             }"
+            :disabled="confirmDisabled"
             @click="handleConfirm"
           >
             <slot name="confirm-icon">

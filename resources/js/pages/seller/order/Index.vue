@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, useHttp, useForm, Link, router } from '@inertiajs/vue3';
-import { PackageIcon, PlusIcon, AlertCircleIcon } from 'lucide-vue-next';
+import { PackageIcon, SquarePenIcon, AlertCircleIcon } from 'lucide-vue-next';
 import { ref, computed, h } from 'vue';
 import DataTable from '@/components/DataTable.vue';
 import OrderItemsTable from '@/components/orders/OrderItemsTable.vue';
@@ -258,6 +258,7 @@ function changeTab(tab: string) {
     "
     :confirm-variant="selectedAction === 'decline' ? 'destructive' : 'default'"
     confirm-text="Confirm"
+    :icon="SquarePenIcon"
     @confirm="processOrderAction"
   >
     <template #description>
