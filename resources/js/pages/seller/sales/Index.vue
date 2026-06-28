@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, useHttp, useForm, Link, router } from '@inertiajs/vue3';
-import { PackageIcon, PlusIcon, AlertCircleIcon } from 'lucide-vue-next';
+import { PackageIcon, SquarePenIcon, AlertCircleIcon } from 'lucide-vue-next';
 import { ref, computed, h } from 'vue';
 import DataTable from '@/components/DataTable.vue';
 import OrderItemsTable from '@/components/orders/OrderItemsTable.vue';
@@ -114,26 +114,43 @@ const selectedOrder = ref<SellerOrder | null>(null);
 const selectedAction = ref<
   'deliver' | 'accept_return' | 'decline_return' | null
 >(null);
-const handleOrderAction = (order: SellerOrder, actionType: string) => {
-  selectedOrder.value = order;
-  selectedAction.value = actionType as any;
-  confirmOpen.value = true;
-};
 
 const actionForm = useForm({
   action: '',
+  rejection_reason: '',
+});
+const rejectionReason = ref('');
+
+const handleOrderAction = (order: SellerOrder, actionType: string) => {
+  selectedOrder.value = order;
+  selectedAction.value = actionType as any;
+  rejectionReason.value = '';
+  confirmOpen.value = true;
+};
+
+const isDeclineReturn = computed(
+  () => selectedAction.value === 'decline_return',
+);
+const canConfirmAction = computed(() => {
+  if (!isDeclineReturn.value) return true;
+  return rejectionReason.value.trim().length > 0;
 });
 
 const processOrderAction = () => {
   if (!selectedOrder.value || !selectedAction.value) return;
+  if (!canConfirmAction.value) return;
 
   const resetState = () => {
     selectedOrder.value = null;
     selectedAction.value = null;
+    rejectionReason.value = '';
   };
 
-  // action
   actionForm.action = selectedAction.value;
+  actionForm.rejection_reason = isDeclineReturn.value
+    ? rejectionReason.value
+    : '';
+
   actionForm.patch(seller.sales.action.url(selectedOrder.value.id), {
     preserveScroll: true,
     onSuccess: () => {
@@ -246,6 +263,8 @@ function changeTab(tab: string) {
     title="Update Order Status"
     confirm-variant="default"
     confirm-text="Confirm"
+    :icon="SquarePenIcon"
+    :confirm-disabled="!canConfirmAction"
     @confirm="processOrderAction"
   >
     <template #description>
@@ -255,6 +274,21 @@ function changeTab(tab: string) {
       }}</span
       >?
     </template>
+
+    <div v-if="isDeclineReturn" class="mt-3 space-y-1.5">
+      <label class="text-xs font-medium text-zinc-600 dark:text-zinc-300">
+        Rejection reason
+      </label>
+      <textarea
+        v-model="rejectionReason"
+        rows="3"
+        placeholder="Let the buyer know why their return was declined..."
+        class="w-full rounded-lg border border-zinc-200 bg-white p-2 text-sm text-zinc-800 focus:border-blue-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+      />
+      <p v-if="!canConfirmAction" class="text-xs text-rose-500">
+        A reason is required to decline a return.
+      </p>
+    </div>
   </ConfirmDialog>
 
   <SellerOrderDetailsDialog

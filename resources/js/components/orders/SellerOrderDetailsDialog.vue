@@ -63,6 +63,10 @@ const statusTone: Record<OrderRawStatus, string> = {
   delivered:
     'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
   cancelled: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
+  return_requested:
+    'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
+  return_approved:
+    'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
   returned:
     'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
 };
@@ -78,6 +82,43 @@ const fullAddress = computed(() => {
 
 const itemsCount = computed(
   () => props.order?.items.reduce((sum, item) => sum + item.quantity, 0) ?? 0,
+);
+
+const TIMESTAMP_LABELS: Record<string, string> = {
+  confirmed_at: 'Confirmed',
+  processing_at: 'Processing',
+  packed_at: 'Packed',
+  shipped_at: 'Shipped',
+  delivered_at: 'Delivered',
+  cancelled_at: 'Cancelled',
+  return_requested_at: 'Return Requested',
+  return_approved_at: 'Return Approved',
+  returned_at: 'Returned',
+};
+
+const timelineSteps = computed(() => {
+  if (!props.order) return [];
+  return Object.entries(props.order.timestamps ?? {})
+    .filter(([, value]) => !!value)
+    .map(([key, value]) => ({
+      key,
+      label: TIMESTAMP_LABELS[key] ?? key,
+      value: value as string,
+    }))
+    .sort((a, b) => new Date(a.value).getTime() - new Date(b.value).getTime());
+});
+
+const RETURN_VISIBLE_STATUSES: OrderRawStatus[] = [
+  'delivered',
+  'return_requested',
+  'return_approved',
+  'returned',
+];
+
+const showReturnSection = computed(
+  () =>
+    !!props.order?.return &&
+    RETURN_VISIBLE_STATUSES.includes(props.order.status),
 );
 </script>
 
@@ -214,6 +255,83 @@ const itemsCount = computed(
                     </div>
                   </li>
                 </ul>
+              </div>
+            </div>
+
+            <!-- Timeline -->
+            <div v-if="timelineSteps.length">
+              <p
+                class="mb-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400"
+              >
+                Order Timeline
+              </p>
+              <ol
+                class="space-y-3 border-l border-zinc-200 pl-4 dark:border-zinc-800"
+              >
+                <li
+                  v-for="step in timelineSteps"
+                  :key="step.key"
+                  class="relative"
+                >
+                  <span
+                    class="absolute top-1 -left-[21px] h-2.5 w-2.5 rounded-full bg-blue-500"
+                  />
+                  <p
+                    class="text-sm font-medium text-zinc-800 dark:text-zinc-100"
+                  >
+                    {{ step.label }}
+                  </p>
+                  <p class="text-xs text-zinc-400 dark:text-zinc-500">
+                    {{ formatDate(step.value) }}
+                  </p>
+                </li>
+              </ol>
+            </div>
+
+            <!-- Return details -->
+            <div
+              v-if="showReturnSection"
+              class="rounded-2xl border border-orange-200 bg-orange-50 p-4 dark:border-orange-900/40 dark:bg-orange-900/10"
+            >
+              <p
+                class="mb-2 text-xs font-semibold text-orange-700 dark:text-orange-400"
+              >
+                Return Request
+              </p>
+              <p class="text-sm font-medium text-zinc-800 dark:text-zinc-100">
+                {{ order.return!.reason_label }}
+              </p>
+              <p
+                v-if="order.return!.description"
+                class="mt-1 text-sm text-zinc-600 dark:text-zinc-300"
+              >
+                {{ order.return!.description }}
+              </p>
+
+              <div
+                v-if="order.return!.media_paths.length"
+                class="mt-3 flex flex-wrap gap-2"
+              >
+                <button
+                  v-for="(media, idx) in order.return!.media_paths"
+                  :key="idx"
+                  type="button"
+                  class="h-14 w-14 overflow-hidden rounded-lg border border-orange-200 dark:border-orange-800"
+                  @click="openImageInNewTab(media)"
+                >
+                  <img
+                    :src="media"
+                    class="h-full w-full cursor-zoom-in object-cover"
+                  />
+                </button>
+              </div>
+
+              <div
+                v-if="order.return!.rejection_reason"
+                class="mt-3 rounded-xl border border-rose-200 bg-rose-50 p-2.5 text-sm text-rose-700 dark:border-rose-900/40 dark:bg-rose-900/10 dark:text-rose-400"
+              >
+                <span class="font-semibold">Rejection reason: </span>
+                {{ order.return!.rejection_reason }}
               </div>
             </div>
 
