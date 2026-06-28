@@ -109,9 +109,32 @@ export interface ShippingAddress {
   landmark: string | null;
 }
 
+export interface OrderReturn {
+  reason: string;
+  reason_label: string;
+  description: string | null;
+  media_paths: string[];
+  rejection_reason: string | null;
+  created_at: string;
+}
+
+export interface OrderTimestamps {
+  confirmed_at?: string;
+  processing_at?: string;
+  packed_at?: string;
+  shipped_at?: string;
+  delivered_at?: string;
+  cancelled_at?: string;
+  return_requested_at?: string;
+  return_approved_at?: string;
+  returned_at?: string;
+}
+
 export interface SellerOrderShow extends SellerOrder {
   status_label: string;
   notes: string | null;
   shipping_address: ShippingAddress;
+  timestamps: OrderTimestamps;
+  return: OrderReturn | null;
   created_at: string;
 }

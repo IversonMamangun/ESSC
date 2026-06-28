@@ -46,6 +46,31 @@ class OrderShowResource extends JsonResource
                 'quantity' => $item->quantity,
                 'total' => round($item->price * $item->quantity, 2),
             ]),
+            // null ones dropped
+            'timestamps' => array_filter([
+                'confirmed_at' => $this->confirmed_at,
+                'processing_at' => $this->processing_at,
+                'packed_at' => $this->packed_at,
+                'shipped_at' => $this->shipped_at,
+                'delivered_at' => $this->delivered_at,
+                'cancelled_at' => $this->cancelled_at,
+                'return_requested_at' => $this->return_requested_at,
+                'return_approved_at' => $this->return_approved_at,
+                'returned_at' => $this->returned_at,
+            ]),
+            // only present when 'return' relation was eager loaded
+            'return' => $this->whenLoaded('return', fn () => $this->return
+                ? [
+                    'reason' => $this->return->reason->value,
+                    'reason_label' => $this->return->reason->label(),
+                    'description' => $this->return->description,
+                    'media_paths' => collect($this->return->media_paths ?? [])
+                        ->map(fn ($path) => Storage::url($path))
+                        ->all(),
+                    'rejection_reason' => $this->return->rejection_reason,
+                    'created_at' => $this->return->created_at,
+                ]
+                : null),
             'created_at' => $this->created_at,
         ];
     }
