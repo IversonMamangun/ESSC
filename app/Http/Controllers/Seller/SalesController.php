@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Enums\OrderStatus;
 use App\Http\Resources\Seller\OrderIndexResource;
+use App\Http\Resources\Seller\OrderShowResource;
 use App\Http\Requests\Seller\SalesActionRequest;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
@@ -88,6 +89,22 @@ class SalesController extends Controller
         ];
     }
 
+    public function show(Request $request, Order $order)
+    {
+        $order->loadMissing([
+            'store',
+            'items',
+            'return',
+        ]);
+
+        abort_unless(
+            $request->user()->id === $order->store->user_id,
+            403
+        );
+
+        return OrderShowResource::make($order);
+    }
+
 
     public function action(SalesActionRequest $request, Order $order) {
         $user = $request->user();
@@ -101,7 +118,7 @@ class SalesController extends Controller
         match ($action) {
             'deliver' => $this->deliverOrder($order),
             'accept_return' => $this->acceptReturnOrder($order),
-            'decline_return' => $this->declineReturnOrder($order),
+            'decline_return' => $this->declineReturnOrder($order, $request->validated('rejection_reason')),
         };
 
         return back()->with(
@@ -124,7 +141,8 @@ class SalesController extends Controller
 
     private function acceptReturnOrder(Order $order): void
     {
-        if ($order->status !== OrderStatus::RETURN_REQUESTED) {
+        $order->loadMissing('return');
+        if ($order->status !== OrderStatus::RETURN_REQUESTED || !$order->return) {
             abort(422, 'Invalid order state');
         }
 
@@ -134,11 +152,17 @@ class SalesController extends Controller
         ]);
     }
 
-    private function declineReturnOrder(Order $order): void
+    private function declineReturnOrder(Order $order, string $rejectionReason): void
     {
-        if ($order->status !== OrderStatus::RETURN_REQUESTED) {
+        $order->loadMissing('return');
+        if ($order->status !== OrderStatus::RETURN_REQUESTED || !$order->return) {
             abort(422, 'Invalid order state');
         }
+
+        $order->return->update([
+            'rejection_reason' => $rejectionReason,
+        ]);
+
 
         $order->update([
             'status' => OrderStatus::DELIVERED,

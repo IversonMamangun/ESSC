@@ -33,6 +33,12 @@ class SalesActionRequest extends FormRequest
                     'decline_return',
                 ]),
             ],
+            'rejection_reason' => [
+                'required_if:action,decline_return',
+                'nullable',
+                'string',
+                'max:1000',
+            ],
         ];
     }
 }
