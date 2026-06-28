@@ -190,41 +190,4 @@ class OrderController extends Controller
             'Order cancelled successfully.'
         );
     }
-
-public function rate(Request $request, Order $order)
-{
-    if ($order->user_id !== $request->user()->id) {
-        abort(403);
-    }
-
-    $order->load(['store:id,name', 'items:id,order_id,product_name,product_image,variant_name']);
-
-    return Inertia::render('shop/customer/order/Rate', [
-        'user' => $request->user()->only('name', 'phone', 'avatar'),
-        'order' => $order,
-    ]);
-}
-
-public function storeRating(Request $request, Order $order)
-{
-    if ($order->user_id !== $request->user()->id) {
-        abort(403);
-    }
-
-    $validated = $request->validate([
-        'items' => ['required', 'array'],
-        'items.*.order_item_id' => ['required', 'exists:order_items,id'],
-        'items.*.rating' => ['required', 'integer', 'min:1', 'max:5'],
-        'items.*.comment' => ['nullable', 'string', 'max:1000'],
-    ]);
-
-    // Save records to your reviews table across each specific item sequence
-    foreach ($validated['items'] as $itemReview) {
-        // Example logic model tracking generation:
-        // ProductReview::create([...$itemReview, 'user_id' => $request->user()->id]);
-    }
-
-    return redirect()->route('shop.orders.index')
-        ->with('success', 'Thank you for your feedback!');
-}
 }

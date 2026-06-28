@@ -20,6 +20,59 @@ const formatPrice = (price: number) => {
   }).format(price);
 };
 
+interface SellerTabAction {
+  label: string;
+  type: string;
+  className?: string;
+}
+const SELLER_TAB_ACTIONS_MAP: Record<string, SellerTabAction[]> = {
+  'to-confirm': [
+    {
+      label: 'Accept Order',
+      type: 'accept',
+      className: 'text-blue-500 focus:text-blue-600',
+    },
+    {
+      label: 'Decline Order',
+      type: 'decline',
+      className: 'text-rose-500 focus:text-rose-600',
+    },
+  ],
+  'to-pack': [
+    {
+      label: 'Mark as Packed',
+      type: 'pack',
+      className: 'text-blue-500 focus:text-blue-600',
+    },
+  ],
+  'to-ship': [
+    {
+      label: 'Mark as Shipped',
+      type: 'ship',
+      className: 'text-blue-500 focus:text-blue-600',
+    },
+  ],
+  'to-receive': [
+    {
+      label: 'Mark as Delivered',
+      type: 'deliver',
+      className: 'text-blue-500 focus:text-blue-600',
+    },
+  ],
+  'return-request': [
+    {
+      label: 'Accept Return Request',
+      type: 'accept_return',
+      className: 'text-blue-500 focus:text-blue-600',
+    },
+    {
+      label: 'Decline Return Request',
+      type: 'decline_return',
+      className: 'text-rose-500 focus:text-rose-600',
+    },
+  ],
+};
+
 export const getSellerProductsColumns = ({
   viewProduct,
   editProduct,
@@ -146,12 +199,10 @@ export const getSellerProductsColumns = ({
 export const getSellerOrdersColumns = ({
   viewOrder,
   handleAction,
-  declineOrder,
   activeTab,
 }: {
   viewOrder: (orderNumber: string) => void;
   handleAction: (order: SellerOrder, actionType: string) => void;
-  declineOrder: (order: SellerOrder) => void;
   activeTab: string;
 }): ColumnDef<SellerOrder>[] => [
   {
@@ -161,15 +212,8 @@ export const getSellerOrdersColumns = ({
   {
     accessorKey: 'status',
     header: 'Status',
-    cell: ({ row }) => {
-      return h(
-        Badge,
-        {
-          variant: 'default',
-        },
-        () => row.original.status,
-      );
-    },
+    cell: ({ row }) =>
+      h(Badge, { variant: 'default' }, () => row.original.status),
   },
   {
     accessorKey: 'items_count',
@@ -178,50 +222,29 @@ export const getSellerOrdersColumns = ({
   {
     id: 'subtotal',
     header: 'Subtotal',
-    cell: ({ row }) => {
-      return formatPrice(row.original.subtotal);
-    },
+    cell: ({ row }) => formatPrice(row.original.subtotal),
   },
   {
     id: 'shipping_fee',
     header: 'Shipping Fee',
-    cell: ({ row }) => {
-      return formatPrice(row.original.shipping_fee);
-    },
+    cell: ({ row }) => formatPrice(row.original.shipping_fee),
   },
   {
     id: 'discount',
     header: 'Discount',
-    cell: ({ row }) => {
-      return formatPrice(row.original.discount);
-    },
+    cell: ({ row }) => formatPrice(row.original.discount),
   },
   {
     id: 'total',
     header: 'Total',
-    cell: ({ row }) => {
-      return formatPrice(row.original.total);
-    },
+    cell: ({ row }) => formatPrice(row.original.total),
   },
   {
     id: 'actions',
     header: () => h('div', { class: 'text-center' }, 'Actions'),
     cell: ({ row }) => {
       const order = row.original;
-
-      let primaryActionLabel = '';
-      let actionType = '';
-
-      if (activeTab === 'to-confirm') {
-        primaryActionLabel = 'Accept Order';
-        actionType = 'accept';
-      } else if (activeTab === 'to-pack') {
-        primaryActionLabel = 'Mark as Packed';
-        actionType = 'pack';
-      } else if (activeTab === 'to-ship') {
-        actionType = 'ship';
-        primaryActionLabel = 'Mark as Shipped';
-      }
+      const dynamicActions = SELLER_TAB_ACTIONS_MAP[activeTab] || [];
 
       const menuItems = [
         h(DropdownMenuLabel, { class: 'text-gray-500' }, () => 'Actions'),
@@ -233,28 +256,24 @@ export const getSellerOrdersColumns = ({
           },
           () => 'View Order Details',
         ),
+      ];
 
-        primaryActionLabel && h(DropdownMenuSeparator),
-        primaryActionLabel &&
-          h(
-            DropdownMenuItem,
-            {
-              class: 'cursor-pointer text-blue-500 focus:text-blue-600',
-              onClick: () => handleAction(order, actionType),
-            },
-            () => primaryActionLabel,
-          ),
+      if (dynamicActions.length > 0) {
+        menuItems.push(h(DropdownMenuSeparator));
 
-        activeTab === 'to-confirm' &&
-          h(
-            DropdownMenuItem,
-            {
-              class: 'cursor-pointer text-rose-500 focus:text-rose-600',
-              onClick: () => declineOrder(order),
-            },
-            () => 'Decline Order',
-          ),
-      ].filter(Boolean);
+        dynamicActions.forEach((action) => {
+          menuItems.push(
+            h(
+              DropdownMenuItem,
+              {
+                class: `cursor-pointer ${action.className || ''}`,
+                onClick: () => handleAction(order, action.type),
+              },
+              () => action.label,
+            ),
+          );
+        });
+      }
 
       return h('div', { class: 'relative text-center' }, [
         h(DropdownMenu, null, () => [

@@ -111,51 +111,45 @@ function handleDetailsOpenChange(value: boolean) {
 // state for action & cancel logic
 const confirmOpen = ref(false);
 const selectedOrder = ref<SellerOrder | null>(null);
-const selectedAction = ref<'accept' | 'pack' | 'ship' | 'cancel' | null>(null);
-
+const selectedAction = ref<'accept' | 'pack' | 'ship' | 'decline' | null>(null);
 const handleOrderAction = (order: SellerOrder, actionType: string) => {
   selectedOrder.value = order;
   selectedAction.value = actionType as any;
   confirmOpen.value = true;
 };
 
-const declineOrder = (order: SellerOrder) => {
-  selectedOrder.value = order;
-  selectedAction.value = 'cancel';
-  confirmOpen.value = true;
-};
-
-// submit action
 const actionForm = useForm({
   action: '',
 });
+
 const processOrderAction = () => {
   if (!selectedOrder.value || !selectedAction.value) return;
 
-  if (selectedAction.value === 'cancel') {
+  const resetState = () => {
+    selectedOrder.value = null;
+    selectedAction.value = null;
+  };
+
+  // decline
+  if (selectedAction.value === 'decline') {
     actionForm.patch(seller.orders.cancel.url(selectedOrder.value.id), {
       preserveScroll: true,
       onSuccess: () => {
         confirmOpen.value = false;
       },
-      onFinish: () => {
-        selectedOrder.value = null;
-        selectedAction.value = null;
-      },
+      onFinish: resetState,
     });
-
     return;
   }
+
+  // action
   actionForm.action = selectedAction.value;
   actionForm.patch(seller.orders.action.url(selectedOrder.value.id), {
     preserveScroll: true,
     onSuccess: () => {
       confirmOpen.value = false;
     },
-    onFinish: () => {
-      selectedOrder.value = null;
-      selectedAction.value = null;
-    },
+    onFinish: resetState,
   });
 };
 
@@ -163,7 +157,6 @@ const orderColumns = computed(() =>
   getSellerOrdersColumns({
     viewOrder,
     handleAction: handleOrderAction,
-    declineOrder,
     activeTab: activeTab.value,
   }),
 );
@@ -261,9 +254,9 @@ function changeTab(tab: string) {
     v-if="selectedAction && selectedOrder"
     v-model:open="confirmOpen"
     :title="
-      selectedAction === 'cancel' ? 'Cancel Order' : 'Update Order Status'
+      selectedAction === 'decline' ? 'Decline Order' : 'Update Order Status'
     "
-    :confirm-variant="selectedAction === 'cancel' ? 'destructive' : 'default'"
+    :confirm-variant="selectedAction === 'decline' ? 'destructive' : 'default'"
     confirm-text="Confirm"
     @confirm="processOrderAction"
   >
