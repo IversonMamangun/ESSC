@@ -17,6 +17,8 @@ export type OrderRawStatus =
   | 'shipped'
   | 'delivered'
   | 'cancelled'
+  | 'return_requested'
+  | 'return_approved'
   | 'returned';
 
 export interface OrderItem {

@@ -26,6 +26,7 @@ use App\Http\Controllers\Seller\DashboardController as SellerDashboardController
 use App\Http\Controllers\Seller\StoreController as SellerStoreController;
 use App\Http\Controllers\Seller\ProductController as SellerProductController;
 use App\Http\Controllers\Seller\OrderController as SellerOrderController;
+use App\Http\Controllers\Seller\SalesController as SellerSalesController;
 
 Route::inertia('/', 'Welcome', [
     'canRegister' => true,
@@ -167,6 +168,12 @@ Route::middleware([
         ->name('orders.action');
     Route::patch('/orders/{order}/cancel', [SellerOrderController::class, 'cancel'])
         ->name('orders.cancel');
+
+
+    Route::get('/sales', [SellerSalesController::class, 'index'])
+        ->name('sales.index');
+    Route::patch('/sales/{order}/action', [SellerOrderController::class, 'action'])
+        ->name('sales.action');
 });
 
 // dedicated admin routes
