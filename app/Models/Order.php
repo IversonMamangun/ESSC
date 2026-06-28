@@ -38,6 +38,8 @@ use App\Enums\OrderStatus;
     'shipped_at',
     'delivered_at',
     'cancelled_at',
+    'return_requested_at',
+    'return_approved_at',
     'returned_at',
 ])]
 class Order extends Model
@@ -61,6 +63,8 @@ class Order extends Model
             'shipped_at' => 'datetime',
             'delivered_at' => 'datetime',
             'cancelled_at' => 'datetime',
+            'return_requested_at' => 'datetime',
+            'return_approved_at' => 'datetime',
             'returned_at' => 'datetime',
         ];
     }

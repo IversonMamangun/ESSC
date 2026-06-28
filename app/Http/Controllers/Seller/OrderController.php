@@ -144,6 +144,8 @@ class OrderController extends Controller
 
         $order->update([
             'status' => OrderStatus::PROCESSING,
+            'confirmed_at' => now(),
+            'processing_at' => now(),
         ]);
     }
 
@@ -155,6 +157,7 @@ class OrderController extends Controller
 
         $order->update([
             'status' => OrderStatus::PACKED,
+            'packed_at' => now(),
         ]);
     }
 
@@ -166,6 +169,7 @@ class OrderController extends Controller
 
         $order->update([
             'status' => OrderStatus::SHIPPED,
+            'shipped_at' => now(),
         ]);
     }
 
@@ -183,6 +187,7 @@ class OrderController extends Controller
 
         $order->update([
             'status' => OrderStatus::CANCELLED,
+            'cancelled_at' => now(),
         ]);
 
         return back()->with(
