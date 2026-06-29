@@ -13,3 +13,8 @@ export interface OrdersSummary {
   total: number;
   chart: SummaryChartSegment[];
 }
+export interface SalesSummary {
+  totalAmount: number;
+  total: number;
+  chart: SummaryChartSegment[];
+}
