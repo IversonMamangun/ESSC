@@ -29,18 +29,6 @@ const props = defineProps<{
   ordersSummary: OrdersSummary;
   salesSummary: SalesSummary;
 }>();
-
-const viewProduct = (productSlug: string) => {
-  // router.visit(seller.products.show(productSlug));
-};
-
-const editProduct = (productSlug: string) => {
-  router.visit(seller.products.edit(productSlug));
-};
-
-const deleteProduct = (productSlug: string) => {
-  // router.visit(seller.products.destroy(productSlug));
-};
 </script>
 
 <template>

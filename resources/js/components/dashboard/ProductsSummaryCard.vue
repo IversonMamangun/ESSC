@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { VisSingleContainer, VisDonut } from '@unovis/vue';
+import { VisSingleContainer, VisDonut, VisTooltip } from '@unovis/vue';
+import { Donut } from '@unovis/ts';
 import { PackageIcon, ArrowRightIcon } from 'lucide-vue-next';
 import { ChartContainer, type ChartConfig } from '@/components/ui/chart';
 import seller from '@/routes/seller';
@@ -18,6 +19,21 @@ type Segment = ProductsSummary['chart'][number];
 
 const value = (d: Segment) => d.value;
 const color = (d: Segment) => `var(--color-${d.key})`;
+
+const tooltipTemplate = (d: { data: Segment }) => {
+  const segment = d.data;
+  return `
+    <div class="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs shadow-md dark:border-zinc-800 dark:bg-zinc-900">
+      <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background-color:${color(segment)}"></span>
+      <span class="font-medium text-zinc-600 dark:text-zinc-300">${segment.label}</span>
+      <span class="font-bold text-zinc-900 dark:text-white">${segment.value}</span>
+    </div>
+  `;
+};
+
+const triggers = {
+  [Donut.selectors.segment]: tooltipTemplate,
+};
 </script>
 
 <template>
@@ -49,6 +65,7 @@ const color = (d: Segment) => `var(--color-${d.key})`;
         class="relative mx-auto aspect-square h-[140px] w-[140px] shrink-0"
       >
         <VisSingleContainer :data="chart">
+          <VisTooltip :triggers="triggers" />
           <VisDonut
             :value="value"
             :color="color"

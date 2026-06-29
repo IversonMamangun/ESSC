@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { VisXYContainer, VisGroupedBar, VisAxis } from '@unovis/vue';
+import {
+  VisXYContainer,
+  VisGroupedBar,
+  VisAxis,
+  VisTooltip,
+} from '@unovis/vue';
+import { GroupedBar } from '@unovis/ts';
 import { TrendingUpIcon, ArrowRightIcon } from 'lucide-vue-next';
 import { ChartContainer, type ChartConfig } from '@/components/ui/chart';
 import seller from '@/routes/seller';
@@ -22,6 +28,18 @@ const x = (_d: Stage, i: number) => i;
 const y = (d: Stage) => d.value;
 const color = (d: Stage) => `var(--color-${d.key})`;
 const tickFormat = (i: number) => props.chart[i]?.label ?? '';
+
+const tooltipTemplate = (d: Stage) => `
+  <div class="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs shadow-md dark:border-zinc-800 dark:bg-zinc-900">
+    <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background-color:${color(d)}"></span>
+    <span class="font-medium text-zinc-600 dark:text-zinc-300">${d.label}</span>
+    <span class="font-bold text-zinc-900 dark:text-white">${d.value}</span>
+  </div>
+`;
+
+const triggers = {
+  [GroupedBar.selectors.bar]: tooltipTemplate,
+};
 </script>
 
 <template>
@@ -49,6 +67,7 @@ const tickFormat = (i: number) => props.chart[i]?.label ?? '';
 
     <ChartContainer :config="chartConfig" class="h-32 w-full">
       <VisXYContainer :data="chart">
+        <VisTooltip :triggers="triggers" />
         <VisGroupedBar
           :x="x"
           :y="y"
