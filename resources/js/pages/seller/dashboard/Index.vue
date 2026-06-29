@@ -13,14 +13,21 @@ import TopBar from '@/components/sections/TopBar.vue';
 import SellerStoreHeader from '@/components/SellerStoreHeader.vue';
 import ProductsSummaryCard from '@/components/dashboard/ProductsSummaryCard.vue';
 import OrdersSummaryCard from '@/components/dashboard/OrdersSummaryCard.vue';
+import SalesSummaryCard from '@/components/dashboard/SalesSummaryCard.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import seller from '@/routes/seller';
-import type { Store, ProductsSummary, OrdersSummary } from '@/types';
+import type {
+  Store,
+  ProductsSummary,
+  OrdersSummary,
+  SalesSummary,
+} from '@/types';
 
 const props = defineProps<{
   store: Store;
   productsSummary: ProductsSummary;
   ordersSummary: OrdersSummary;
+  salesSummary: SalesSummary;
 }>();
 
 const viewProduct = (productSlug: string) => {
@@ -117,7 +124,7 @@ const deleteProduct = (productSlug: string) => {
                 Total Sales
               </h3>
               <p class="text-3xl font-black text-zinc-900 dark:text-white">
-                ₱0.00
+                ₱{{ salesSummary.totalAmount.toFixed(2) }}
               </p>
             </div>
           </div>
@@ -126,15 +133,7 @@ const deleteProduct = (productSlug: string) => {
         <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
           <ProductsSummaryCard v-bind="props.productsSummary" />
           <OrdersSummaryCard v-bind="props.ordersSummary" />
-          <div
-            class="flex gap-5 rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900"
-          >
-            <div>
-              <h3 class="text-sm font-bold text-zinc-500 dark:text-zinc-400">
-                Sales Summary
-              </h3>
-            </div>
-          </div>
+          <SalesSummaryCard v-bind="props.salesSummary" />
         </div>
       </div>
 
