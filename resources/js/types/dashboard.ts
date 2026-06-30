@@ -18,3 +18,26 @@ export interface SalesSummary {
   total: number;
   chart: SummaryChartSegment[];
 }
+// seller sales
+export interface SalesSummaryStat {
+  today: number;
+  weekly: number;
+  monthly: number;
+  yearly: number;
+}
+export interface TopProduct {
+  key: string;
+  label: string;
+  value: number;
+}
+export interface OrdersOverviewPoint {
+  month: string;
+  label: string;
+  orders: number;
+}
+export interface OrderStatusSlice {
+  key: string;
+  label: string;
+  value: number;
+  color: string;
+}

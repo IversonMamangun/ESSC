@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { Head, useHttp, useForm, Link, router } from '@inertiajs/vue3';
-import { PackageIcon, SquarePenIcon, AlertCircleIcon } from 'lucide-vue-next';
+import {
+  PackageIcon,
+  SquarePenIcon,
+  AlertCircleIcon,
+  ChartSplineIcon,
+} from 'lucide-vue-next';
 import { ref, computed, h } from 'vue';
 import DataTable from '@/components/DataTable.vue';
 import OrderItemsTable from '@/components/orders/OrderItemsTable.vue';
@@ -210,7 +215,16 @@ function changeTab(tab: string) {
         <SellerStoreHeader
           :store="props.store"
           :edit-store-href="seller.store.edit.url(props.store.slug)"
-        />
+        >
+          <template #actions>
+            <Link
+              :href="seller.sales.analytics()"
+              class="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#009933] px-6 py-3.5 font-bold text-white shadow-md transition-colors hover:bg-green-700 active:scale-95"
+            >
+              <ChartSplineIcon class="h-5 w-5" /> View Analytics
+            </Link>
+          </template>
+        </SellerStoreHeader>
         <div
           class="overflow-hidden rounded-3xl border border-zinc-200 bg-zinc-50 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900"
         >
