@@ -27,6 +27,7 @@ use App\Http\Controllers\Seller\StoreController as SellerStoreController;
 use App\Http\Controllers\Seller\ProductController as SellerProductController;
 use App\Http\Controllers\Seller\OrderController as SellerOrderController;
 use App\Http\Controllers\Seller\SalesController as SellerSalesController;
+use App\Http\Controllers\Seller\SalesAnalyticsController as SellerSalesAnalyticsController;
 
 Route::inertia('/', 'Welcome', [
     'canRegister' => true,
@@ -174,6 +175,8 @@ Route::middleware([
         ->name('sales.index');
     Route::patch('/sales/{order}/action', [SellerOrderController::class, 'action'])
         ->name('sales.action');
+    Route::get('/sales/analytics', [SellerSalesAnalyticsController::class, 'analytics'])
+        ->name('sales.analytics');
 });
 
 // dedicated admin routes
