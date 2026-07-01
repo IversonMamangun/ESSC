@@ -33,11 +33,20 @@ export interface OrderItem {
 
 export interface Order {
   id: number;
+  order_number: string;
   store_name: string;
   status: OrderDisplayStatus;
   shipping_fee: number;
   total: number;
   items: OrderItem[];
+}
+
+export interface OrderShow extends Order {
+  status_label: string;
+  subtotal: number;
+  discount: number;
+  shipping_address: ShippingAddress;
+  timestamps: OrderTimestamps;
 }
 
 export interface PaginatedOrders {
@@ -119,6 +128,7 @@ export interface OrderReturn {
 }
 
 export interface OrderTimestamps {
+  created_at?: string;
   confirmed_at?: string;
   processing_at?: string;
   packed_at?: string;
