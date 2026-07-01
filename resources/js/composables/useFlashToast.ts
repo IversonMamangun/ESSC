@@ -23,7 +23,7 @@ export function useFlashToast() {
       if (!flash) {
         return;
       }
-      
+
       if (flash.success) {
         toast.success(flash.success);
       }
@@ -42,6 +42,7 @@ export function useFlashToast() {
     },
     {
       immediate: true,
+      deep: true,
     },
   );
 }

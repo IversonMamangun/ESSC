@@ -187,7 +187,7 @@ class CheckoutController extends Controller
             'address' => $address,
         ] = $this->getCheckoutData($request);
 
-        $order = $this->checkoutService
+        $this->checkoutService
             ->createCheckout(
                 user: $request->user(),
                 address: $address,
@@ -197,13 +197,13 @@ class CheckoutController extends Controller
                 decrementStock: true
             );
 
-        foreach ($cartItems as $cartItem) {
-            $cartItem->productVariant()
-                ->decrement(
-                    'stock',
-                    $cartItem->quantity
-                );
-        }
+        // foreach ($cartItems as $cartItem) {
+        //     $cartItem->productVariant()
+        //         ->decrement(
+        //             'stock',
+        //             $cartItem->quantity
+        //         );
+        // }
 
         $cartItems->each->delete();
 

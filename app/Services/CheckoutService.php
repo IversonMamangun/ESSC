@@ -95,21 +95,15 @@ class CheckoutService
                 $order = $checkout->orders()->create([
                     'user_id' => $user->id,
                     'store_id' => $storeId,
-
                     'order_number' => 'ORD-' . Str::upper(Str::random(12)),
-
                     'status' => OrderStatus::PENDING,
-
                     'subtotal' => $subtotal,
                     'shipping_fee' => $shippingFee,
                     'discount' => $discount,
                     'total' => $total,
-
                     'notes' => $note,
-
                     'recipient_name' => $address->recipient_name,
                     'recipient_phone' => $address->recipient_number,
-
                     'region' => $address->region,
                     'province' => $address->province,
                     'city' => $address->city,
@@ -128,22 +122,15 @@ class CheckoutService
 
                     $order->items()->create([
                         'product_id' => $variant->product_id,
-
                         'product_variant_id' => $variant->id,
-
                         'product_sku' => $variant->sku,
-
                         'product_name' => $variant->product->name,
-
                         'product_image' => $variant->image,
-
                         'variant_name' => $variant
                             ->attributeValues
                             ->pluck('value')
                             ->implode(' / '),
-
                         'price' => $variant->price,
-
                         'quantity' => $cartItem->quantity,
                     ]);
 
