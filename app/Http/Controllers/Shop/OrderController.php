@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Shop\OrderIndexResource;
+use App\Http\Resources\Shop\OrderShowResource;
 use App\Models\Order;
 use Illuminate\Database\Eloquent\Builder;
 use App\Enums\OrderStatus;
@@ -42,6 +43,7 @@ class OrderController extends Controller
             ->select([
                 'id',
                 'store_id',
+                'order_number',
                 'status',
                 'shipping_fee',
                 'total',
@@ -90,58 +92,24 @@ class OrderController extends Controller
         };
     }
 
-   public function show(Request $request, Order $order)
-{
-    // Ensure the customer owns this order record
-    if ($order->user_id !== $request->user()->id) {
-        abort(403, 'Unauthorized action.');
+    public function show(Request $request, Order $order)
+    {
+        $order->loadMissing([
+            'store',
+            'items',
+        ]);
+
+        abort_unless(
+            $request->user()->id === $order->user_id,
+            403
+        );
+
+        return Inertia::render('shop/customer/order/Show', [
+            'user' => $request->user()->only('name', 'phone', 'avatar'),
+            'order' => OrderShowResource::make($order)->resolve(),
+        ]);
     }
 
-    // 1. Load relationships
-    $order->load([
-        'store:id,name',
-        'items:id,order_id,product_name,product_image,variant_name,price,quantity',
-    ]);
-
-    // 2. Format a comprehensive address string out of your granular database columns
-    $fullAddress = collect([
-        $order->unit_bldg_house,
-        $order->street,
-        $order->barangay,
-        $order->city,
-        $order->province,
-        $order->region,
-        $order->postal_code,
-    ])->filter()->implode(', ');
-
-    $isPaid = !in_array($order->status, [OrderStatus::PENDING]);
-    $isShipped = in_array($order->status, [OrderStatus::SHIPPED, OrderStatus::DELIVERED]);
-    $isCompleted = $order->status === OrderStatus::DELIVERED;
-
-    return Inertia::render('shop/customer/order/Show', [
-        'user' => $request->user()->only('name', 'phone', 'avatar'),
-        'order' => [
-            'id' => $order->id,
-            'order_number' => $order->order_number,
-            'status' => $order->status->value ?? $order->status,
-            'shipping_fee' => (float) $order->shipping_fee,
-            'total' => (float) $order->total,
-            'created_at' => $order->created_at->toIso8601String(),
-            'store' => $order->store,
-            'items' => $order->items,
-            
-            'shipping_name' => $order->recipient_name,
-            'shipping_phone' => $order->recipient_phone,
-            'shipping_address' => $fullAddress ?: 'No shipping address provided.',
-            
-            // Timeline dates
-            'paid_at' => $isPaid ? $order->created_at->addMinutes(5)->toIso8601String() : null,
-            'shipped_at' => $isShipped ? $order->updated_at->toIso8601String() : null,
-            'completed_at' => $isCompleted ? $order->updated_at->toIso8601String() : null,
-        ],
-    ]);
-    
-}
 public function rate(Request $request, Order $order)
     {
         // Ensure the customer owns this order
@@ -180,4 +148,5 @@ public function rate(Request $request, Order $order)
         return redirect()->route('shop.orders.index')
             ->with('success', 'Thank you for your feedback!');
     }
+
 }
