@@ -1,17 +1,6 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import {
-  MapPin,
-  Package,
-  Clock,
-  Truck,
-  CheckCircle2,
-  XCircle,
-  Store,
-  Search,
-  ChevronRight,
-  MessageCircle,
-} from 'lucide-vue-next';
+import { PackageIcon, SearchIcon } from 'lucide-vue-next';
 import { ref, computed } from 'vue';
 import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
 import OrderCard from '@/components/orders/OrderCard.vue';
@@ -97,7 +86,7 @@ const handleBuyAgain = (orderId: string | number) => {
 const handleRateOrder = (orderId: string | number) => {
   router.get(`/orders/${orderId}/rate`);
   // console.log('Opening rating form modal/page for order:', orderId);
-  
+
   // Redirect to rating page or trigger local display dialog
 };
 
@@ -146,7 +135,7 @@ const handleViewRating = (orderId: string | number) => {
           </div>
 
           <div class="relative mb-6">
-            <Search class="absolute top-3.5 left-4 h-5 w-5 text-zinc-400" />
+            <SearchIcon class="absolute top-3.5 left-4 h-5 w-5 text-zinc-400" />
             <input
               type="text"
               placeholder="Search by Order ID or Product Name"
@@ -161,7 +150,7 @@ const handleViewRating = (orderId: string | number) => {
             <div
               class="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full border border-zinc-200 bg-white shadow-sm dark:border-zinc-700 dark:bg-zinc-800"
             >
-              <Package class="h-10 w-10 text-zinc-300 dark:text-zinc-600" />
+              <PackageIcon class="h-10 w-10 text-zinc-300 dark:text-zinc-600" />
             </div>
             <h3 class="mb-2 text-xl font-black text-zinc-800 dark:text-white">
               No orders yet

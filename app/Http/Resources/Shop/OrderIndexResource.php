@@ -18,6 +18,7 @@ class OrderIndexResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'order_number' => $this->order_number,
             'store_name' => $this->store?->name,
             'status' => match ($this->status) {
                 OrderStatus::PENDING => 'to-pay',

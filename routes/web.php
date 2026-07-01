@@ -115,7 +115,7 @@ Route::middleware([
 
     Route::get('/orders', [CustomerOrderController::class, 'index'])
         ->name('orders.index');
-    Route::get('/orders/{order}', [CustomerOrderController::class, 'show'])
+    Route::get('/orders/{order:order_number}', [CustomerOrderController::class, 'show'])
         ->name('orders.show');
 
     Route::get('/orders/{order}/rate', [CustomerOrderController::class, 'rate'])

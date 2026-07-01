@@ -20,7 +20,7 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
-import OrderStatusBadge from './OrderStatusBadge.vue';
+import OrderStatusBadge from '@/components/orders/OrderStatusBadge.vue';
 
 const props = defineProps<{
   order: Order;
@@ -47,7 +47,7 @@ const formatPrice = (value: number) => {
     <CardHeader class="flex flex-row items-center justify-between">
       <div>
         <Link
-          :href="shop.orders.show.url({ order: order.id })"
+          :href="shop.orders.show.url(order.order_number)"
           class="font-semibold transition-colors hover:text-[#009933] hover:underline"
         >
           {{ order.store_name }}
@@ -70,7 +70,7 @@ const formatPrice = (value: number) => {
                 class="flex gap-4"
               >
                 <Link
-                  :href="shop.orders.show.url({ order: order.id })"
+                  :href="shop.orders.show.url(order.order_number)"
                   class="shrink-0 transition-opacity hover:opacity-80"
                 >
                   <img
@@ -84,7 +84,7 @@ const formatPrice = (value: number) => {
                 <div class="flex flex-1 justify-between">
                   <div>
                     <Link
-                      :href="shop.orders.show.url({ order: order.id })"
+                      :href="shop.orders.show.url(order.order_number)"
                       class="line-clamp-1 font-medium transition-colors hover:text-[#009933] hover:underline"
                     >
                       {{ item.product_name }}
@@ -114,7 +114,7 @@ const formatPrice = (value: number) => {
       <div class="flex w-full flex-wrap gap-2 sm:w-auto">
         <template v-if="order.status === 'to-receive'">
           <Link
-            :href="shop.orders.show.url({ order: order.id })"
+            :href="shop.orders.show.url(order.order_number)"
             class="inline-flex cursor-pointer items-center justify-center rounded-xl bg-zinc-900 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200"
           >
             <TruckIcon class="mr-2 h-4 w-4" />
