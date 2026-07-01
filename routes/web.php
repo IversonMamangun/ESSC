@@ -173,7 +173,7 @@ Route::middleware([
 
     Route::get('/sales', [SellerSalesController::class, 'index'])
         ->name('sales.index');
-    Route::patch('/sales/{order}/action', [SellerOrderController::class, 'action'])
+    Route::patch('/sales/{order}/action', [SellerSalesController::class, 'action'])
         ->name('sales.action');
     Route::get('/sales/analytics', [SellerSalesAnalyticsController::class, 'analytics'])
         ->name('sales.analytics');
