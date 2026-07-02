@@ -31,30 +31,29 @@ class SalesAnalyticsController extends Controller
     }
 
     /**
-     * Today / weekly / monthly / yearly totals from delivered orders.
+     * Today / weekly / monthly / yearly totals from completed orders.
      */
     private function getSalesSummary(Store $store): array
     {
         $now = Carbon::now();
-
-        $delivered = fn () => $store->orders()->where('status', OrderStatus::DELIVERED);
+        $completed = fn () => $store->orders()->where('status', OrderStatus::COMPLETED);
 
         return [
-            'today' => (float) $delivered()
-                ->whereDate('delivered_at', $now->toDateString())
+            'today' => (float) $completed()
+                ->whereDate('completed_at', $now->toDateString())
                 ->sum('total'),
 
-            'weekly' => (float) $delivered()
-                ->whereBetween('delivered_at', [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()])
+            'weekly' => (float) $completed()
+                ->whereBetween('completed_at', [$now->copy()->startOfWeek(), $now->copy()->endOfWeek()])
                 ->sum('total'),
 
-            'monthly' => (float) $delivered()
-                ->whereYear('delivered_at', $now->year)
-                ->whereMonth('delivered_at', $now->month)
+            'monthly' => (float) $completed()
+                ->whereYear('completed_at', $now->year)
+                ->whereMonth('completed_at', $now->month)
                 ->sum('total'),
 
-            'yearly' => (float) $delivered()
-                ->whereYear('delivered_at', $now->year)
+            'yearly' => (float) $completed()
+                ->whereYear('completed_at', $now->year)
                 ->sum('total'),
         ];
     }
@@ -122,6 +121,7 @@ class SalesAnalyticsController extends Controller
             ->pluck('total', 'status');
 
         $palette = [
+            OrderStatus::COMPLETED->value => 'var(--chart-2)',
             OrderStatus::DELIVERED->value => 'var(--chart-2)',
             OrderStatus::SHIPPED->value => 'var(--chart-1)',
             OrderStatus::PROCESSING->value => 'var(--chart-3)',
@@ -139,7 +139,7 @@ class SalesAnalyticsController extends Controller
             ->map(fn ($total, $status) => [
                 'key' => $status,
                 'label' => OrderStatus::from($status)->label(),
-                'value' => $total,
+                'value' => (int) $total,
                 'color' => $palette[$status] ?? 'var(--chart-1)',
             ])
             ->values()

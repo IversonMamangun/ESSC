@@ -62,6 +62,8 @@ const statusTone: Record<OrderRawStatus, string> = {
   shipped: 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400',
   delivered:
     'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
+  completed:
+    'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
   cancelled: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400',
   return_requested:
     'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400',
@@ -90,6 +92,7 @@ const TIMESTAMP_LABELS: Record<string, string> = {
   packed_at: 'Packed',
   shipped_at: 'Shipped',
   delivered_at: 'Delivered',
+  completed_at: 'Completed',
   cancelled_at: 'Cancelled',
   return_requested_at: 'Return Requested',
   return_approved_at: 'Return Approved',

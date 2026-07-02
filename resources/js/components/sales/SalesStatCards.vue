@@ -26,25 +26,25 @@ const cards = [
     key: 'today' as const,
     label: 'Today',
     icon: CalendarDaysIcon,
-    tooltip: 'Total of delivered orders confirmed today.',
+    tooltip: 'Total of completed orders today.',
   },
   {
     key: 'weekly' as const,
     label: 'This Week',
     icon: CalendarRangeIcon,
-    tooltip: 'Total of delivered orders this week (Mon–Sun).',
+    tooltip: 'Total of completed orders this week (Mon–Sun).',
   },
   {
     key: 'monthly' as const,
     label: 'This Month',
     icon: CalendarIcon,
-    tooltip: 'Total of delivered orders this calendar month.',
+    tooltip: 'Total of completed orders this calendar month.',
   },
   {
     key: 'yearly' as const,
     label: 'This Year',
     icon: TrendingUpIcon,
-    tooltip: 'Total of delivered orders this calendar year.',
+    tooltip: 'Total of completed orders this calendar year.',
   },
 ];
 </script>

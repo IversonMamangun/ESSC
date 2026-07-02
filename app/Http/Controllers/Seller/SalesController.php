@@ -62,7 +62,10 @@ class SalesController extends Controller
     {
         return match ($status) {
             'to-receive' => $query->where('status', OrderStatus::SHIPPED),
-            'completed' => $query->where('status', OrderStatus::DELIVERED),
+            'completed' => $query->whereIn('status', [
+                OrderStatus::DELIVERED,
+                OrderStatus::COMPLETED
+            ]),
             'return-request' => $query->whereIn('status', [
                 OrderStatus::RETURN_REQUESTED,
                 OrderStatus::RETURN_APPROVED,
@@ -82,7 +85,8 @@ class SalesController extends Controller
 
         return [
             'to_receive'   => (int) $counts->get(OrderStatus::SHIPPED->value, 0),
-            'completed'      =>(int) $counts->get(OrderStatus::DELIVERED->value, 0),
+            'completed'      =>(int) ($counts->get(OrderStatus::DELIVERED->value, 0)
+                            + $counts->get(OrderStatus::COMPLETED->value, 0)),
             'return_request'   => (int) ($counts->get(OrderStatus::RETURN_REQUESTED->value, 0)) 
                             + ($counts->get(OrderStatus::RETURN_APPROVED->value, 0)),
             'returned'      =>(int) $counts->get(OrderStatus::RETURNED->value, 0),

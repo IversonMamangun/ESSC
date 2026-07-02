@@ -53,6 +53,7 @@ class OrderShowResource extends JsonResource
                 'packed_at' => $this->packed_at,
                 'shipped_at' => $this->shipped_at,
                 'delivered_at' => $this->delivered_at,
+                'completed_at' => $this->completed_at,
                 'cancelled_at' => $this->cancelled_at,
                 'return_requested_at' => $this->return_requested_at,
                 'return_approved_at' => $this->return_approved_at,
