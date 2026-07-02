@@ -46,6 +46,7 @@ const TIMESTAMP_LABELS: Record<string, string> = {
   packed_at: 'Packed',
   shipped_at: 'Shipped',
   delivered_at: 'Delivered',
+  completed_at: 'Completed',
   cancelled_at: 'Cancelled',
   return_requested_at: 'Return Requested',
   return_approved_at: 'Return Approved',

@@ -16,6 +16,7 @@ export type OrderRawStatus =
   | 'packed'
   | 'shipped'
   | 'delivered'
+  | 'completed'
   | 'cancelled'
   | 'return_requested'
   | 'return_approved'
@@ -134,6 +135,7 @@ export interface OrderTimestamps {
   packed_at?: string;
   shipped_at?: string;
   delivered_at?: string;
+  completed_at?: string;
   cancelled_at?: string;
   return_requested_at?: string;
   return_approved_at?: string;

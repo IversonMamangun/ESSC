@@ -76,10 +76,10 @@ class OrderController extends Controller
                 'status',
                 OrderStatus::SHIPPED
             ),
-            'completed' => $query->where(
-                'status',
-                OrderStatus::DELIVERED
-            ),
+            'completed' => $query->whereIn('status', [
+                OrderStatus::DELIVERED,
+                OrderStatus::COMPLETED
+            ]),
             'cancelled' => $query->where(
                 'status',
                 OrderStatus::CANCELLED

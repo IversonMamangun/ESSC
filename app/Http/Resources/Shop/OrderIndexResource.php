@@ -26,6 +26,7 @@ class OrderIndexResource extends JsonResource
                 OrderStatus::PROCESSING,
                 OrderStatus::PACKED => 'to-ship',
                 OrderStatus::SHIPPED => 'to-receive',
+                OrderStatus::COMPLETED,
                 OrderStatus::DELIVERED => 'completed',
                 OrderStatus::CANCELLED => 'cancelled',
                 OrderStatus::RETURNED => 'returned',
