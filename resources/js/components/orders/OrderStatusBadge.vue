@@ -26,6 +26,12 @@ const config = computed(() => {
         class: 'text-indigo-500',
       };
 
+    case 'delivered':
+      return {
+        label: 'Delivered',
+        class: 'text-green-600',
+      };
+
     case 'completed':
       return {
         label: 'Completed',

@@ -37,6 +37,10 @@ const tabs = [
     value: 'to-receive',
   },
   {
+    label: 'Delivered',
+    value: 'delivered',
+  },
+  {
     label: 'Completed',
     value: 'completed',
   },
@@ -64,13 +68,6 @@ function changeStatus(status: string) {
   );
 }
 
-const formatPrice = (price: number) => {
-  return new Intl.NumberFormat('en-PH', {
-    style: 'currency',
-    currency: 'PHP',
-  }).format(price);
-};
-
 const cancelOrder = (orderId: string | number) => {
   //
 };
@@ -79,18 +76,18 @@ const completeOrder = (orderId: string | number) => {
   //
 };
 
-const handleBuyAgain = (orderId: string | number) => {
-  console.log('Repurchasing order items for ID:', orderId);
+const requestReturnOrder = (orderId: string | number) => {
+  //
 };
 
-const handleRateOrder = (orderId: string | number) => {
+const rateOrder = (orderId: string | number) => {
   router.get(`/orders/${orderId}/rate`);
   // console.log('Opening rating form modal/page for order:', orderId);
 
   // Redirect to rating page or trigger local display dialog
 };
 
-const handleViewRating = (orderId: string | number) => {
+const viewRatingOrder = (orderId: string | number) => {
   console.log('Showing existing submission score for order:', orderId);
 };
 </script>
@@ -98,7 +95,6 @@ const handleViewRating = (orderId: string | number) => {
 <template>
   <Head title="My Purchases" />
 
-  <!-- REMOVED bg-zinc-50 dark:bg-zinc-950 to use your default app background -->
   <div class="flex min-h-screen flex-col transition-colors duration-300">
     <TopBar />
     <div class="sticky top-0 z-50 mt-8">
@@ -106,13 +102,12 @@ const handleViewRating = (orderId: string | number) => {
     </div>
 
     <main
-      class="mx-auto w-full max-w-7xl flex-grow px-4 py-8 sm:px-6 md:py-12 lg:px-8"
+      class="mx-auto w-full max-w-7xl grow px-4 py-8 sm:px-6 md:py-12 lg:px-8"
     >
       <div class="flex flex-col gap-8 lg:flex-row">
         <UserAccountSidebar :name="user.name" :avatar="user.avatar" />
 
         <div class="min-w-0 flex-1">
-          <!-- Adjusted backgrounds to stand out from default bg -->
           <div
             class="mb-6 overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900"
           >
@@ -166,9 +161,11 @@ const handleViewRating = (orderId: string | number) => {
                 v-for="order in orders.data"
                 :key="order.id"
                 :order="order"
-                @buyAgain="handleBuyAgain"
-                @rate="handleRateOrder"
-                @viewRating="handleViewRating"
+                @cancel="cancelOrder"
+                @complete="completeOrder"
+                @requestReturn="requestReturnOrder"
+                @rate="rateOrder"
+                @viewRating="viewRatingOrder"
               />
             </div>
 

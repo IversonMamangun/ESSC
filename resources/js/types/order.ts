@@ -5,6 +5,7 @@ export type OrderDisplayStatus =
   | 'to-pay'
   | 'to-ship'
   | 'to-receive'
+  | 'delivered'
   | 'completed'
   | 'cancelled'
   | 'returned';
