@@ -18,7 +18,7 @@ class OrderController extends Controller
     {
         $user = $request->user();
         $validated = $request->validate([
-            'status' => ['sometimes', 'string', Rule::in(['all', 'to-pay', 'to-ship', 'to-receive', 'completed', 'cancelled', 'returned'])],
+            'status' => ['sometimes', 'string', Rule::in(['all', 'to-pay', 'to-ship', 'to-receive', 'delivered', 'completed', 'cancelled', 'returned'])],
         ]);
 
         $filters = [
@@ -76,10 +76,14 @@ class OrderController extends Controller
                 'status',
                 OrderStatus::SHIPPED
             ),
-            'completed' => $query->whereIn('status', [
-                OrderStatus::DELIVERED,
+            'delivered' => $query->where(
+                'status',
+                OrderStatus::DELIVERED
+            ),
+            'completed' => $query->where(
+                'status',
                 OrderStatus::COMPLETED
-            ]),
+            ),
             'cancelled' => $query->where(
                 'status',
                 OrderStatus::CANCELLED
