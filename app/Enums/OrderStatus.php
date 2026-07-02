@@ -10,6 +10,7 @@ enum OrderStatus: string
     case PACKED = 'packed';
     case SHIPPED = 'shipped';
     case DELIVERED = 'delivered';
+    case COMPLETED = 'completed';
     case CANCELLED = 'cancelled';
     case RETURN_REQUESTED = 'return_requested';
     case RETURN_APPROVED = 'return_approved';
@@ -24,6 +25,7 @@ enum OrderStatus: string
             self::PACKED => 'Ready to Ship',
             self::SHIPPED => 'In Transit',
             self::DELIVERED => 'Delivered',
+            self::COMPLETED => 'Completed',
             self::CANCELLED => 'Cancelled',
             self::RETURN_REQUESTED => 'Return Requested',
             self::RETURN_APPROVED => 'Return Approved',
