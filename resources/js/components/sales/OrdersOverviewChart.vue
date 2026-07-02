@@ -7,7 +7,6 @@ import {
   VisCrosshair,
   VisTooltip,
 } from '@unovis/vue';
-import { Area } from '@unovis/ts';
 import { ActivityIcon } from 'lucide-vue-next';
 import { ChartContainer, type ChartConfig } from '@/components/ui/chart';
 import type { OrdersOverviewPoint } from '@/types';
@@ -24,17 +23,13 @@ const tickFormat = (i: number) => props.data[i]?.label ?? '';
 
 const total = props.data.reduce((sum, d) => sum + d.orders, 0);
 
-const tooltipTemplate = (d: OrdersOverviewPoint) => `
+const crosshairTemplate = (d: OrdersOverviewPoint) => `
   <div class="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs shadow-md dark:border-zinc-800 dark:bg-zinc-900">
     <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background-color:var(--color-orders)"></span>
     <span class="font-medium text-zinc-600 dark:text-zinc-300">${d.label}</span>
     <span class="font-bold text-zinc-900 dark:text-white">${d.orders} orders</span>
   </div>
 `;
-
-const triggers = {
-  [Area.selectors.area]: tooltipTemplate,
-};
 </script>
 
 <template>
@@ -54,22 +49,27 @@ const triggers = {
 
     <ChartContainer :config="chartConfig" class="h-72 w-full">
       <VisXYContainer :data="data">
-        <VisTooltip :triggers="triggers" />
+        <VisTooltip />
         <VisArea
           :x="x"
           :y="y"
           color="var(--color-orders)"
           :opacity="0.15"
-          :curve-type="'monotoneX'"
+          curve-type="monotoneX"
         />
         <VisLine
           :x="x"
           :y="y"
           color="var(--color-orders)"
           :line-width="2.5"
-          :curve-type="'monotoneX'"
+          curve-type="monotoneX"
         />
-        <VisCrosshair :x="x" :y="y" color="var(--color-orders)" />
+        <VisCrosshair
+          :x="x"
+          :y="y"
+          color="var(--color-orders)"
+          :template="crosshairTemplate"
+        />
         <VisAxis
           type="x"
           :x="x"

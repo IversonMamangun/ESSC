@@ -17,13 +17,22 @@ const color = (d: OrderStatusSlice) => d.color;
 
 const total = props.data.reduce((sum, d) => sum + d.value, 0);
 
-const tooltipTemplate = (d: OrderStatusSlice) => {
-  const pct = total ? Math.round((d.value / total) * 100) : 0;
+const tooltipTemplate = (d: { data: OrderStatusSlice }) => {
+  const slice = d.data;
+  const pct = total ? Math.round((slice.value / total) * 100) : 0;
+
   return `
     <div class="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs shadow-md dark:border-zinc-800 dark:bg-zinc-900">
-      <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background-color:${d.color}"></span>
-      <span class="font-medium text-zinc-600 dark:text-zinc-300">${d.label}</span>
-      <span class="font-bold text-zinc-900 dark:text-white">${d.value} (${pct}%)</span>
+      <span
+        class="h-2.5 w-2.5 shrink-0 rounded-full"
+        style="background-color:${slice.color}"
+      ></span>
+      <span class="font-medium text-zinc-600 dark:text-zinc-300">
+        ${slice.label}
+      </span>
+      <span class="font-bold text-zinc-900 dark:text-white">
+        ${slice.value} (${pct}%)
+      </span>
     </div>
   `;
 };
