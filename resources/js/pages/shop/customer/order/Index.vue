@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { Head, Link, router } from '@inertiajs/vue3';
-import { PackageIcon, SearchIcon } from 'lucide-vue-next';
+import {
+  PackageIcon,
+  SearchIcon,
+  CircleCheckBigIcon,
+  CircleXIcon,
+} from 'lucide-vue-next';
 import { ref, computed } from 'vue';
 import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
 import OrderCard from '@/components/orders/OrderCard.vue';
@@ -8,6 +13,7 @@ import Pagination from '@/components/Pagination.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import shop from '@/routes/shop';
 import type { User, OrderDisplayStatus, PaginatedOrders } from '@/types';
 
@@ -68,27 +74,81 @@ function changeStatus(status: string) {
   );
 }
 
-const cancelOrder = (orderId: string | number) => {
+// cancel & complete
+type ActionType = 'complete' | 'cancel';
+interface Action {
+  type: ActionType;
+  orderNo: string;
+}
+const action = ref<Action | null>(null);
+const confirmOpen = computed({
+  get: () => action.value !== null,
+  set: (val: boolean) => {
+    if (!val) action.value = null;
+  },
+});
+// config per action type
+const dialogConfig = computed(() => {
+  switch (action.value?.type) {
+    case 'complete':
+      return {
+        title: 'Complete this order?',
+        description:
+          "Confirm that you've received your order. This can't be undone.",
+        confirmText: 'Complete Order',
+        confirmVariant: 'default' as const,
+        icon: CircleCheckBigIcon,
+      };
+    case 'cancel':
+      return {
+        title: 'Cancel this order?',
+        description: 'This will cancel your order and cannot be undone.',
+        confirmText: 'Cancel Order',
+        confirmVariant: 'destructive' as const,
+        icon: CircleXIcon,
+      };
+    default:
+      return {
+        title: '',
+        description: '',
+        confirmText: 'Confirm',
+        confirmVariant: 'default' as const,
+        icon: undefined,
+      };
+  }
+});
+const cancelOrder = (orderNo: string) => {
+  action.value = { type: 'cancel', orderNo };
+};
+const completeOrder = (orderNo: string) => {
+  action.value = { type: 'complete', orderNo };
+};
+// confirm endpoint
+const handleConfirmAction = () => {
+  if (!action.value) return;
+  const { type, orderNo } = action.value;
+
+  const requests: Record<ActionType, () => void> = {
+    complete: () =>
+      router.patch(shop.orders.complete(orderNo), {}, { preserveScroll: true }),
+    cancel: () =>
+      router.patch(shop.orders.cancel(orderNo), {}, { preserveScroll: true }),
+  };
+
+  requests[type]();
+  action.value = null;
+};
+
+const requestReturnOrder = (orderNo: string) => {
   //
 };
 
-const completeOrder = (orderId: string | number) => {
+const rateOrder = (orderNo: string) => {
   //
 };
 
-const requestReturnOrder = (orderId: string | number) => {
+const viewRatingOrder = (orderNo: string) => {
   //
-};
-
-const rateOrder = (orderId: string | number) => {
-  router.get(`/orders/${orderId}/rate`);
-  // console.log('Opening rating form modal/page for order:', orderId);
-
-  // Redirect to rating page or trigger local display dialog
-};
-
-const viewRatingOrder = (orderId: string | number) => {
-  console.log('Showing existing submission score for order:', orderId);
 };
 </script>
 
@@ -178,6 +238,19 @@ const viewRatingOrder = (orderId: string | number) => {
     </main>
     <Footer />
   </div>
+
+  <ConfirmDialog
+    v-model:open="confirmOpen"
+    :title="dialogConfig.title"
+    :confirm-text="dialogConfig.confirmText"
+    :confirm-variant="dialogConfig.confirmVariant"
+    :icon="dialogConfig.icon"
+    :confirmDisabled="!action"
+    @confirm="handleConfirmAction"
+    @cancel="action = null"
+  >
+    <template #description>{{ dialogConfig.description }}</template>
+  </ConfirmDialog>
 </template>
 
 <style scoped>

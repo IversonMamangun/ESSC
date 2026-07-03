@@ -30,11 +30,11 @@ const props = defineProps<{
 
 // define emits to pass events to parent
 defineEmits<{
-  (e: 'cancel', id: number): void;
-  (e: 'complete', id: number): void;
-  (e: 'requestReturn', id: number): void;
-  (e: 'rate', id: number): void;
-  (e: 'viewRating', id: number): void;
+  (e: 'cancel', no: string): void;
+  (e: 'complete', no: string): void;
+  (e: 'requestReturn', no: string): void;
+  (e: 'rate', no: string): void;
+  (e: 'viewRating', no: string): void;
 }>();
 
 const formatPrice = (value: number) => {
@@ -117,7 +117,7 @@ const formatPrice = (value: number) => {
       <div class="flex w-full flex-wrap gap-2 sm:w-auto">
         <template v-if="order.status === 'delivered'">
           <button
-            @click="$emit('complete', order.id)"
+            @click="$emit('complete', order.order_number)"
             class="inline-flex cursor-pointer items-center justify-center rounded-xl border border-emerald-200 bg-emerald-100 px-4 py-2 text-sm font-bold text-emerald-700 transition-colors hover:bg-emerald-200 active:scale-95 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-400 dark:hover:bg-emerald-900/50"
           >
             <CircleCheckBigIcon class="mr-2 h-4 w-4" />
@@ -125,7 +125,7 @@ const formatPrice = (value: number) => {
           </button>
 
           <button
-            @click="$emit('complete', order.id)"
+            @click="$emit('complete', order.order_number)"
             class="inline-flex cursor-pointer items-center justify-center rounded-xl border border-rose-200 bg-rose-100 px-4 py-2 text-sm font-bold text-rose-700 transition-colors hover:bg-rose-200 active:scale-95 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-400 dark:hover:bg-rose-900/50"
           >
             <CornerDownLeftIcon class="mr-2 h-4 w-4" />
