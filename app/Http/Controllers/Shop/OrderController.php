@@ -114,6 +114,51 @@ class OrderController extends Controller
         ]);
     }
 
+    public function complete(Request $request, Order $order)
+    {
+        abort_unless(
+            $request->user()->id === $order->user_id,
+            403
+        );
+
+        if ($order->status !== OrderStatus::DELIVERED) {
+            abort(422, 'Invalid order state');
+        }
+
+        $order->update([
+            'status' => OrderStatus::COMPLETED,
+            'completed_at' => now(),
+        ]);
+
+        return back()->with(
+            'success',
+            'Order completed successfully.'
+        );
+    }
+
+    public function cancel(Request $request, Order $order)
+    {
+        abort_unless(
+            $request->user()->id === $order->user_id,
+            403
+        );
+
+        if ($order->status !== OrderStatus::PENDING) {
+            abort(422, 'Invalid order state');
+        }
+
+        $order->update([
+            'status' => OrderStatus::CANCELLED,
+            'cancelled_at' => now(),
+            // extra fields for reason
+        ]);
+
+        return back()->with(
+            'success',
+            'Order cancelled successfully.'
+        );
+    }
+
 public function rate(Request $request, Order $order)
     {
         // Ensure the customer owns this order

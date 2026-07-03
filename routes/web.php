@@ -22,6 +22,7 @@ use App\Http\Controllers\Shop\UserAddressController as CustomerUserAddressContro
 use App\Http\Controllers\Shop\CartController as CustomerCartController;
 use App\Http\Controllers\Shop\CheckoutController as CustomerCheckoutController;
 use App\Http\Controllers\Shop\OrderController as CustomerOrderController;
+use App\Http\Controllers\Shop\ReturnOrderController as CustomerReturnOrderController;
 use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
 use App\Http\Controllers\Seller\StoreController as SellerStoreController;
 use App\Http\Controllers\Seller\ProductController as SellerProductController;
@@ -117,6 +118,12 @@ Route::middleware([
         ->name('orders.index');
     Route::get('/orders/{order:order_number}', [CustomerOrderController::class, 'show'])
         ->name('orders.show');
+    Route::patch('/orders/{order:order_number}/complete', [CustomerOrderController::class, 'complete'])
+        ->name('orders.complete');
+    Route::patch('/orders/{order:order_number}/cancel', [CustomerOrderController::class, 'cancel'])
+        ->name('orders.cancel');
+    Route::post('/orders/{order:order_number}/return', [CustomerReturnOrderController::class, 'store'])
+        ->name('orders.return.store');
 
     Route::get('/orders/{order}/rate', [CustomerOrderController::class, 'rate'])
         ->name('orders.rate');
