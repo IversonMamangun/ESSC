@@ -23,6 +23,7 @@ use App\Http\Controllers\Shop\CartController as CustomerCartController;
 use App\Http\Controllers\Shop\CheckoutController as CustomerCheckoutController;
 use App\Http\Controllers\Shop\OrderController as CustomerOrderController;
 use App\Http\Controllers\Shop\ReturnOrderController as CustomerReturnOrderController;
+use App\Http\Controllers\Shop\ReviewController as CustomerReviewController;
 use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
 use App\Http\Controllers\Seller\StoreController as SellerStoreController;
 use App\Http\Controllers\Seller\ProductController as SellerProductController;
@@ -124,9 +125,9 @@ Route::middleware([
         ->name('orders.cancel');
     Route::post('/orders/{order:order_number}/return', [CustomerReturnOrderController::class, 'store'])
         ->name('orders.return.store');
+    Route::get('/orders/{order:order_number}/review', [CustomerReviewController::class, 'create'])
+        ->name('orders.review.create');
 
-    Route::get('/orders/{order}/rate', [CustomerOrderController::class, 'rate'])
-        ->name('orders.rate');
     Route::post('/orders/{order}/rate', [CustomerOrderController::class, 'storeRating'])
         ->name('orders.store-rating');
 
