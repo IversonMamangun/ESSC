@@ -40,6 +40,7 @@ export interface Order {
   status: OrderDisplayStatus;
   shipping_fee: number;
   total: number;
+  is_rate_eligible?: boolean;
   items: OrderItem[];
 }
 

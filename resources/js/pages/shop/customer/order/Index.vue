@@ -144,7 +144,7 @@ const requestReturnOrder = (orderNo: string) => {
 };
 
 const rateOrder = (orderNo: string) => {
-  //
+  router.visit(shop.orders.review.create(orderNo));
 };
 
 const viewRatingOrder = (orderNo: string) => {

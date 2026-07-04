@@ -125,29 +125,32 @@ const formatPrice = (value: number) => {
           </button>
 
           <button
-            @click="$emit('complete', order.order_number)"
+            @click="$emit('requestReturn', order.order_number)"
             class="inline-flex cursor-pointer items-center justify-center rounded-xl border border-rose-200 bg-rose-100 px-4 py-2 text-sm font-bold text-rose-700 transition-colors hover:bg-rose-200 active:scale-95 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-400 dark:hover:bg-rose-900/50"
           >
             <CornerDownLeftIcon class="mr-2 h-4 w-4" />
             Request Return
           </button>
+        </template>
 
-          <!-- <button
-            @click="$emit('rate', order.id)"
+        <template v-if="order.status === 'completed'">
+          <button
+            v-if="order.is_rate_eligible"
+            @click="$emit('rate', order.order_number)"
             class="inline-flex cursor-pointer items-center justify-center rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm font-bold text-amber-700 transition-colors hover:bg-amber-100 dark:border-amber-900/30 dark:bg-amber-950/25 dark:text-amber-400"
           >
             <StarIcon class="mr-2 h-4 w-4 fill-amber-400 text-amber-400" />
             Rate Product
-          </button> -->
+          </button>
 
-          <!-- <button
+          <button
             v-else
-            @click="$emit('viewRating', order.id)"
-            class="inline-flex items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-bold text-zinc-600 hover:bg-zinc-50 transition-colors dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 cursor-pointer"
+            @click="$emit('viewRating', order.order_number)"
+            class="inline-flex cursor-pointer items-center justify-center rounded-xl border border-zinc-200 bg-white px-4 py-2 text-sm font-bold text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700"
           >
             <MessageSquareIcon class="mr-2 h-4 w-4" />
             View Rating
-          </button> -->
+          </button>
         </template>
       </div>
 
