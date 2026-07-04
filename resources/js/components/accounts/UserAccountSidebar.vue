@@ -65,7 +65,12 @@ const isActive = (path: string) => page.url.startsWith(path);
 
       <Link
         :href="shop.orders.index()"
-        class="flex items-center gap-3 rounded-xl px-4 py-3 font-bold text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800/50"
+        :class="[
+          isActive(shop.orders.index().url)
+            ? 'bg-green-50 font-black text-[#009933] dark:bg-green-900/10'
+            : 'font-bold text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800/50',
+          'flex items-center gap-3 rounded-xl px-4 py-3',
+        ]"
       >
         <PackageIcon class="h-5 w-5" />
         Purchases
