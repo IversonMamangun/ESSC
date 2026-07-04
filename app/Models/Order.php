@@ -37,6 +37,7 @@ use App\Enums\OrderStatus;
     'packed_at',
     'shipped_at',
     'delivered_at',
+    'completed_at',
     'cancelled_at',
     'return_requested_at',
     'return_approved_at',
@@ -62,6 +63,7 @@ class Order extends Model
             'packed_at' => 'datetime',
             'shipped_at' => 'datetime',
             'delivered_at' => 'datetime',
+            'completed_at' => 'datetime',
             'cancelled_at' => 'datetime',
             'return_requested_at' => 'datetime',
             'return_approved_at' => 'datetime',
@@ -104,6 +106,14 @@ class Order extends Model
     public function isOnline(): bool
     {
         return $this->checkout?->payment?->payment_method_id === PaymentMethod::PAY_ONLINE;
+    }
+
+    // need withExists() when accessing $this->return_exists
+    public function isEligibleForRating(): bool
+    {
+        return $this->status === OrderStatus::COMPLETED
+            && $this->completed_at?->greaterThanOrEqualTo(now()->subMonths(3))
+            && ! $this->return_exists;
     }
 
 }

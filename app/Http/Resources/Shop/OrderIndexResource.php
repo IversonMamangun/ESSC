@@ -43,6 +43,7 @@ class OrderIndexResource extends JsonResource
                 'price' => (float) $item->price,
                 'quantity' => $item->quantity,
             ])->values(),
+            'is_rate_eligible' => $this->isEligibleForRating(),
             'created_at' => $this->created_at,
         ];
     }
