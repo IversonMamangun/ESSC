@@ -127,9 +127,8 @@ Route::middleware([
         ->name('orders.return.store');
     Route::get('/orders/{order:order_number}/review', [CustomerReviewController::class, 'create'])
         ->name('orders.review.create');
-
-    Route::post('/orders/{order}/rate', [CustomerOrderController::class, 'storeRating'])
-        ->name('orders.store-rating');
+    Route::post('/orders/{order:order_number}/review', [CustomerReviewController::class, 'store'])
+        ->name('orders.review.store');
 
     Route::get('/chat/{store:slug?}', [ChatController::class, 'index'])
     ->name('chat.index');

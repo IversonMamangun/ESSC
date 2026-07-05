@@ -24,6 +24,7 @@ export type OrderRawStatus =
   | 'returned';
 
 export interface OrderItem {
+  id: number;
   product_sku: string;
   product_name: string;
   product_image: string | null;

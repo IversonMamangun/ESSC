@@ -1,48 +1,34 @@
 <script setup lang="ts">
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import {
-  ArrowLeft,
-  Star,
-  Camera,
-  Store,
-  X,
-  UploadCloud,
+  ArrowLeftIcon,
+  StarIcon,
+  PackageIcon,
+  StoreIcon,
+  XIcon,
+  VideoIcon,
+  CameraIcon,
 } from 'lucide-vue-next';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import shop from '@/routes/shop';
-
-interface OrderItem {
-  id: number;
-  product_name: string;
-  product_image: string | null;
-  variant_name: string | null;
-}
-
-interface OrderDetails {
-  id: number;
-  order_number: string;
-  store: {
-    id: number;
-    name: string;
-  };
-  items: OrderItem[];
-}
+import type { User, Order } from '@/types';
 
 const props = defineProps<{
-  user: { name: string; avatar: string | null };
-  order: OrderDetails;
+  user: User;
+  order: Order;
 }>();
 
-// Initialize Inertia form tracking state for each item dynamically
 const form = useForm({
   items: props.order.items.map((item) => ({
     order_item_id: item.id,
-    rating: 5, // Default to a 5-star rating
+    rating: 5,
     comment: '',
+    images: [] as File[],
+    video: null as File | null,
   })),
 });
 
@@ -52,23 +38,76 @@ const hoverRatings = ref<Record<number, number>>({});
 const setRating = (itemIndex: number, score: number) => {
   form.items[itemIndex].rating = score;
 };
-
 const setHoverRating = (itemIndex: number, score: number) => {
   hoverRatings.value[itemIndex] = score;
 };
-
 const clearHoverRating = (itemIndex: number) => {
   delete hoverRatings.value[itemIndex];
 };
 
+const MAX_IMAGES = 5;
+const MAX_VIDEO = 1;
+
+const imagePreviews = ref<Record<number, string[]>>({});
+const videoPreviews = ref<Record<number, string | null>>({});
+
+const getImageCount = (index: number) =>
+  computed(() => form.items[index].images.length);
+
+const canAddImages = (index: number) =>
+  computed(() => getImageCount(index).value < MAX_IMAGES);
+
+const hasVideo = (index: number) =>
+  computed(() => !!form.items[index].video || !!videoPreviews.value[index]);
+
+const handleImages = (index: number, e: Event) => {
+  const input = e.target as HTMLInputElement;
+  const files = Array.from(input.files ?? []);
+
+  if (!files.length) return;
+
+  if (!imagePreviews.value[index]) {
+    imagePreviews.value[index] = [];
+  }
+  const remaining = MAX_IMAGES - form.items[index].images.length;
+  const allowed = files.slice(0, remaining);
+
+  form.items[index].images.push(...allowed);
+
+  imagePreviews.value[index].push(
+    ...allowed.map((file) => URL.createObjectURL(file)),
+  );
+  input.value = '';
+};
+
+const removeImage = (itemIndex: number, imageIndex: number) => {
+  form.items[itemIndex].images.splice(imageIndex, 1);
+
+  URL.revokeObjectURL(imagePreviews.value[itemIndex][imageIndex]);
+  imagePreviews.value[itemIndex].splice(imageIndex, 1);
+};
+
+const handleVideo = (index: number, e: Event) => {
+  if (hasVideo(index).value) return;
+
+  const file = (e.target as HTMLInputElement).files?.[0];
+  if (!file) return;
+
+  form.items[index].video = file;
+  videoPreviews.value[index] = URL.createObjectURL(file);
+};
+
+const removeVideo = (index: number) => {
+  form.items[index].video = null;
+
+  if (videoPreviews.value[index]) {
+    URL.revokeObjectURL(videoPreviews.value[index]!);
+  }
+  videoPreviews.value[index] = null;
+};
+
 const submitReview = () => {
-  // Replace with your designated post route handler block
-  form.post(`/orders/${props.order.id}/rate`, {
-    preserveScroll: true,
-    onSuccess: () => {
-      // Handle completion logic (e.g., redirect or flash toast notice)
-    },
-  });
+  form.post(shop.orders.review.store.url(props.order.order_number));
 };
 </script>
 
@@ -93,7 +132,7 @@ const submitReview = () => {
               :href="shop.orders.index.url()"
               class="inline-flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
             >
-              <ArrowLeft class="h-4 w-4" /> Back to Purchases
+              <ArrowLeftIcon class="h-4 w-4" /> Back to Purchases
             </Link>
             <div class="text-sm text-zinc-500">
               Order No:
@@ -107,10 +146,11 @@ const submitReview = () => {
             <div
               class="flex items-center gap-2 rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900"
             >
-              <Store class="h-5 w-5 text-zinc-400" />
+              <StoreIcon class="h-5 w-5 text-zinc-400" />
               <span class="text-sm font-black text-zinc-800 dark:text-white"
-                >Reviewing Store: {{ order.store?.name }}</span
-              >
+                >Reviewing Store:
+                <span class="text-indigo-500"> {{ order.store_name }}</span>
+              </span>
             </div>
 
             <div
@@ -121,11 +161,25 @@ const submitReview = () => {
               <div
                 class="flex gap-4 border-b border-zinc-100 pb-4 dark:border-zinc-800"
               >
-                <img
-                  :src="item.product_image || '/placeholder-product.png'"
-                  :alt="item.product_name"
-                  class="h-16 w-16 shrink-0 rounded-xl border border-zinc-200 object-cover dark:border-zinc-700"
-                />
+                <a
+                  v-if="item.product_image"
+                  :href="item.product_image"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <img
+                    :src="item.product_image"
+                    :alt="item.product_name"
+                    class="h-16 w-16 shrink-0 cursor-zoom-in rounded-xl border border-zinc-200 object-cover dark:border-zinc-700"
+                  />
+                </a>
+                <div
+                  v-else
+                  class="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800"
+                >
+                  <PackageIcon class="h-5 w-5 text-zinc-400" />
+                </div>
+
                 <div class="min-w-0 flex-1">
                   <h4
                     class="line-clamp-1 font-bold text-zinc-900 dark:text-white"
@@ -157,7 +211,7 @@ const submitReview = () => {
                     @mouseleave="clearHoverRating(index)"
                     class="cursor-pointer p-0.5 transition-transform hover:scale-110 focus:outline-none"
                   >
-                    <Star
+                    <StarIcon
                       class="h-7 w-7 transition-colors"
                       :class="[
                         star <=
@@ -188,6 +242,119 @@ const submitReview = () => {
                   placeholder="Tell others about the product quality, shipping speed, packaging details..."
                   class="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 p-4 text-sm text-zinc-900 shadow-sm transition-all outline-none focus:border-[#009933] focus:ring-2 focus:ring-[#009933]/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                 ></textarea>
+
+                <div class="grid grid-cols-[2fr_1fr] gap-8 border-t pt-6">
+                  <!-- Images -->
+                  <div>
+                    <div class="mb-2 flex items-center justify-between">
+                      <span
+                        class="text-sm font-bold text-zinc-700 dark:text-zinc-300"
+                      >
+                        Review Images
+                      </span>
+
+                      <span class="text-sm text-zinc-500">
+                        {{ form.items[index].images.length }}/{{ MAX_IMAGES }}
+                      </span>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3">
+                      <!-- previews -->
+                      <div
+                        v-for="(src, imgIndex) in imagePreviews[index] ?? []"
+                        :key="src"
+                        class="group relative h-28 w-28 rounded border border-zinc-200 dark:border-zinc-700"
+                      >
+                        <img
+                          :src="src"
+                          class="h-full w-full rounded object-cover"
+                        />
+                        <button
+                          type="button"
+                          class="absolute -top-1.5 -right-1.5 hidden cursor-pointer rounded-full bg-red-500 p-0.5 text-white group-hover:flex"
+                          @click="removeImage(index, imgIndex)"
+                        >
+                          <XIcon class="h-4 w-4" />
+                        </button>
+                      </div>
+
+                      <!-- upload -->
+                      <label
+                        :class="[
+                          'group flex h-28 w-28 flex-col items-center justify-center rounded border-2 border-dashed transition',
+                          canAddImages(index).value
+                            ? 'cursor-pointer border-zinc-300 bg-zinc-50 text-zinc-500 hover:border-zinc-800 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400'
+                            : 'cursor-not-allowed border-zinc-500 opacity-50',
+                        ]"
+                      >
+                        <CameraIcon class="mb-2 h-6 w-6" />
+                        <span class="text-xs font-medium">
+                          {{
+                            canAddImages(index).value
+                              ? 'Add Photo'
+                              : 'Limit Reached'
+                          }}
+                        </span>
+                        <input
+                          type="file"
+                          multiple
+                          accept="image/*"
+                          class="hidden"
+                          :disabled="!canAddImages(index).value"
+                          @change="handleImages(index, $event)"
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Video -->
+                  <div>
+                    <div class="mb-2 flex items-center justify-between">
+                      <span
+                        class="text-sm font-bold text-zinc-700 dark:text-zinc-300"
+                      >
+                        Review Video
+                      </span>
+                      <span class="text-sm text-zinc-500">
+                        {{ hasVideo(index).value ? 1 : 0 }}/{{ MAX_VIDEO }}
+                      </span>
+                    </div>
+
+                    <div class="flex flex-wrap gap-3">
+                      <div
+                        v-if="videoPreviews[index]"
+                        class="group relative h-36 w-60 rounded border border-zinc-200 dark:border-zinc-700"
+                      >
+                        <video
+                          :src="videoPreviews[index]!"
+                          controls
+                          class="h-full w-full rounded object-cover"
+                        />
+                        <button
+                          type="button"
+                          class="absolute -top-1.5 -right-1.5 cursor-pointer rounded-full bg-red-500 p-1 text-white"
+                          @click="removeVideo(index)"
+                        >
+                          <XIcon class="h-4 w-4" />
+                        </button>
+                      </div>
+
+                      <label
+                        v-else
+                        class="group flex h-28 w-52 cursor-pointer flex-col items-center justify-center rounded border-2 border-dashed border-zinc-300 bg-zinc-50 text-zinc-500 hover:border-zinc-800 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
+                      >
+                        <VideoIcon class="mb-2 h-6 w-6" />
+                        <span class="text-xs font-medium"> Add Video </span>
+                        <input
+                          type="file"
+                          accept="video/*"
+                          class="hidden"
+                          @change="handleVideo(index, $event)"
+                        />
+                      </label>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
