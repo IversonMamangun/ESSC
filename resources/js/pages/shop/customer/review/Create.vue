@@ -9,7 +9,9 @@ import {
   VideoIcon,
   CameraIcon,
 } from 'lucide-vue-next';
-import { ref, computed } from 'vue';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
+import { ref, computed, onUnmounted } from 'vue';
 import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
@@ -29,6 +31,7 @@ const form = useForm({
     comment: '',
     images: [] as File[],
     video: null as File | null,
+    is_anonymous: false,
   })),
 });
 
@@ -109,6 +112,18 @@ const removeVideo = (index: number) => {
 const submitReview = () => {
   form.post(shop.orders.review.store.url(props.order.order_number));
 };
+
+// cleanup
+onUnmounted(() => {
+  Object.values(imagePreviews.value).forEach((previews) => {
+    previews.forEach((url) => URL.revokeObjectURL(url));
+  });
+  Object.values(videoPreviews.value).forEach((url) => {
+    if (url) {
+      URL.revokeObjectURL(url);
+    }
+  });
+});
 </script>
 
 <template>
@@ -354,6 +369,32 @@ const submitReview = () => {
                       </label>
                     </div>
                   </div>
+                </div>
+
+                <div class="pt-6">
+                  <Label
+                    class="flex cursor-pointer items-center gap-4 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-zinc-800/50"
+                  >
+                    <Checkbox
+                      :model-value="form.items[index].is_anonymous === true"
+                      @update:model-value="
+                        (val) => (form.items[index].is_anonymous = val === true)
+                      "
+                      class="border-zinc-500"
+                    />
+                    <div class="flex flex-col select-none">
+                      <span
+                        class="text-sm font-bold text-zinc-900 transition-colors group-hover:text-[#009933] dark:text-white"
+                      >
+                        Anonymous
+                      </span>
+                      <span
+                        class="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400"
+                      >
+                        Checking this box will make the review anonymous.
+                      </span>
+                    </div>
+                  </Label>
                 </div>
               </div>
             </div>
