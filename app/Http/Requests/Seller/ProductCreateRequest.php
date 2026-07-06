@@ -65,7 +65,7 @@ class ProductCreateRequest extends FormRequest
                 'nullable',
                 'file',
                 'mimetypes:video/mp4,video/webm,video/quicktime',
-                'max:51200',
+                'max:20480',
             ],
             // variants
             'variants' => [

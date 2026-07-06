@@ -49,7 +49,7 @@ class ProductUpdateRequest extends FormRequest
             'video'        => [
                 'nullable', 'file',
                 'mimetypes:video/mp4,video/webm,video/quicktime',
-                'max:51200',
+                'max:20480',
             ],
 
             // variant management
