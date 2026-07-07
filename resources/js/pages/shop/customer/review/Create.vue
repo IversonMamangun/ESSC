@@ -16,6 +16,7 @@ import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
+import InputError from '@/components/InputError.vue';
 import shop from '@/routes/shop';
 import type { User, Order } from '@/types';
 
@@ -167,6 +168,7 @@ onUnmounted(() => {
                 <span class="text-indigo-500"> {{ order.store_name }}</span>
               </span>
             </div>
+            <InputError :message="form.errors.items" />
 
             <div
               v-for="(item, index) in order.items"
@@ -208,6 +210,10 @@ onUnmounted(() => {
                     Variation: {{ item.variant_name }}
                   </p>
                 </div>
+
+                <InputError
+                  :message="form.errors[`items.${index}.order_item_id`]"
+                />
               </div>
 
               <div
@@ -244,6 +250,7 @@ onUnmounted(() => {
                     }}
                   </span>
                 </div>
+                <InputError :message="form.errors[`items.${index}.rating`]" />
               </div>
 
               <div class="space-y-2">
@@ -257,6 +264,7 @@ onUnmounted(() => {
                   placeholder="Tell others about the product quality, shipping speed, packaging details..."
                   class="w-full rounded-xl border border-zinc-200 bg-zinc-50/50 p-4 text-sm text-zinc-900 shadow-sm transition-all outline-none focus:border-[#009933] focus:ring-2 focus:ring-[#009933]/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                 ></textarea>
+                <InputError :message="form.errors[`items.${index}.comment`]" />
 
                 <div class="grid grid-cols-[2fr_1fr] gap-8 border-t pt-6">
                   <!-- Images -->
@@ -320,6 +328,9 @@ onUnmounted(() => {
                         />
                       </label>
                     </div>
+                    <InputError
+                      :message="form.errors[`items.${index}.images`]"
+                    />
                   </div>
 
                   <!-- Video -->
@@ -368,6 +379,9 @@ onUnmounted(() => {
                         />
                       </label>
                     </div>
+                    <InputError
+                      :message="form.errors[`items.${index}.video`]"
+                    />
                   </div>
                 </div>
 
@@ -396,6 +410,9 @@ onUnmounted(() => {
                     </div>
                   </Label>
                 </div>
+                <InputError
+                  :message="form.errors[`items.${index}.is_anonymous`]"
+                />
               </div>
             </div>
 
