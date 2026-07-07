@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Shop;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Shop\ReviewCreateResource;
+use App\Http\Resources\Shop\ReviewShowResource;
 use App\Http\Requests\Shop\ReviewCreateRequest;
 use App\Models\Review;
 use Illuminate\Support\Facades\DB;
@@ -78,5 +79,19 @@ class ReviewController extends Controller
 
         return to_route('shop.orders.index')
             ->with('success', 'Thank you for your review!');
+    }
+
+    public function show(Request $request, Order $order)
+    {
+        abort_unless($request->user()->id === $order->user_id, 403);
+
+        $order->load([
+            'store:id,name',
+            'items.review.images',
+        ]);
+
+        return response()->json(
+            ReviewShowResource::make($order)->resolve()
+        );
     }
 }

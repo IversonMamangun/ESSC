@@ -123,16 +123,16 @@ Route::middleware([
         ->name('orders.complete');
     Route::patch('/orders/{order:order_number}/cancel', [CustomerOrderController::class, 'cancel'])
         ->name('orders.cancel');
+
     Route::post('/orders/{order:order_number}/return', [CustomerReturnOrderController::class, 'store'])
         ->name('orders.return.store');
-    Route::get('/orders/{order:order_number}/review', [CustomerReviewController::class, 'create'])
+
+    Route::get('/orders/{order:order_number}/review', [CustomerReviewController::class, 'show'])
+        ->name('orders.review.show');
+    Route::get('/orders/{order:order_number}/review/create', [CustomerReviewController::class, 'create'])
         ->name('orders.review.create');
     Route::post('/orders/{order:order_number}/review', [CustomerReviewController::class, 'store'])
         ->name('orders.review.store');
-
-    Route::get('/chat/{store:slug?}', [ChatController::class, 'index'])
-    ->name('chat.index');
-
 });
 
 // dedicated seller routes
