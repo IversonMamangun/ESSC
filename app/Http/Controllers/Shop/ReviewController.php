@@ -16,9 +16,20 @@ class ReviewController extends Controller
     public function create(Request $request, Order $order)
     {
         // Ensure the customer owns this order
-        if ($order->user_id !== $request->user()->id) {
-            abort(403);
-        }
+        abort_unless(
+            $request->user()->id === $order->user_id,
+            403
+        );
+
+        $order->loadExists([
+            'items as has_unreviewed_items' => fn ($query) =>
+                $query->whereDoesntHave('review'),
+        ]);
+
+        abort_unless(
+            $order->isEligibleForRating(),
+            403
+        );
 
         $order->loadMissing([
             'store',

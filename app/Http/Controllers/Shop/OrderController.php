@@ -55,7 +55,10 @@ class OrderController extends Controller
                 'store:id,name',
                 'items:id,order_id,product_name,product_image,variant_name,price,quantity',
             ])
-            ->withExists('return')
+            ->withExists([
+                'items as has_unreviewed_items' => fn ($query) =>
+                    $query->whereDoesntHave('review'),
+            ])
             ->when(
                 $filters['status'] !== 'all',
                 fn (Builder $query) => $this->applyStatusFilter(

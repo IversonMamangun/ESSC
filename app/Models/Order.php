@@ -108,12 +108,12 @@ class Order extends Model
         return $this->checkout?->payment?->payment_method_id === PaymentMethod::PAY_ONLINE;
     }
 
-    // need withExists() when accessing $this->return_exists
+    // need withExists() when accessing $this->has_unreviewed_items
     public function isEligibleForRating(): bool
     {
         return $this->status === OrderStatus::COMPLETED
             && $this->completed_at?->greaterThanOrEqualTo(now()->subMonths(3))
-            && ! $this->return_exists;
+            && $this->has_unreviewed_items;
     }
 
 }

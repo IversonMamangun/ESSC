@@ -17,10 +17,11 @@ class ReviewCreateRequest extends FormRequest
         if (! $order || $order->user_id !== $this->user()->id) {
             return false;
         }
-
-        // isEligibleForRating() relies on `return_exists` being loaded.
-        $order->loadExists('return');
-        $order->loadMissing('items:id,order_id');
+        
+        $order->loadExists([
+            'items as has_unreviewed_items' => fn ($query) =>
+                $query->whereDoesntHave('review'),
+        ]);
 
         return $order->isEligibleForRating();
     }
