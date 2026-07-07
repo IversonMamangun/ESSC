@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
     'store_id',
     'product_id',
     'rating',
-    'review',
+    'comment',
     'video',
     'is_anonymous',
 ])]

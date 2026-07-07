@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('store_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('product_id')->nullable()->constrained()->nullOnDelete();
             $table->unsignedTinyInteger('rating');
-            $table->text('review')->nullable();
+            $table->text('comment')->nullable();
             $table->string('video')->nullable();
             $table->boolean('is_anonymous')->default(false);
             $table->timestamps();
