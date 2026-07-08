@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link, router } from '@inertiajs/vue3';
+import { Head, useHttp, router } from '@inertiajs/vue3';
 import {
   PackageIcon,
   SearchIcon,
@@ -9,13 +9,19 @@ import {
 import { ref, computed } from 'vue';
 import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
 import OrderCard from '@/components/orders/OrderCard.vue';
+import OrderReviewDetailsDialog from '@/components/orders/OrderReviewDetailsDialog.vue';
 import Pagination from '@/components/Pagination.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import shop from '@/routes/shop';
-import type { User, OrderDisplayStatus, PaginatedOrders } from '@/types';
+import type {
+  User,
+  OrderDisplayStatus,
+  PaginatedOrders,
+  ReviewShow,
+} from '@/types';
 
 const props = defineProps<{
   user: User;
@@ -147,8 +153,18 @@ const rateOrder = (orderNo: string) => {
   router.visit(shop.orders.review.create(orderNo));
 };
 
-const viewRatingOrder = (orderNo: string) => {
-  //
+const ratingDialogOpen = ref(false);
+const ratingItems = ref<ReviewShow[]>([]);
+const ratingHttp = useHttp({});
+const viewRatingOrder = async (orderNo: string) => {
+  ratingDialogOpen.value = true;
+  ratingItems.value = [];
+
+  const response = (await ratingHttp.get(
+    shop.orders.review.show.url(orderNo),
+  )) as { items: ReviewShow[] };
+
+  ratingItems.value = response.items;
 };
 </script>
 
@@ -251,6 +267,12 @@ const viewRatingOrder = (orderNo: string) => {
   >
     <template #description>{{ dialogConfig.description }}</template>
   </ConfirmDialog>
+
+  <OrderReviewDetailsDialog
+    v-model:open="ratingDialogOpen"
+    :loading="ratingHttp.processing"
+    :items="ratingItems"
+  />
 </template>
 
 <style scoped>
