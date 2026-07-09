@@ -44,6 +44,7 @@ class OrderIndexResource extends JsonResource
                 'quantity' => $item->quantity,
             ])->values(),
             'is_rate_eligible' => $this->isEligibleForRating(),
+            'is_edit_rate_eligible' => $this->isEligibleForEditingRating(),
             'created_at' => $this->created_at,
         ];
     }

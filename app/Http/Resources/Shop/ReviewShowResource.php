@@ -4,6 +4,7 @@ namespace App\Http\Resources\Shop;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Storage;
 
 class ReviewShowResource extends JsonResource
 {
@@ -30,7 +31,10 @@ class ReviewShowResource extends JsonResource
                     'video' => $item->review->video,
                     'is_anonymous' => $item->review->is_anonymous,
                     'created_at' => $item->review->created_at?->toIso8601String(),
-                    'images' => $item->review->images->pluck('image'),
+                    'images' => $item->review->images->map(fn ($image) => [
+                        'id' => $image->id,
+                        'url' => Storage::url($image->image),
+                    ]),
                 ] : null,
             ])->values(),
         ];

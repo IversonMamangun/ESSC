@@ -116,4 +116,11 @@ class Order extends Model
             && $this->has_unreviewed_items;
     }
 
+    // need withExists() when accessing $this->has_reviewed_items
+    public function isEligibleForEditingRating(): bool
+    {
+        return $this->status === OrderStatus::COMPLETED
+            && $this->completed_at?->greaterThanOrEqualTo(now()->subMonths(3))
+            && $this->has_reviewed_items;
+    }
 }
