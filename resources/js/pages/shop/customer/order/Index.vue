@@ -153,10 +153,18 @@ const rateOrder = (orderNo: string) => {
   router.visit(shop.orders.review.create(orderNo));
 };
 
+// rating details logic
 const ratingDialogOpen = ref(false);
 const ratingItems = ref<ReviewShow[]>([]);
 const ratingHttp = useHttp({});
+const ratingOrderNo = ref<string | null>(null);
+const ratingCanEdit = ref(false);
+
 const viewRatingOrder = async (orderNo: string) => {
+  const orderData = props.orders.data.find((o) => o.order_number === orderNo);
+
+  ratingCanEdit.value = orderData?.is_edit_rate_eligible ?? false;
+  ratingOrderNo.value = orderNo;
   ratingDialogOpen.value = true;
   ratingItems.value = [];
 
@@ -272,6 +280,8 @@ const viewRatingOrder = async (orderNo: string) => {
     v-model:open="ratingDialogOpen"
     :loading="ratingHttp.processing"
     :items="ratingItems"
+    :order-number="ratingOrderNo"
+    :can-edit="ratingCanEdit"
   />
 </template>
 

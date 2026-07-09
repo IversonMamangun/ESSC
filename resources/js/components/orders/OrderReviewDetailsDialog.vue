@@ -5,14 +5,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
+  DialogFooter,
 } from '@/components/ui/dialog';
 import { StarIcon, PackageIcon } from 'lucide-vue-next';
+import { Link } from '@inertiajs/vue3';
 import type { ReviewShow } from '@/types';
+import shop from '@/routes/shop';
 
 const props = defineProps<{
   open: boolean;
   loading: boolean;
   items: ReviewShow[];
+  orderNumber: string | null;
+  canEdit: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -98,12 +103,12 @@ const emit = defineEmits<{
                 <a
                   v-for="(image, index) in item.review.images"
                   :key="index"
-                  :href="image"
+                  :href="image.url"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
                   <img
-                    :src="image"
+                    :src="image.url"
                     :alt="`Review image ${index + 1}`"
                     class="h-16 w-16 cursor-zoom-in rounded-lg border object-cover"
                   />
@@ -131,6 +136,15 @@ const emit = defineEmits<{
           </div>
         </div>
       </div>
+
+      <DialogFooter v-if="!props.loading && props.canEdit && props.orderNumber">
+        <Link
+          :href="shop.orders.review.edit.url(props.orderNumber)"
+          class="inline-flex w-full items-center justify-center rounded-xl bg-[#009933] px-6 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#007722] sm:w-auto"
+        >
+          Edit Review
+        </Link>
+      </DialogFooter>
     </DialogContent>
   </Dialog>
 </template>

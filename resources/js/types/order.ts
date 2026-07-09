@@ -42,6 +42,7 @@ export interface Order {
   shipping_fee: number;
   total: number;
   is_rate_eligible?: boolean;
+  is_edit_rate_eligible?: boolean;
   items: OrderItem[];
 }
 
