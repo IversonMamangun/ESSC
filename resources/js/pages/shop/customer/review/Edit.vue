@@ -1,40 +1,22 @@
 <script setup lang="ts">
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import {
-  ArrowLeftIcon,
-  StarIcon,
-  PackageIcon,
-  StoreIcon,
-  XIcon,
-  VideoIcon,
-  CameraIcon,
-} from 'lucide-vue-next';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { ref, computed, onUnmounted } from 'vue';
+import { Head, Link } from '@inertiajs/vue3';
+import { ArrowLeftIcon } from 'lucide-vue-next';
 import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
-import CustomerForm from '@/components/review/CustomerForm.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import InputError from '@/components/InputError.vue';
+import CustomerForm from '@/components/review/CustomerForm.vue';
 import shop from '@/routes/shop';
 import type { User, Order } from '@/types';
 
-const props = defineProps<{
-  user: User;
-  order: Order;
-}>();
+const props = defineProps<{ user: User; order: Order }>();
 </script>
 
 <template>
-  <Head :title="`Rate Order #${order.order_number}`" />
-
+  <Head :title="`Edit Review — Order #${order.order_number}`" />
   <div class="flex min-h-screen flex-col transition-colors duration-300">
     <TopBar />
-    <div class="sticky top-0 z-50 mt-8">
-      <Navbar />
-    </div>
+    <div class="sticky top-0 z-50 mt-8"><Navbar /></div>
 
     <main
       class="mx-auto w-full max-w-7xl flex-grow px-4 py-8 sm:px-6 md:py-12 lg:px-8"
@@ -59,7 +41,7 @@ const props = defineProps<{
           </div>
 
           <CustomerForm
-            mode="create"
+            mode="edit"
             :order-number="order.order_number"
             :store-name="order.store_name"
             :items="order.items"
