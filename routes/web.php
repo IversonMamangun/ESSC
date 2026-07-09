@@ -131,8 +131,12 @@ Route::middleware([
         ->name('orders.review.show');
     Route::get('/orders/{order:order_number}/review/create', [CustomerReviewController::class, 'create'])
         ->name('orders.review.create');
+    Route::get('/orders/{order:order_number}/review/edit', [CustomerReviewController::class, 'edit'])
+        ->name('orders.review.edit');
     Route::post('/orders/{order:order_number}/review', [CustomerReviewController::class, 'store'])
         ->name('orders.review.store');
+    Route::patch('/orders/{order:order_number}/review', [CustomerReviewController::class, 'update'])
+        ->name('orders.review.update');
 });
 
 // dedicated seller routes
