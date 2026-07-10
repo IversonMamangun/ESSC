@@ -124,8 +124,10 @@ Route::middleware([
     Route::patch('/orders/{order:order_number}/cancel', [CustomerOrderController::class, 'cancel'])
         ->name('orders.cancel');
 
+    Route::get('/orders/{order:order_number}/return', [CustomerReturnOrderController::class, 'create'])
+        ->name('orders.return.create');
     Route::post('/orders/{order:order_number}/return', [CustomerReturnOrderController::class, 'store'])
-        ->name('orders.return.store');
+        ->name('orders.return.store');    
 
     Route::get('/orders/{order:order_number}/review', [CustomerReviewController::class, 'show'])
         ->name('orders.review.show');
