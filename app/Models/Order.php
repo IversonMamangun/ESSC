@@ -123,4 +123,12 @@ class Order extends Model
             && $this->completed_at?->greaterThanOrEqualTo(now()->subMonths(3))
             && $this->has_reviewed_items;
     }
+
+    // need withExists() when accessing $this->has_returnable_items
+    public function isEligibleForReturn(): bool
+    {
+        return $this->status === OrderStatus::DELIVERED
+            && $this->delivered_at?->greaterThanOrEqualTo(now()->subDays(7))
+            && $this->has_returnable_items;
+    }
 }

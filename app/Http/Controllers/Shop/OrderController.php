@@ -47,6 +47,7 @@ class OrderController extends Controller
                 'status',
                 'shipping_fee',
                 'total',
+                'delivered_at',
                 'completed_at',
                 'created_at',
             ])
@@ -58,6 +59,7 @@ class OrderController extends Controller
             ->withExists([
                 'items as has_unreviewed_items' => fn ($query) => $query->whereDoesntHave('review'),
                 'items as has_reviewed_items' => fn ($query) => $query->whereHas('review'),
+                'items as has_returnable_items' => fn ($query) => $query->whereDoesntHave('orderReturn'),
             ])
             ->when(
                 $filters['status'] !== 'all',
