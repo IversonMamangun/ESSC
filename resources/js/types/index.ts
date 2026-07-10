@@ -8,6 +8,7 @@ export * from './checkout';
 export * from './order';
 export * from './dashboard';
 export * from './review';
+export * from './return';
 
 export type ApiResponse<T> = {
   data: T;
