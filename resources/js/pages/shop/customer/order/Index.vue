@@ -146,7 +146,7 @@ const handleConfirmAction = () => {
 };
 
 const requestReturnOrder = (orderNo: string) => {
-  //
+  router.visit(shop.orders.return.create(orderNo));
 };
 
 const rateOrder = (orderNo: string) => {

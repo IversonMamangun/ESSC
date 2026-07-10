@@ -1,23 +1,11 @@
 <script setup lang="ts">
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import {
-  ArrowLeftIcon,
-  StarIcon,
-  PackageIcon,
-  StoreIcon,
-  XIcon,
-  VideoIcon,
-  CameraIcon,
-} from 'lucide-vue-next';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
-import { ref, computed, onUnmounted } from 'vue';
+import { ArrowLeftIcon } from 'lucide-vue-next';
 import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
 import CustomerForm from '@/components/review/CustomerForm.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import InputError from '@/components/InputError.vue';
 import shop from '@/routes/shop';
 import type { User, Order } from '@/types';
 

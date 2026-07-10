@@ -43,6 +43,7 @@ export interface Order {
   total: number;
   is_rate_eligible?: boolean;
   is_edit_rate_eligible?: boolean;
+  is_return_eligible?: boolean;
   items: OrderItem[];
 }
 

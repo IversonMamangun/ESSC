@@ -125,6 +125,7 @@ const formatPrice = (value: number) => {
           </button>
 
           <button
+            v-if="order.is_return_eligible"
             @click="$emit('requestReturn', order.order_number)"
             class="inline-flex cursor-pointer items-center justify-center rounded-xl border border-rose-200 bg-rose-100 px-4 py-2 text-sm font-bold text-rose-700 transition-colors hover:bg-rose-200 active:scale-95 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-400 dark:hover:bg-rose-900/50"
           >
