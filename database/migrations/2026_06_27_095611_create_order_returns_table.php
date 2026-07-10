@@ -14,10 +14,11 @@ return new class extends Migration
     {
         Schema::create('order_returns', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->unique()->constrained()->cascadeOnDelete();
+            $table->foreignId('order_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('order_item_id')->unique()->constrained()->cascadeOnDelete();
             $table->string('reason')->default(OrderReturnReason::DEFECTIVE->value);
             $table->text('description');
-            $table->json('media_paths'); 
+            $table->string('video')->nullable();
             $table->text('rejection_reason')->nullable(); 
             $table->timestamps();
         });
