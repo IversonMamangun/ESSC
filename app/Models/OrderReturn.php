@@ -13,9 +13,10 @@ use App\Enums\OrderReturnReason;
 
 #[Fillable([
     'order_id',
+    'order_item_id',
     'reason',
     'description',
-    'media_paths',
+    'video',
     'rejection_reason',
 ])]
 class OrderReturn extends Model
@@ -26,13 +27,23 @@ class OrderReturn extends Model
     {
         return [
             'order_id' => 'integer',
+            'order_item_id' => 'integer',
             'reason' => OrderReturnReason::class,
-            'media_paths' => 'array',
         ];
     }
 
     public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function orderItem(): BelongsTo
+    {
+        return $this->belongsTo(OrderItem::class);
+    }
+
+    public function images(): HasMany
+    {
+        return $this->hasMany(OrderReturnImage::class);
     }
 }

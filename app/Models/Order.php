@@ -91,9 +91,9 @@ class Order extends Model
         return $this->belongsTo(Checkout::class);
     }
 
-    public function return(): HasOne
+    public function returns(): HasMany
     {
-        return $this->hasOne(OrderReturn::class);
+        return $this->hasMany(OrderReturn::class);
     }
 
     // cod helper method

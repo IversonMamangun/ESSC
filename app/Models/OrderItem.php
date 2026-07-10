@@ -53,4 +53,9 @@ class OrderItem extends Model
     {
         return $this->hasOne(Review::class);
     }
+
+    public function orderReturn(): HasOne
+    {
+        return $this->hasOne(OrderReturn::class);
+    }
 }
