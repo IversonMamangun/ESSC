@@ -29,6 +29,8 @@ class OrderShowResource extends JsonResource
                 OrderStatus::DELIVERED => 'delivered',
                 OrderStatus::COMPLETED => 'completed',
                 OrderStatus::CANCELLED => 'cancelled',
+                OrderStatus::RETURN_REQUESTED => 'return-requested',
+                OrderStatus::RETURN_APPROVED => 'return-approved',
                 OrderStatus::RETURNED => 'returned',
             },
             'status_label' => $this->status->label(),

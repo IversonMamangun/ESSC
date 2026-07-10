@@ -95,10 +95,11 @@ class OrderController extends Controller
                 'status',
                 OrderStatus::CANCELLED
             ),
-            'returned' => $query->where(
-                'status',
-                OrderStatus::RETURNED
-            ),
+            'returned' => $query->whereIn('status', [
+                OrderStatus::RETURN_REQUESTED,
+                OrderStatus::RETURN_APPROVED,
+                OrderStatus::RETURNED,
+            ]),
             default => $query,
         };
     }
