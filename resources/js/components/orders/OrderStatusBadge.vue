@@ -44,9 +44,27 @@ const config = computed(() => {
         class: 'text-red-500',
       };
 
-    default:
+    case 'return-requested':
+      return {
+        label: 'Return Requested',
+        class: 'text-pink-500',
+      };
+
+    case 'return-approved':
+      return {
+        label: 'Return Approved',
+        class: 'text-cyan-500',
+      };
+
+    case 'returned':
       return {
         label: 'Returned / Refunded',
+        class: 'text-zinc-500',
+      };
+
+    default:
+      return {
+        label: 'N/A',
         class: 'text-zinc-500',
       };
   }

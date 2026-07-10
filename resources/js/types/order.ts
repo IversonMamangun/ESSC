@@ -8,6 +8,9 @@ export type OrderDisplayStatus =
   | 'delivered'
   | 'completed'
   | 'cancelled'
+  | 'returned'
+  | 'return-requested'
+  | 'return-approved'
   | 'returned';
 
 export type OrderRawStatus =
