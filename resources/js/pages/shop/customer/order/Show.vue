@@ -280,7 +280,10 @@ const timelineSteps = computed(() => {
                     <span>Discount</span>
                     <span>-{{ formatCurrency(order.discount) }}</span>
                   </div>
-                  <div class="flex justify-between text-zinc-500">
+                  <div
+                    v-if="Number(order.shipping_fee) > 0"
+                    class="flex justify-between text-zinc-500"
+                  >
                     <span>Shipping Total</span>
                     <span class="text-zinc-800 dark:text-white">{{
                       formatCurrency(order.shipping_fee)

@@ -330,7 +330,7 @@ const total = computed(() => subtotal.value + delivery.value);
                   type="checkbox"
                   :value="item.id"
                   v-model="selectedItems"
-                  class="mt-2 h-5 w-5"
+                  class="mt-2 h-5 w-5 cursor-pointer"
                 />
 
                 <img

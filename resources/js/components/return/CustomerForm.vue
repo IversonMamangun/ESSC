@@ -152,6 +152,7 @@ onUnmounted(() => {
           <p v-if="item.variant_name" class="mt-0.5 text-xs text-zinc-400">
             Variation: {{ item.variant_name }}
           </p>
+          <p class="mt-0.5 text-xs text-zinc-400">Qty: {{ item.quantity }}</p>
           <p
             v-if="item.has_return"
             class="mt-1 text-xs font-bold text-amber-600 dark:text-amber-400"

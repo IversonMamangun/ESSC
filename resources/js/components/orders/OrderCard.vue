@@ -158,7 +158,10 @@ const formatPrice = (value: number) => {
       <div
         class="flex w-full flex-col items-end gap-0.5 border-b pb-3 sm:w-auto sm:border-0 sm:pb-0"
       >
-        <div class="text-xs text-muted-foreground">
+        <div
+          v-if="Number(order.shipping_fee) > 0"
+          class="text-xs text-muted-foreground"
+        >
           Shipping: {{ formatPrice(order.shipping_fee) }}
         </div>
         <div class="text-lg font-black text-zinc-900 dark:text-white">
