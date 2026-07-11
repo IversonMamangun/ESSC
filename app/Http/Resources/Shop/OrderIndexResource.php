@@ -16,6 +16,22 @@ class OrderIndexResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $isReturnGroup = in_array($this->status, [
+            OrderStatus::RETURN_REQUESTED,
+            OrderStatus::RETURN_APPROVED,
+            OrderStatus::RETURNED,
+        ], true);
+
+        $allItems = $this->items;
+        $displayItems = $isReturnGroup
+            ? $allItems->filter(fn ($item) => $item->orderReturn !== null)->values()
+            : $allItems;
+
+        $shippingFee = $isReturnGroup ? 0.0 : (float) $this->shipping_fee;
+        $total = $isReturnGroup 
+            ? (float) $displayItems->sum(fn ($item) => $item->price * $item->quantity) 
+            : (float) $this->total;
+
         return [
             'id' => $this->id,
             'order_number' => $this->order_number,
@@ -34,9 +50,9 @@ class OrderIndexResource extends JsonResource
                 OrderStatus::RETURNED => 'returned',
             },
             'status_label' => $this->status->label(),
-            'shipping_fee' => (float) $this->shipping_fee,
-            'total' => (float) $this->total,
-            'items' => $this->items->map(fn ($item) => [
+            'shipping_fee' => $shippingFee,
+            'total' => $total,
+            'items' => $displayItems->map(fn ($item) => [
                 'product_name' => $item->product_name,
                 'product_image' => $item->product_image
                     ? Storage::url($item->product_image)

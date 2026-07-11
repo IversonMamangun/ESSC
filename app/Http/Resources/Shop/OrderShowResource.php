@@ -16,6 +16,24 @@ class OrderShowResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $isReturnGroup = in_array($this->status, [
+            OrderStatus::RETURN_REQUESTED,
+            OrderStatus::RETURN_APPROVED,
+            OrderStatus::RETURNED,
+        ], true);
+
+        $allItems = $this->items;
+        $displayItems = $isReturnGroup
+            ? $allItems->filter(fn ($item) => $item->orderReturn !== null)->values()
+            : $allItems;
+
+        $subtotal = $isReturnGroup
+            ? $displayItems->sum(fn ($item) => $item->price * $item->quantity)
+            : (float) $this->subtotal;
+
+        $shippingFee = $isReturnGroup ? 0.0 : (float) $this->shipping_fee;
+        $total = $isReturnGroup ? round($subtotal, 2) : (float) $this->total;
+
         return [
             'id' => $this->id,
             'order_number' => $this->order_number,
@@ -34,10 +52,10 @@ class OrderShowResource extends JsonResource
                 OrderStatus::RETURNED => 'returned',
             },
             'status_label' => $this->status->label(),
-            'subtotal' => $this->subtotal,
-            'shipping_fee' => $this->shipping_fee,
+            'subtotal' => $subtotal,
+            'shipping_fee' => $shippingFee,
             'discount' => $this->discount,
-            'total' => $this->total,
+            'total' => $total,
             'shipping_address' => [
                 'recipient_name' => $this->recipient_name,
                 'recipient_phone' => $this->recipient_phone,
@@ -50,7 +68,7 @@ class OrderShowResource extends JsonResource
                 'postal_code' => $this->postal_code,
                 'landmark' => $this->landmark,
             ],
-            'items' => $this->items->map(fn ($item) => [
+            'items' => $displayItems->map(fn ($item) => [
                 'product_name' => $item->product_name,
                 'product_image' => $item->product_image
                     ? Storage::url($item->product_image)
