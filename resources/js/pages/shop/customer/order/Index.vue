@@ -18,7 +18,7 @@ import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import shop from '@/routes/shop';
 import type {
   User,
-  OrderDisplayStatus,
+  OrderFilterStatus,
   PaginatedOrders,
   ReviewShow,
 } from '@/types';
@@ -27,7 +27,7 @@ const props = defineProps<{
   user: User;
   orders: PaginatedOrders;
   filters: {
-    status: OrderDisplayStatus;
+    status: OrderFilterStatus;
   };
 }>();
 

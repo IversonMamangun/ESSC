@@ -1,5 +1,15 @@
 import { LaravelPaginationItem } from './product';
 
+export type OrderFilterStatus =
+  | 'all'
+  | 'to-pay'
+  | 'to-ship'
+  | 'to-receive'
+  | 'delivered'
+  | 'completed'
+  | 'cancelled'
+  | 'returned';
+
 export type OrderDisplayStatus =
   | 'all'
   | 'to-pay'
