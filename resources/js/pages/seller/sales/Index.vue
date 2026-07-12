@@ -17,6 +17,7 @@ import TopBar from '@/components/sections/TopBar.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import Pagination from '@/components/Pagination.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import InputError from '@/components/InputError.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getSellerOrdersColumns } from '@/features/seller/columns';
 import seller from '@/routes/seller';
@@ -160,8 +161,9 @@ const processOrderAction = () => {
     preserveScroll: true,
     onSuccess: () => {
       confirmOpen.value = false;
+      resetState();
     },
-    onFinish: resetState,
+    // onFinish: resetState,
   });
 };
 
@@ -287,22 +289,22 @@ function changeTab(tab: string) {
         selectedOrder.order_number
       }}</span
       >?
+      <div v-if="isDeclineReturn" class="mt-3">
+        <label class="text-xs font-medium text-zinc-600 dark:text-zinc-300">
+          Rejection reason
+        </label>
+        <textarea
+          v-model="rejectionReason"
+          rows="3"
+          placeholder="Let the buyer know why their return was declined..."
+          class="w-full rounded-lg border border-zinc-200 bg-white p-2 text-sm text-zinc-800 focus:border-blue-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+        />
+        <p v-if="!canConfirmAction" class="text-xs text-rose-500">
+          A reason is required to decline a return.
+        </p>
+        <InputError :message="actionForm.errors.rejection_reason" />
+      </div>
     </template>
-
-    <div v-if="isDeclineReturn" class="mt-3 space-y-1.5">
-      <label class="text-xs font-medium text-zinc-600 dark:text-zinc-300">
-        Rejection reason
-      </label>
-      <textarea
-        v-model="rejectionReason"
-        rows="3"
-        placeholder="Let the buyer know why their return was declined..."
-        class="w-full rounded-lg border border-zinc-200 bg-white p-2 text-sm text-zinc-800 focus:border-blue-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
-      />
-      <p v-if="!canConfirmAction" class="text-xs text-rose-500">
-        A reason is required to decline a return.
-      </p>
-    </div>
   </ConfirmDialog>
 
   <SellerOrderDetailsDialog

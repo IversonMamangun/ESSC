@@ -110,19 +110,6 @@ const timelineSteps = computed(() => {
     }))
     .sort((a, b) => new Date(a.value).getTime() - new Date(b.value).getTime());
 });
-
-const RETURN_VISIBLE_STATUSES: OrderRawStatus[] = [
-  'delivered',
-  'return_requested',
-  'return_approved',
-  'returned',
-];
-
-const showReturnSection = computed(
-  () =>
-    !!props.order?.return &&
-    RETURN_VISIBLE_STATUSES.includes(props.order.status),
-);
 </script>
 
 <template>
@@ -151,35 +138,67 @@ const showReturnSection = computed(
 
         <ScrollArea class="max-h-[calc(90vh-88px)]">
           <div class="flex flex-col gap-5 px-6 py-5">
-            <!-- Shipping info -->
-            <div
-              class="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900"
-            >
-              <p
-                class="mb-2 flex items-center gap-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400"
+            <div class="grid grid-cols-[2fr_1fr] items-start gap-5">
+              <!-- Shipping info -->
+              <div
+                class="rounded-2xl border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900"
               >
-                <MapPinIcon class="h-3.5 w-3.5" /> Shipping To
-              </p>
-              <p class="font-semibold text-zinc-800 dark:text-zinc-100">
-                {{ order.shipping_address.recipient_name }}
-              </p>
-              <p
-                class="mt-0.5 flex items-center gap-1.5 text-sm text-zinc-500 dark:text-zinc-400"
-              >
-                <PhoneIcon class="h-3.5 w-3.5" />
-                {{ order.shipping_address.recipient_phone }}
-              </p>
-              <p
-                class="mt-1.5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300"
-              >
-                {{ fullAddress }}
-              </p>
-              <p
-                v-if="order.shipping_address.landmark"
-                class="mt-1 text-xs text-zinc-400 dark:text-zinc-500"
-              >
-                Landmark: {{ order.shipping_address.landmark }}
-              </p>
+                <p
+                  class="mb-2 flex items-center gap-1.5 text-xs font-semibold text-zinc-500 dark:text-zinc-400"
+                >
+                  <MapPinIcon class="h-3.5 w-3.5" /> Shipping To
+                </p>
+                <p class="font-semibold text-zinc-800 dark:text-zinc-100">
+                  {{ order.shipping_address.recipient_name }}
+                </p>
+                <p
+                  class="mt-0.5 flex items-center gap-1.5 text-sm text-zinc-500 dark:text-zinc-400"
+                >
+                  <PhoneIcon class="h-3.5 w-3.5" />
+                  {{ order.shipping_address.recipient_phone }}
+                </p>
+                <p
+                  class="mt-1.5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300"
+                >
+                  {{ fullAddress }}
+                </p>
+                <p
+                  v-if="order.shipping_address.landmark"
+                  class="mt-1 text-xs text-zinc-400 dark:text-zinc-500"
+                >
+                  Landmark: {{ order.shipping_address.landmark }}
+                </p>
+              </div>
+
+              <!-- Timeline -->
+              <div v-if="timelineSteps.length">
+                <p
+                  class="mb-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400"
+                >
+                  Order Timeline
+                </p>
+                <ol
+                  class="space-y-3 border-l border-zinc-200 pl-4 dark:border-zinc-800"
+                >
+                  <li
+                    v-for="step in timelineSteps"
+                    :key="step.key"
+                    class="relative"
+                  >
+                    <span
+                      class="absolute top-1 -left-[21px] h-2.5 w-2.5 rounded-full bg-blue-500"
+                    />
+                    <p
+                      class="text-sm font-medium text-zinc-800 dark:text-zinc-100"
+                    >
+                      {{ step.label }}
+                    </p>
+                    <p class="text-xs text-zinc-400 dark:text-zinc-500">
+                      {{ formatDate(step.value) }}
+                    </p>
+                  </li>
+                </ol>
+              </div>
             </div>
 
             <!-- Notes -->
@@ -196,7 +215,13 @@ const showReturnSection = computed(
               <p
                 class="mb-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400"
               >
-                Items ({{ order.items.length }})
+                Product / Variant ({{ order.items.length }})
+              </p>
+
+              <p
+                class="mb-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400"
+              >
+                Total Items ({{ order.items_count }})
               </p>
 
               <div
@@ -206,135 +231,107 @@ const showReturnSection = computed(
                   <li
                     v-for="(item, index) in order.items"
                     :key="`${item.product_sku}-${index}`"
-                    class="flex items-center gap-3 px-3 py-3"
+                    class="flex flex-col gap-3 p-3"
                   >
-                    <button
-                      v-if="item.product_image"
-                      type="button"
-                      class="group relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700"
-                      title="View image"
-                      @click="openImageInNewTab(item.product_image)"
-                    >
-                      <img
-                        :src="item.product_image"
-                        class="h-full w-full cursor-zoom-in object-cover transition-transform duration-150 group-hover:scale-110"
-                      />
-                    </button>
+                    <div class="flex items-center gap-3">
+                      <button
+                        v-if="item.product_image"
+                        type="button"
+                        class="group relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700"
+                        title="View image"
+                        @click="openImageInNewTab(item.product_image)"
+                      >
+                        <img
+                          :src="item.product_image"
+                          class="h-full w-full cursor-zoom-in object-cover transition-transform duration-150 group-hover:scale-110"
+                        />
+                      </button>
+                      <div
+                        v-else
+                        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800"
+                      >
+                        <PackageIcon class="h-5 w-5 text-zinc-400" />
+                      </div>
+
+                      <div class="min-w-0 flex-1">
+                        <p
+                          class="truncate text-sm font-medium text-zinc-800 dark:text-zinc-100"
+                        >
+                          {{ item.product_name }}
+                        </p>
+                        <p
+                          class="mt-0.5 flex items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500"
+                        >
+                          <span class="font-mono">{{ item.product_sku }}</span>
+                          <template v-if="item.variant_name">
+                            <span>•</span>
+                            <span>{{ item.variant_name }}</span>
+                          </template>
+                        </p>
+                      </div>
+
+                      <div class="shrink-0 text-right">
+                        <p
+                          class="text-sm font-semibold text-zinc-800 dark:text-zinc-100"
+                        >
+                          {{ formatCurrency(item.total) }}
+                        </p>
+                        <p
+                          class="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500"
+                        >
+                          {{ formatCurrency(item.price) }} × {{ item.quantity }}
+                        </p>
+                      </div>
+                    </div>
+
                     <div
-                      v-else
-                      class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800"
+                      v-if="item.return"
+                      class="ml-15 rounded-xl border border-rose-100 bg-rose-50/50 p-3 dark:border-rose-900/40 dark:bg-rose-950/20"
                     >
-                      <PackageIcon class="h-5 w-5 text-zinc-400" />
-                    </div>
+                      <p
+                        class="text-xs font-bold text-rose-600 dark:text-rose-400"
+                      >
+                        Return Reason: {{ item.return.reason_label }}
+                      </p>
+                      <p
+                        v-if="item.return.description"
+                        class="mt-1 text-sm text-zinc-600 dark:text-zinc-300"
+                      >
+                        {{ item.return.description }}
+                      </p>
 
-                    <div class="min-w-0 flex-1">
-                      <p
-                        class="truncate text-sm font-medium text-zinc-800 dark:text-zinc-100"
+                      <div
+                        v-if="item.return.images.length || item.return.video"
+                        class="mt-2 flex flex-wrap gap-2"
                       >
-                        {{ item.product_name }}
-                      </p>
-                      <p
-                        class="mt-0.5 flex items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500"
-                      >
-                        <span class="font-mono">{{ item.product_sku }}</span>
-                        <template v-if="item.variant_name">
-                          <span>•</span>
-                          <span>{{ item.variant_name }}</span>
-                        </template>
-                      </p>
-                    </div>
+                        <img
+                          v-for="(path, i) in item.return.images"
+                          :key="`img-${i}`"
+                          :src="path"
+                          class="h-24 w-24 cursor-zoom-in rounded-lg border object-cover"
+                          @click="openImageInNewTab(path)"
+                        />
+                        <video
+                          v-if="item.return.video"
+                          :src="item.return.video"
+                          controls
+                          class="h-24 w-40 rounded-lg border object-cover"
+                        />
+                      </div>
 
-                    <div class="shrink-0 text-right">
                       <p
-                        class="text-sm font-semibold text-zinc-800 dark:text-zinc-100"
+                        v-if="item.return.rejection_reason"
+                        class="mt-2 text-xs font-medium text-red-500"
                       >
-                        {{ formatCurrency(item.total) }}
+                        Rejected: {{ item.return.rejection_reason }}
                       </p>
-                      <p
-                        class="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500"
-                      >
-                        {{ formatCurrency(item.price) }} × {{ item.quantity }}
+
+                      <p class="mt-2 text-xs text-zinc-400">
+                        Requested {{ formatDate(item.return.created_at) }}
                       </p>
                     </div>
                   </li>
                 </ul>
-              </div>
-            </div>
-
-            <!-- Timeline -->
-            <div v-if="timelineSteps.length">
-              <p
-                class="mb-2 text-xs font-semibold text-zinc-500 dark:text-zinc-400"
-              >
-                Order Timeline
-              </p>
-              <ol
-                class="space-y-3 border-l border-zinc-200 pl-4 dark:border-zinc-800"
-              >
-                <li
-                  v-for="step in timelineSteps"
-                  :key="step.key"
-                  class="relative"
-                >
-                  <span
-                    class="absolute top-1 -left-[21px] h-2.5 w-2.5 rounded-full bg-blue-500"
-                  />
-                  <p
-                    class="text-sm font-medium text-zinc-800 dark:text-zinc-100"
-                  >
-                    {{ step.label }}
-                  </p>
-                  <p class="text-xs text-zinc-400 dark:text-zinc-500">
-                    {{ formatDate(step.value) }}
-                  </p>
-                </li>
-              </ol>
-            </div>
-
-            <!-- Return details -->
-            <div
-              v-if="showReturnSection"
-              class="rounded-2xl border border-orange-200 bg-orange-50 p-4 dark:border-orange-900/40 dark:bg-orange-900/10"
-            >
-              <p
-                class="mb-2 text-xs font-semibold text-orange-700 dark:text-orange-400"
-              >
-                Return Request
-              </p>
-              <p class="text-sm font-medium text-zinc-800 dark:text-zinc-100">
-                {{ order.return!.reason_label }}
-              </p>
-              <p
-                v-if="order.return!.description"
-                class="mt-1 text-sm text-zinc-600 dark:text-zinc-300"
-              >
-                {{ order.return!.description }}
-              </p>
-
-              <div
-                v-if="order.return!.media_paths.length"
-                class="mt-3 flex flex-wrap gap-2"
-              >
-                <button
-                  v-for="(media, idx) in order.return!.media_paths"
-                  :key="idx"
-                  type="button"
-                  class="h-14 w-14 overflow-hidden rounded-lg border border-orange-200 dark:border-orange-800"
-                  @click="openImageInNewTab(media)"
-                >
-                  <img
-                    :src="media"
-                    class="h-full w-full cursor-zoom-in object-cover"
-                  />
-                </button>
-              </div>
-
-              <div
-                v-if="order.return!.rejection_reason"
-                class="mt-3 rounded-xl border border-rose-200 bg-rose-50 p-2.5 text-sm text-rose-700 dark:border-rose-900/40 dark:bg-rose-900/10 dark:text-rose-400"
-              >
-                <span class="font-semibold">Rejection reason: </span>
-                {{ order.return!.rejection_reason }}
               </div>
             </div>
 
@@ -349,6 +346,7 @@ const showReturnSection = computed(
                 <span>{{ formatCurrency(order.subtotal) }}</span>
               </div>
               <div
+                v-if="Number(order.shipping_fee) > 0"
                 class="flex justify-between text-zinc-500 dark:text-zinc-400"
               >
                 <span>Shipping Fee</span>
