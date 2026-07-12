@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources\Seller;
 
+use App\Enums\OrderStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
@@ -15,20 +16,39 @@ class OrderIndexResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        $itemsCount = 0;
-        
-        $mappedItems = $this->items->map(function ($item) use (&$itemsCount) {
-            $itemsCount += $item->quantity;
-            $itemTotal = $item->price * $item->quantity;
+        $isReturnOrder = in_array(
+            $this->status,
+            [
+                OrderStatus::RETURN_REQUESTED,
+                OrderStatus::RETURN_APPROVED,
+                OrderStatus::RETURNED,
+            ],
+            true
+        );
 
+        $items = $isReturnOrder
+            ? $this->items
+                ->filter(fn ($item) => $item->orderReturn)
+                ->values()
+            : $this->items;
+
+        $subtotal = $isReturnOrder
+            ? $items->sum(fn ($item) => $item->price * $item->quantity)
+            : (float) $this->subtotal;
+
+        $itemsCount = $items->sum('quantity');
+
+        $mappedItems = $items->map(function ($item) {
             return [
                 'product_name'  => $item->product_name,
-                'product_image' => $item->product_image ? Storage::url($item->product_image) : null,
+                'product_image' => $item->product_image
+                    ? Storage::url($item->product_image)
+                    : null,
                 'product_sku'   => $item->product_sku,
                 'variant_name'  => $item->variant_name,
                 'price'         => (float) $item->price,
                 'quantity'      => $item->quantity,
-                'total'         => (float) $itemTotal,
+                'total'         => (float) ($item->price * $item->quantity),
             ];
         })->values();
 
@@ -38,10 +58,10 @@ class OrderIndexResource extends JsonResource
             'status'       => $this->status,
             'status_label' => $this->status->label(),
             'items_count'  => $itemsCount,
-            'subtotal'     => (float) $this->subtotal,
-            'shipping_fee' => (float) $this->shipping_fee,
+            'subtotal'     => $subtotal,
+            'shipping_fee' => $isReturnOrder ? 0.0 : (float) $this->shipping_fee,
             'discount'     => (float) $this->discount,
-            'total'        => (float) $this->total,
+            'total'        => $isReturnOrder ? round($subtotal, 2) : (float) $this->total,
             'items'        => $mappedItems,
         ];
     }

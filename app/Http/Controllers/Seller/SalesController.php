@@ -97,8 +97,7 @@ class SalesController extends Controller
     {
         $order->loadMissing([
             'store',
-            'items',
-            'return',
+            'items.orderReturn.images',
         ]);
 
         abort_unless(

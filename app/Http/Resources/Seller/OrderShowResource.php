@@ -4,7 +4,8 @@ namespace App\Http\Resources\Seller;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Facades\Storage; 
+use Illuminate\Support\Facades\Storage;
+use App\Enums\OrderStatus;
 
 class OrderShowResource extends JsonResource
 {
@@ -15,15 +16,35 @@ class OrderShowResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $isReturnGroup = in_array($this->status, [
+            OrderStatus::RETURN_REQUESTED,
+            OrderStatus::RETURN_APPROVED,
+            OrderStatus::RETURNED,
+        ], true);
+
+        $allItems = $this->items;
+        $displayItems = $isReturnGroup
+            ? $allItems->filter(fn ($item) => $item->orderReturn !== null)->values()
+            : $allItems;
+
+        $subtotal = $isReturnGroup
+            ? $displayItems->sum(fn ($item) => $item->price * $item->quantity)
+            : (float) $this->subtotal;
+
+        $itemsCount = $displayItems->sum('quantity');
+        $shippingFee = $isReturnGroup ? 0.0 : (float) $this->shipping_fee;
+        $total = $isReturnGroup ? round($subtotal, 2) : (float) $this->total;
+
         return [
             'id' => $this->id,
             'order_number' => $this->order_number,
             'status' => $this->status->value,
             'status_label' => $this->status->label(),
-            'subtotal' => $this->subtotal,
-            'shipping_fee' => $this->shipping_fee,
+            'items_count'  => $itemsCount,
+            'subtotal' => $subtotal,
+            'shipping_fee' => $shippingFee,
             'discount' => $this->discount,
-            'total' => $this->total,
+            'total' => $total,
             'notes' => $this->notes,
             'shipping_address' => [
                 'recipient_name' => $this->recipient_name,
@@ -37,7 +58,7 @@ class OrderShowResource extends JsonResource
                 'postal_code' => $this->postal_code,
                 'landmark' => $this->landmark,
             ],
-            'items' => $this->items->map(fn ($item) => [
+            'items' => $displayItems->map(fn ($item) => [
                 'product_sku' => $item->product_sku,
                 'product_name' => $item->product_name,
                 'product_image' => Storage::url($item->product_image),
@@ -45,6 +66,19 @@ class OrderShowResource extends JsonResource
                 'price' => $item->price,
                 'quantity' => $item->quantity,
                 'total' => round($item->price * $item->quantity, 2),
+                'return' => $item->orderReturn ? [
+                    'reason' => $item->orderReturn->reason->value,
+                    'reason_label' => $item->orderReturn->reason->label(),
+                    'description' => $item->orderReturn->description,
+                    'images' => $item->orderReturn->images
+                        ->map(fn ($image) => Storage::url($image->image))
+                        ->values(),
+                    'video' => $item->orderReturn->video
+                        ? Storage::url($item->orderReturn->video)
+                        : null,
+                    'rejection_reason' => $item->orderReturn->rejection_reason,
+                    'created_at' => $item->orderReturn->created_at,
+                ] : null,
             ]),
             // null ones dropped
             'timestamps' => array_filter([
@@ -59,19 +93,6 @@ class OrderShowResource extends JsonResource
                 'return_approved_at' => $this->return_approved_at,
                 'returned_at' => $this->returned_at,
             ]),
-            // only present when 'return' relation was eager loaded
-            'return' => $this->whenLoaded('return', fn () => $this->return
-                ? [
-                    'reason' => $this->return->reason->value,
-                    'reason_label' => $this->return->reason->label(),
-                    'description' => $this->return->description,
-                    'media_paths' => collect($this->return->media_paths ?? [])
-                        ->map(fn ($path) => Storage::url($path))
-                        ->all(),
-                    'rejection_reason' => $this->return->rejection_reason,
-                    'created_at' => $this->return->created_at,
-                ]
-                : null),
             'created_at' => $this->created_at,
         ];
     }
