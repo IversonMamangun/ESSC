@@ -154,54 +154,103 @@ const timelineSteps = computed(() => {
                   <li
                     v-for="(item, index) in order.items"
                     :key="`${item.product_sku}-${index}`"
-                    class="flex items-center gap-3 py-2"
+                    class="flex flex-col gap-3 py-3"
                   >
-                    <button
-                      v-if="item.product_image"
-                      type="button"
-                      class="group relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700"
-                      title="View image"
-                      @click="openImageInNewTab(item.product_image)"
-                    >
-                      <img
-                        :src="item.product_image"
-                        class="h-full w-full cursor-zoom-in object-cover transition-transform duration-150 group-hover:scale-110"
-                      />
-                    </button>
+                    <div class="flex items-center gap-3">
+                      <button
+                        v-if="item.product_image"
+                        type="button"
+                        class="group relative h-12 w-12 shrink-0 overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700"
+                        title="View image"
+                        @click="openImageInNewTab(item.product_image)"
+                      >
+                        <img
+                          :src="item.product_image"
+                          class="h-full w-full cursor-zoom-in object-cover transition-transform duration-150 group-hover:scale-110"
+                        />
+                      </button>
+                      <div
+                        v-else
+                        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800"
+                      >
+                        <PackageIcon class="h-5 w-5 text-zinc-400" />
+                      </div>
+
+                      <div class="min-w-0 flex-1">
+                        <p
+                          class="truncate text-sm font-medium text-zinc-800 dark:text-zinc-100"
+                        >
+                          {{ item.product_name }}
+                        </p>
+                        <p
+                          class="mt-0.5 flex items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500"
+                        >
+                          <span class="font-mono">{{ item.product_sku }}</span>
+                          <template v-if="item.variant_name">
+                            <span>•</span>
+                            <span>{{ item.variant_name }}</span>
+                          </template>
+                        </p>
+                      </div>
+
+                      <div class="shrink-0 text-right">
+                        <p
+                          class="text-sm font-semibold text-zinc-800 dark:text-zinc-100"
+                        >
+                          {{ formatCurrency(item.total) }}
+                        </p>
+                        <p
+                          class="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500"
+                        >
+                          {{ formatCurrency(item.price) }} × {{ item.quantity }}
+                        </p>
+                      </div>
+                    </div>
+
                     <div
-                      v-else
-                      class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800"
+                      v-if="item.return"
+                      class="ml-15 rounded-xl border border-rose-100 bg-rose-50/50 p-3 dark:border-rose-900/40 dark:bg-rose-950/20"
                     >
-                      <PackageIcon class="h-5 w-5 text-zinc-400" />
-                    </div>
+                      <p
+                        class="text-xs font-bold text-rose-600 dark:text-rose-400"
+                      >
+                        Return Reason: {{ item.return.reason_label }}
+                      </p>
+                      <p
+                        v-if="item.return.description"
+                        class="mt-1 text-sm text-zinc-600 dark:text-zinc-300"
+                      >
+                        {{ item.return.description }}
+                      </p>
 
-                    <div class="min-w-0 flex-1">
-                      <p
-                        class="truncate text-sm font-medium text-zinc-800 dark:text-zinc-100"
+                      <div
+                        v-if="item.return.images.length || item.return.video"
+                        class="mt-2 flex flex-wrap gap-2"
                       >
-                        {{ item.product_name }}
-                      </p>
-                      <p
-                        class="mt-0.5 flex items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500"
-                      >
-                        <span class="font-mono">{{ item.product_sku }}</span>
-                        <template v-if="item.variant_name">
-                          <span>•</span>
-                          <span>{{ item.variant_name }}</span>
-                        </template>
-                      </p>
-                    </div>
+                        <img
+                          v-for="(path, i) in item.return.images"
+                          :key="`img-${i}`"
+                          :src="path"
+                          class="h-24 w-24 cursor-zoom-in rounded-lg border object-cover"
+                          @click="openImageInNewTab(path)"
+                        />
+                        <video
+                          v-if="item.return.video"
+                          :src="item.return.video"
+                          controls
+                          class="h-24 w-40 rounded-lg border object-cover"
+                        />
+                      </div>
 
-                    <div class="shrink-0 text-right">
                       <p
-                        class="text-sm font-semibold text-zinc-800 dark:text-zinc-100"
+                        v-if="item.return.rejection_reason"
+                        class="mt-2 text-xs font-medium text-red-500"
                       >
-                        {{ formatCurrency(item.total) }}
+                        Rejected: {{ item.return.rejection_reason }}
                       </p>
-                      <p
-                        class="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500"
-                      >
-                        {{ formatCurrency(item.price) }} × {{ item.quantity }}
+
+                      <p class="mt-2 text-xs text-zinc-400">
+                        Requested {{ formatDate(item.return.created_at) }}
                       </p>
                     </div>
                   </li>

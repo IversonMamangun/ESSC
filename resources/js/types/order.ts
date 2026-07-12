@@ -11,14 +11,12 @@ export type OrderFilterStatus =
   | 'returned';
 
 export type OrderDisplayStatus =
-  | 'all'
   | 'to-pay'
   | 'to-ship'
   | 'to-receive'
   | 'delivered'
   | 'completed'
   | 'cancelled'
-  | 'returned'
   | 'return-requested'
   | 'return-approved'
   | 'returned';
@@ -45,6 +43,7 @@ export interface OrderItem {
   price: number;
   quantity: number;
   total: number;
+  return?: OrderReturn;
 }
 
 export interface Order {
@@ -141,7 +140,8 @@ export interface OrderReturn {
   reason: string;
   reason_label: string;
   description: string | null;
-  media_paths: string[];
+  images: string[];
+  video: string | null;
   rejection_reason: string | null;
   created_at: string;
 }
