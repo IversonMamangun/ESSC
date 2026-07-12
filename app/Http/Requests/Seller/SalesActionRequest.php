@@ -13,7 +13,8 @@ class SalesActionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        $order = $this->route('order');
+        return $order && $order->store_id === $this->user()->store?->id;
     }
 
     /**

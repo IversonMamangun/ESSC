@@ -110,12 +110,6 @@ class SalesController extends Controller
 
 
     public function action(SalesActionRequest $request, Order $order) {
-        $user = $request->user();
-
-        abort_unless(
-            $order->store_id === $user->store?->id,
-            403
-        );
         $action = $request->validated('action');
 
         match ($action) {
@@ -144,10 +138,12 @@ class SalesController extends Controller
 
     private function acceptReturnOrder(Order $order): void
     {
-        $order->loadMissing('return');
-        if ($order->status !== OrderStatus::RETURN_REQUESTED || !$order->return) {
-            abort(422, 'Invalid order state');
-        }
+        abort_unless(
+            $order->status === OrderStatus::RETURN_REQUESTED
+                && $order->returns()->exists(),
+            422,
+            'Invalid order state'
+        );
 
         $order->update([
             'status' => OrderStatus::RETURN_APPROVED,
@@ -157,18 +153,22 @@ class SalesController extends Controller
 
     private function declineReturnOrder(Order $order, string $rejectionReason): void
     {
-        $order->loadMissing('return');
-        if ($order->status !== OrderStatus::RETURN_REQUESTED || !$order->return) {
-            abort(422, 'Invalid order state');
-        }
+        abort_unless(
+            $order->status === OrderStatus::RETURN_REQUESTED
+                && $order->returns()->exists(),
+            422,
+            'Invalid order state'
+        );
 
-        $order->return->update([
+        // applies to every item-level return under this order —
+        // decline is an order-wide decision even though returns are stored per item
+        $order->returns()->update([
             'rejection_reason' => $rejectionReason,
         ]);
 
-
         $order->update([
-            'status' => OrderStatus::DELIVERED,
+            'status' => OrderStatus::COMPLETED,
+            'completed_at' => now(),
             'return_approved_at' => null,
         ]);
     }
