@@ -5,7 +5,7 @@ namespace App\Http\Resources\Shop;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use App\Enums\OrderStatus;
-use Illuminate\Support\Facades\Storage; 
+use Illuminate\Support\Facades\Storage;
 
 class OrderShowResource extends JsonResource
 {
@@ -77,6 +77,19 @@ class OrderShowResource extends JsonResource
                 'price' => (float) $item->price,
                 'quantity' => $item->quantity,
                 'total' => round($item->price * $item->quantity, 2),
+                'return' => $item->orderReturn ? [
+                    'reason' => $item->orderReturn->reason->value,
+                    'reason_label' => $item->orderReturn->reason->label(),
+                    'description' => $item->orderReturn->description,
+                    'images' => $item->orderReturn->images
+                        ->map(fn ($image) => Storage::url($image->image))
+                        ->values(),
+                    'video' => $item->orderReturn->video
+                        ? Storage::url($item->orderReturn->video)
+                        : null,
+                    'rejection_reason' => $item->orderReturn->rejection_reason,
+                    'created_at' => $item->orderReturn->created_at,
+                ] : null,
             ])->values(),
             'timestamps' => array_filter([
                 'created_at' => $this->created_at,

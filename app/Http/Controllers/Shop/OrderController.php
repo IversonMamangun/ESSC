@@ -106,15 +106,15 @@ class OrderController extends Controller
 
     public function show(Request $request, Order $order)
     {
-        $order->loadMissing([
-            'store',
-            'items',
-        ]);
-
         abort_unless(
             $request->user()->id === $order->user_id,
             403
         );
+
+        $order->loadMissing([
+            'store',
+            'items.orderReturn.images',
+        ]);
 
         return Inertia::render('shop/customer/order/Show', [
             'user' => $request->user()->only('name', 'phone', 'avatar'),
