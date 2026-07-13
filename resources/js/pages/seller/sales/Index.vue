@@ -118,7 +118,7 @@ function handleDetailsOpenChange(value: boolean) {
 const confirmOpen = ref(false);
 const selectedOrder = ref<SellerOrder | null>(null);
 const selectedAction = ref<
-  'deliver' | 'accept_return' | 'decline_return' | null
+  'deliver' | 'accept_return' | 'decline_return' | 'confirm_return' | null
 >(null);
 
 const actionForm = useForm({

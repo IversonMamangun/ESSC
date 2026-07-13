@@ -71,6 +71,18 @@ const SELLER_TAB_ACTIONS_MAP: Record<string, SellerTabAction[]> = {
       className: 'text-rose-500 focus:text-rose-600',
     },
   ],
+  returned: [
+    {
+      label: 'Confirm Return',
+      type: 'confirm_return',
+      className: 'text-blue-500 focus:text-blue-600',
+    },
+    {
+      label: 'Decline Return',
+      type: 'decline_return',
+      className: 'text-rose-500 focus:text-rose-600',
+    },
+  ],
 };
 
 export const getSellerProductsColumns = ({
@@ -244,7 +256,16 @@ export const getSellerOrdersColumns = ({
     header: () => h('div', { class: 'text-center' }, 'Actions'),
     cell: ({ row }) => {
       const order = row.original;
-      const dynamicActions = SELLER_TAB_ACTIONS_MAP[activeTab] || [];
+      let dynamicActions = SELLER_TAB_ACTIONS_MAP[activeTab] || [];
+
+      // Don't show confirm/decline return actions if the order status is already 'returned'
+      if (order.status === 'returned') {
+        dynamicActions = dynamicActions.filter(
+          (action) =>
+            action.type !== 'confirm_return' &&
+            action.type !== 'decline_return',
+        );
+      }
 
       const menuItems = [
         h(DropdownMenuLabel, { class: 'text-gray-500' }, () => 'Actions'),
