@@ -66,11 +66,11 @@ class SalesController extends Controller
                 OrderStatus::DELIVERED,
                 OrderStatus::COMPLETED
             ]),
-            'return-request' => $query->whereIn('status', [
-                OrderStatus::RETURN_REQUESTED,
+            'return-request' => $query->where('status', OrderStatus::RETURN_REQUESTED),
+            'returned' => $query->whereIn('status',  [
                 OrderStatus::RETURN_APPROVED,
+                OrderStatus::RETURNED,
             ]),
-            'returned' => $query->where('status', OrderStatus::RETURNED),
             default => $query,
         };
     }
@@ -87,9 +87,9 @@ class SalesController extends Controller
             'to_receive'   => (int) $counts->get(OrderStatus::SHIPPED->value, 0),
             'completed'      =>(int) ($counts->get(OrderStatus::DELIVERED->value, 0)
                             + $counts->get(OrderStatus::COMPLETED->value, 0)),
-            'return_request'   => (int) ($counts->get(OrderStatus::RETURN_REQUESTED->value, 0)) 
-                            + ($counts->get(OrderStatus::RETURN_APPROVED->value, 0)),
-            'returned'      =>(int) $counts->get(OrderStatus::RETURNED->value, 0),
+            'return_request'   => (int) $counts->get(OrderStatus::RETURN_REQUESTED->value, 0),
+            'returned'      =>(int) ($counts->get(OrderStatus::RETURN_APPROVED->value, 0) 
+                            + $counts->get(OrderStatus::RETURNED->value, 0)),
         ];
     }
 
@@ -116,6 +116,7 @@ class SalesController extends Controller
             'deliver' => $this->deliverOrder($order),
             'accept_return' => $this->acceptReturnOrder($order),
             'decline_return' => $this->declineReturnOrder($order, $request->validated('rejection_reason')),
+            'confirm_return' => $this->confirmReturnOrder($order),
         };
 
         return back()->with(
@@ -154,7 +155,7 @@ class SalesController extends Controller
     private function declineReturnOrder(Order $order, string $rejectionReason): void
     {
         abort_unless(
-            $order->status === OrderStatus::RETURN_REQUESTED
+            ($order->status === OrderStatus::RETURN_REQUESTED || $order->status === OrderStatus::RETURN_APPROVED)
                 && $order->returns()->exists(),
             422,
             'Invalid order state'
@@ -170,6 +171,21 @@ class SalesController extends Controller
             'status' => OrderStatus::COMPLETED,
             'completed_at' => now(),
             'return_approved_at' => null,
+        ]);
+    }
+
+    private function confirmReturnOrder(Order $order): void
+    {
+        abort_unless(
+            $order->status === OrderStatus::RETURN_APPROVED
+                && $order->returns()->exists(),
+            422,
+            'Invalid order state'
+        );
+
+        $order->update([
+            'status' => OrderStatus::RETURNED,
+            'returned_at' => now(),
         ]);
     }
 }

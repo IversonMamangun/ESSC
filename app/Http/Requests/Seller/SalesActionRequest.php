@@ -32,6 +32,7 @@ class SalesActionRequest extends FormRequest
                     'deliver',
                     'accept_return',
                     'decline_return',
+                    'confirm_return',
                 ]),
             ],
             'rejection_reason' => [

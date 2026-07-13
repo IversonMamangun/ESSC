@@ -84,9 +84,9 @@ class DashboardController extends Controller
         $toReceive = $counts[OrderStatus::SHIPPED->value] ?? 0;
         $completed = ($counts[OrderStatus::DELIVERED->value] ?? 0)
             + ($counts[OrderStatus::COMPLETED->value] ?? 0);
-        $returnRequest = ($counts[OrderStatus::RETURN_REQUESTED->value] ?? 0)
-            + ($counts[OrderStatus::RETURN_APPROVED->value] ?? 0);
-        $returned = $counts[OrderStatus::RETURNED->value] ?? 0;
+        $returnRequest = $counts[OrderStatus::RETURN_REQUESTED->value] ?? 0;
+        $returned = ($counts[OrderStatus::RETURN_APPROVED->value] ?? 0)
+            + ($counts[OrderStatus::RETURNED->value] ?? 0);
 
         $totalAmount = (float) $store->orders()
             ->where('status', OrderStatus::COMPLETED->value)
