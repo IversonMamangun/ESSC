@@ -7,7 +7,7 @@ import {
   StarIcon,
   CircleCheckBigIcon,
   CornerDownLeftIcon,
-  RotateCcwIcon,
+  CircleXIcon,
   MessageSquareIcon,
 } from 'lucide-vue-next';
 import {
@@ -115,6 +115,16 @@ const formatPrice = (value: number) => {
       class="flex flex-col-reverse gap-4 border-t pt-4 sm:flex-row sm:items-center sm:justify-between"
     >
       <div class="flex w-full flex-wrap gap-2 sm:w-auto">
+        <template v-if="order.status === 'to-pay'">
+          <button
+            @click="$emit('cancel', order.order_number)"
+            class="inline-flex cursor-pointer items-center justify-center rounded-xl border border-rose-200 bg-rose-100 px-4 py-2 text-sm font-bold text-rose-700 transition-colors hover:bg-rose-200 active:scale-95 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-400 dark:hover:bg-rose-900/50"
+          >
+            <CircleXIcon class="mr-2 h-4 w-4" />
+            Cancel Order
+          </button>
+        </template>
+
         <template v-if="order.status === 'delivered'">
           <button
             @click="$emit('complete', order.order_number)"

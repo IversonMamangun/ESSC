@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, useHttp, router } from '@inertiajs/vue3';
+import { Head, useHttp, router, useForm } from '@inertiajs/vue3';
 import {
   PackageIcon,
   SearchIcon,
@@ -14,6 +14,7 @@ import Pagination from '@/components/Pagination.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
+import InputError from '@/components/InputError.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import shop from '@/routes/shop';
 import type {
@@ -123,6 +124,9 @@ const dialogConfig = computed(() => {
       };
   }
 });
+const cancelForm = useForm({
+  cancellation_reason: '',
+});
 const cancelOrder = (orderNo: string) => {
   action.value = { type: 'cancel', orderNo };
 };
@@ -136,13 +140,27 @@ const handleConfirmAction = () => {
 
   const requests: Record<ActionType, () => void> = {
     complete: () =>
-      router.patch(shop.orders.complete(orderNo), {}, { preserveScroll: true }),
+      router.patch(
+        shop.orders.complete(orderNo),
+        {},
+        {
+          preserveScroll: true,
+          onSuccess: () => {
+            action.value = null;
+          },
+        },
+      ),
     cancel: () =>
-      router.patch(shop.orders.cancel(orderNo), {}, { preserveScroll: true }),
+      cancelForm.patch(shop.orders.cancel.url(orderNo), {
+        preserveScroll: true,
+        onSuccess: () => {
+          cancelForm.reset();
+          action.value = null;
+        },
+      }),
   };
 
   requests[type]();
-  action.value = null;
 };
 
 const requestReturnOrder = (orderNo: string) => {
@@ -269,11 +287,39 @@ const viewRatingOrder = async (orderNo: string) => {
     :confirm-text="dialogConfig.confirmText"
     :confirm-variant="dialogConfig.confirmVariant"
     :icon="dialogConfig.icon"
-    :confirmDisabled="!action"
+    :confirmDisabled="
+      !action ||
+      (action.type === 'cancel' && cancelForm.cancellation_reason === '')
+    "
     @confirm="handleConfirmAction"
     @cancel="action = null"
   >
-    <template #description>{{ dialogConfig.description }}</template>
+    <template #description
+      >{{ dialogConfig.description }}
+
+      <span class="font-bold text-blue-600 capitalize dark:text-blue-400">{{
+        action?.orderNo
+      }}</span
+      >?
+      <div v-if="action?.type === 'cancel'" class="mt-3">
+        <label class="text-xs font-medium text-zinc-600 dark:text-zinc-300">
+          Cancellation reason
+        </label>
+        <textarea
+          v-model="cancelForm.cancellation_reason"
+          rows="3"
+          placeholder="Let the seller know why your order was cancelled..."
+          class="w-full rounded-lg border border-zinc-200 bg-white p-2 text-sm text-zinc-800 focus:border-blue-400 focus:outline-none dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+        />
+        <p
+          v-if="cancelForm.cancellation_reason === ''"
+          class="text-xs text-rose-500"
+        >
+          A reason is required to cancel an order.
+        </p>
+        <InputError :message="cancelForm.errors.cancellation_reason" />
+      </div>
+    </template>
   </ConfirmDialog>
 
   <OrderReviewDetailsDialog

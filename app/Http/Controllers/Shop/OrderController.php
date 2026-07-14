@@ -155,10 +155,18 @@ class OrderController extends Controller
             abort(422, 'Invalid order state');
         }
 
+        $validated = $request->validate([
+            'cancellation_reason' => [
+                'required',
+                'string',
+                'max:500',
+            ],
+        ]);
+
         $order->update([
             'status' => OrderStatus::CANCELLED,
             'cancelled_at' => now(),
-            // extra fields for reason
+            'cancellation_reason' => $validated['cancellation_reason']
         ]);
 
         return back()->with(
