@@ -24,6 +24,7 @@ return new class extends Migration
             $table->decimal('discount', 12, 2)->default(0);
             $table->decimal('total', 12, 2);
             $table->text('notes')->nullable();
+            $table->text('cancellation_reason')->nullable();
             // Shipping Address Reference
             $table->string('recipient_name');
             $table->string('recipient_phone');

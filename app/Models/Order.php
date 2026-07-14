@@ -22,6 +22,7 @@ use App\Enums\OrderStatus;
     'discount',
     'total',
     'notes',
+    'cancellation_reason',
     'recipient_name',
     'recipient_phone',
     'region',
