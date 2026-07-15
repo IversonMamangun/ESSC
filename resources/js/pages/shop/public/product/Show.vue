@@ -201,6 +201,9 @@ const prevImage = () => {
   selectedImage.value = galleryImages.value[prev].url;
 };
 
+// rating
+const filledStars = computed(() => Math.round(props.product.rating));
+
 // quantity for ordering
 const increaseQuantity = () => {
   if (quantity.value >= currentStock.value) {
@@ -264,10 +267,6 @@ const handleBuyNow = () => {
 
   // route to checkout
 };
-
-// onMounted(() => {
-//   document.documentElement.classList.remove('dark');
-// });
 </script>
 
 <template>
@@ -450,16 +449,24 @@ const handleBuyNow = () => {
                   <StarIcon
                     v-for="i in 5"
                     :key="i"
-                    class="h-4 w-4 fill-current"
+                    class="h-4 w-4"
+                    :class="
+                      i <= filledStars
+                        ? 'fill-current'
+                        : 'fill-none stroke-current text-zinc-300 dark:text-zinc-600'
+                    "
                   />
-                  <span class="ml-1 font-black text-zinc-900 dark:text-white"
-                    >5</span
+                  <span class="ml-1 font-black text-zinc-900 dark:text-white">
+                    {{ product.rating.toFixed(1) }}
+                  </span>
+                  <span class="text-zinc-400"
+                    >({{ product.reviews_count }} reviews)</span
                   >
                 </div>
                 <div class="h-3 w-px bg-zinc-300 dark:bg-zinc-700"></div>
-                <span class="font-bold text-zinc-500 dark:text-zinc-400"
-                  >123 Sold</span
-                >
+                <span class="font-bold text-zinc-500 dark:text-zinc-400">
+                  {{ product.sold_count }} Sold
+                </span>
               </div>
             </div>
 

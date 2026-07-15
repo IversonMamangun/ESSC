@@ -58,6 +58,9 @@ export interface ProductShow extends Product {
   video: string | null;
   variants: ProductVariant[];
   store: Store;
+  rating: number;
+  reviews_count: number;
+  sold_count: number;
 }
 
 export interface Category {
