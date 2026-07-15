@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use App\Enums\OrderStatus;
+use App\Observers\OrderObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 
 #[Fillable([
     'user_id',
@@ -44,6 +46,7 @@ use App\Enums\OrderStatus;
     'return_approved_at',
     'returned_at',
 ])]
+#[ObservedBy([OrderObserver::class])]
 class Order extends Model
 {
     use HasFactory;
