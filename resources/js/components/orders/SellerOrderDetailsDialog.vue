@@ -15,6 +15,7 @@ import {
   MapPinIcon,
   PhoneIcon,
   StickyNoteIcon,
+  CircleXIcon,
 } from 'lucide-vue-next';
 import type { SellerOrderShow, OrderRawStatus } from '@/types';
 
@@ -333,6 +334,22 @@ const timelineSteps = computed(() => {
                   </li>
                 </ul>
               </div>
+            </div>
+            <div
+              v-if="order.cancellation_reason && order.status === 'cancelled'"
+              class="rounded-2xl border border-rose-100 bg-rose-50/50 p-3 dark:border-rose-900/40 dark:bg-rose-950/20"
+            >
+              <div
+                class="flex items-center border-b border-rose-500/30 pb-1.5 text-sm font-medium"
+              >
+                <CircleXIcon
+                  class="me-1 h-4 w-4 text-rose-600 dark:text-rose-400"
+                />
+                <p>Cancellation Reason</p>
+              </div>
+              <p class="mt-2 text-xs font-medium">
+                {{ order.cancellation_reason }}
+              </p>
             </div>
 
             <Separator />
