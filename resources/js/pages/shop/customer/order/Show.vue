@@ -7,6 +7,7 @@ import {
   MapPinIcon,
   PackageIcon,
   StoreIcon,
+  CircleXIcon,
 } from 'lucide-vue-next';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
@@ -255,6 +256,22 @@ const timelineSteps = computed(() => {
                     </div>
                   </li>
                 </ul>
+              </div>
+              <div
+                v-if="order.cancellation_reason && order.status === 'cancelled'"
+                class="rounded-2xl border border-rose-100 bg-rose-50/50 p-5 dark:border-rose-900/40 dark:bg-rose-950/20"
+              >
+                <div
+                  class="flex items-center border-b border-rose-500/30 pb-1.5 text-sm font-medium"
+                >
+                  <CircleXIcon
+                    class="me-1 h-4 w-4 text-rose-600 dark:text-rose-400"
+                  />
+                  <p>Cancellation Reason</p>
+                </div>
+                <p class="mt-2 text-xs font-medium">
+                  {{ order.cancellation_reason }}
+                </p>
               </div>
             </div>
 

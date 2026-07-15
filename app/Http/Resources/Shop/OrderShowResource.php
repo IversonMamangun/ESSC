@@ -56,6 +56,7 @@ class OrderShowResource extends JsonResource
             'shipping_fee' => $shippingFee,
             'discount' => $this->discount,
             'total' => $total,
+            'cancellation_reason' => $this->cancellation_reason,
             'shipping_address' => [
                 'recipient_name' => $this->recipient_name,
                 'recipient_phone' => $this->recipient_phone,

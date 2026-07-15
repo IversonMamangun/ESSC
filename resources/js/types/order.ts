@@ -65,6 +65,7 @@ export interface OrderShow extends Order {
   discount: number;
   shipping_address: ShippingAddress;
   timestamps: OrderTimestamps;
+  cancellation_reason: string | null;
 }
 
 export interface PaginatedOrders {
@@ -167,4 +168,5 @@ export interface SellerOrderShow extends SellerOrder {
   timestamps: OrderTimestamps;
   return: OrderReturn | null;
   created_at: string;
+  cancellation_reason: string | null;
 }
