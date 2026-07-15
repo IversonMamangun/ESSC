@@ -74,12 +74,14 @@ class ReviewObserver
             return;
         }
 
-        $average = Review::query()
+        $stats = Review::query()
             ->where('store_id', $review->store_id)
-            ->avg('rating');
+            ->selectRaw('COUNT(*) as count, COALESCE(AVG(rating), 0) as average')
+            ->first();
 
         $review->store?->update([
-            'rating' => round((float) ($average ?? 0), 1),
+            'reviews_count' => $stats->count,
+            'rating' => round((float) $stats->average, 1),
         ]);
     }
 

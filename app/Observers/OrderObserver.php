@@ -26,7 +26,7 @@ class OrderObserver
         }
 
         if ($order->status === OrderStatus::COMPLETED) {
-            $this->incrementSoldCount($order);
+            $this->adjustSoldCount($order, 1);
         }
     }
 
@@ -54,13 +54,15 @@ class OrderObserver
         //
     }
 
-    protected function incrementSoldCount(Order $order): void
+    protected function adjustSoldCount(Order $order, int $direction): void
     {
         $order->loadMissing('items');
 
         $quantities = $order->items
             ->groupBy('product_id')
             ->map(fn ($items) => $items->sum('quantity'));
+
+        $totalQuantity = 0;
 
         foreach ($quantities as $productId => $quantity) {
             if (! $productId) {
@@ -69,7 +71,15 @@ class OrderObserver
 
             DB::table('products')
                 ->where('id', $productId)
-                ->increment('sold_count', $quantity);
+                ->increment('sold_count', $quantity * $direction);
+
+            $totalQuantity += $quantity;
+        }
+
+        if ($totalQuantity > 0) {
+            DB::table('stores')
+                ->where('id', $order->store_id)
+                ->increment('sold_count', $totalQuantity * $direction);
         }
     }
 }
