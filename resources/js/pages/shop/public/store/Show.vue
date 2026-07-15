@@ -26,7 +26,7 @@ const showProduct = (slug: string) => {
 };
 
 const goToChat = () => {
-  router.visit(`/chat/${props.store.slug}`);
+  //
 };
 </script>
 
@@ -90,21 +90,34 @@ const goToChat = () => {
                     class="mr-1.5 h-4 w-4 fill-current text-amber-400"
                   />
                   <span class="font-bold text-zinc-800 dark:text-zinc-100">
-                    <!-- {{ store.rating ?? '4.9' }} -->
-                      4.9
+                    {{ store.rating.toFixed(1) }}
                   </span>
                   <span class="ml-1 text-xs text-zinc-400 dark:text-zinc-500">
-                    ({{ store.reviews_count ?? '1.2k' }})
+                    ({{ store.reviews_count }})
                   </span>
                 </div>
+
                 <div
                   class="flex items-center rounded-lg border border-zinc-100 bg-zinc-50 px-3 py-1.5 text-sm text-zinc-600 transition-colors dark:border-zinc-700/50 dark:bg-zinc-800/50 dark:text-zinc-300"
                 >
+                  <PackageIcon
+                    class="mr-1.5 h-4 w-4 text-zinc-400 dark:text-zinc-500"
+                  />
                   <span class="font-bold text-zinc-800 dark:text-zinc-100">
-                    {{ store.followers_count ?? '5.4k' }}
+                    {{ store.sold_count }}
+                  </span>
+                  <span class="ml-1 text-xs text-zinc-400 dark:text-zinc-500"
+                    >Sold</span
+                  >
+                </div>
+                <!-- <div
+                  class="flex items-center rounded-lg border border-zinc-100 bg-zinc-50 px-3 py-1.5 text-sm text-zinc-600 transition-colors dark:border-zinc-700/50 dark:bg-zinc-800/50 dark:text-zinc-300"
+                >
+                  <span class="font-bold text-zinc-800 dark:text-zinc-100">
+                    {{ store.followers_count }}
                   </span>
                   <span class="ml-1.5 text-xs text-zinc-500">Followers</span>
-                </div>
+                </div> -->
                 <div
                   class="flex items-center rounded-lg border border-zinc-100 bg-zinc-50 px-3 py-1.5 text-sm text-zinc-600 transition-colors dark:border-zinc-700/50 dark:bg-zinc-800/50 dark:text-zinc-300"
                 >
@@ -112,7 +125,7 @@ const goToChat = () => {
                     class="mr-1.5 h-4 w-4 text-zinc-400 dark:text-zinc-500"
                   />
                   <span class="text-xs text-zinc-700 dark:text-zinc-300">
-                    {{ store.location ?? 'Philippines' }}
+                    Philippines
                   </span>
                 </div>
               </div>
@@ -127,27 +140,21 @@ const goToChat = () => {
 
           <div
             class="flex w-full shrink-0 items-center justify-center gap-3 border-t border-zinc-100 pt-6 transition-colors lg:w-auto lg:border-t-0 lg:pt-0 dark:border-zinc-800"
-          ><button
-            @click="goToChat"
-            class="flex flex-1 it
-        // 3. Send the data to your Vue component
-        return Inertia::render('customer/chat/Index', [
-            // Only pass the specific store data needed for the UI, not the whole model
-            'activeStore' => $store ? [
-                'id' => $store->id,
-                'name' => $store->name,
-                'slug' => $store->slug,ems-center justify-center gap-2 rounded-xl border-2 border-[#009933] px-6 py-3 font-bold text-[#009933] shadow-sm transition-all hover:bg-green-50 active:scale-95 lg:flex-none dark:text-[#00cc44] dark:hover:bg-green-900/20"
           >
-            <MessageCircleIcon class="h-5 w-5" />
-            Chat
-          </button>
-
             <button
+              @click="goToChat"
+              class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#009933] px-6 py-3 font-bold text-white shadow-md transition-all hover:bg-green-700 active:scale-95 lg:flex-none"
+            >
+              <MessageCircleIcon class="h-5 w-5" />
+              Chat
+            </button>
+
+            <!-- <button
               class="flex flex-1 items-center justify-center gap-2 rounded-xl bg-[#009933] px-6 py-3 font-bold text-white shadow-md transition-all hover:bg-green-700 active:scale-95 lg:flex-none"
             >
               <PlusIcon class="h-5 w-5" />
               Follow
-            </button>
+            </button> -->
           </div>
         </div>
       </section>
