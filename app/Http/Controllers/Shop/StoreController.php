@@ -33,6 +33,9 @@ class StoreController extends Controller
             'slug',
             'is_featured',
             'is_active',
+            'rating',
+            'reviews_count',
+            'sold_count',
             'created_at',
         ])
         ->with([

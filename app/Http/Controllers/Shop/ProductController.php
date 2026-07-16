@@ -41,6 +41,9 @@ class ProductController extends Controller
                 'name',
                 'slug',
                 'is_featured',
+                'rating',
+                'reviews_count',
+                'sold_count',
                 'created_at',
             ])
             ->with([

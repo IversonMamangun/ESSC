@@ -25,6 +25,9 @@ class ProductCardResource extends JsonResource
             'price' => $this->defaultVariant?->price,
             'compare_price' => $this->defaultVariant?->compare_price,
             'stock' => (int) ($this->total_stock ?? 0),
+            'rating' => (float) $this->rating,
+            'reviews_count' => $this->reviews_count,
+            'sold_count' => $this->sold_count,
         ];
     }
 }
