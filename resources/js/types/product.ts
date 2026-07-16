@@ -22,6 +22,9 @@ export interface ProductCard extends Product {
   price: string;
   compare_price: string | null;
   stock: number;
+  rating: number;
+  reviews_count: number;
+  sold_count: number;
 }
 
 export interface LaravelPaginationItem {

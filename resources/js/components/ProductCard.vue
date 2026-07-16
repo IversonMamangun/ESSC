@@ -57,11 +57,14 @@ const props = defineProps<{
           <div class="flex items-center text-amber-400">
             <StarIcon class="h-3.5 w-3.5 fill-current" />
             <span class="ml-1 font-bold text-zinc-700 dark:text-zinc-300"
-              >5</span
+              >{{ product.rating.toFixed(1) }} ({{
+                product.reviews_count
+              }}
+              reviews)</span
             >
           </div>
           <span class="text-zinc-300 dark:text-zinc-600">|</span>
-          <span>123 sold</span>
+          <span>{{ product.sold_count }} sold</span>
         </div>
 
         <div
