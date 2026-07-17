@@ -14,9 +14,14 @@ import {
   LogOutIcon,
 } from 'lucide-vue-next';
 import { ref, computed, onMounted } from 'vue';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import Breadcrumbs from '@/components/Breadcrumbs.vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import InputError from '@/components/InputError.vue';
+import Footer from '@/components/sections/Footer.vue';
+import Navbar from '@/components/sections/Navbar.vue';
+import TopBar from '@/components/sections/TopBar.vue';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -26,13 +31,8 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import Footer from '@/components/sections/Footer.vue';
-import Navbar from '@/components/sections/Navbar.vue';
-import TopBar from '@/components/sections/TopBar.vue';
-import Breadcrumbs from '@/components/Breadcrumbs.vue';
-import ConfirmDialog from '@/components/ConfirmDialog.vue';
-import shop from '@/routes/shop';
 import { logout, login } from '@/routes';
+import shop from '@/routes/shop';
 import type { ProductShow, ProductVariant } from '@/types';
 
 const props = defineProps<{
@@ -97,6 +97,7 @@ const currentStock = computed(() => {
   if (selectedVariant.value) {
     return selectedVariant.value.stock;
   }
+
   return props.product.variants.reduce(
     (total, variant) => total + variant.stock,
     0,
@@ -224,12 +225,16 @@ const showRoleMismatchDialog = ref(false);
 const checkUserAccess = (): boolean => {
   if (!user.value) {
     router.get(login());
+
     return false;
   }
+
   if (user.value.user_type?.slug !== 'customer') {
     showRoleMismatchDialog.value = true;
+
     return false;
   }
+
   return true;
 };
 const handleLogoutAndRedirect = () => {
@@ -251,8 +256,13 @@ const cartForm = useForm({
 });
 
 const handleAddToCart = () => {
-  if (!checkUserAccess()) return;
-  if (!selectedVariant.value) return;
+  if (!checkUserAccess()) {
+return;
+}
+
+  if (!selectedVariant.value) {
+return;
+}
 
   cartForm.product_variant_id = selectedVariant.value.id;
   cartForm.quantity = quantity.value;
@@ -263,7 +273,9 @@ const handleAddToCart = () => {
 };
 
 const handleBuyNow = () => {
-  if (!checkUserAccess()) return;
+  if (!checkUserAccess()) {
+return;
+}
 
   // route to checkout
 };
