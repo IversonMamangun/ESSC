@@ -1,15 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   PackageIcon,
   MapPinIcon,
@@ -17,6 +6,17 @@ import {
   StickyNoteIcon,
   CircleXIcon,
 } from 'lucide-vue-next';
+import { computed } from 'vue';
+import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import type { SellerOrderShow, OrderRawStatus } from '@/types';
 
 const props = defineProps<{
@@ -34,7 +34,10 @@ const isOpen = computed({
 });
 
 function openImageInNewTab(url: string | null | undefined) {
-  if (!url) return;
+  if (!url) {
+return;
+}
+
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 
@@ -75,8 +78,12 @@ const statusTone: Record<OrderRawStatus, string> = {
 };
 
 const fullAddress = computed(() => {
-  if (!props.order) return '';
+  if (!props.order) {
+return '';
+}
+
   const a = props.order.shipping_address;
+
   return [a.unit_bldg_house, a.street, a.barangay, a.city, a.province, a.region]
     .filter(Boolean)
     .join(', ')
@@ -101,7 +108,10 @@ const TIMESTAMP_LABELS: Record<string, string> = {
 };
 
 const timelineSteps = computed(() => {
-  if (!props.order) return [];
+  if (!props.order) {
+return [];
+}
+
   return Object.entries(props.order.timestamps ?? {})
     .filter(([, value]) => !!value)
     .map(([key, value]) => ({

@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { Head, router, usePage, Link } from '@inertiajs/vue3';
 import { ref, onMounted, nextTick, computed } from 'vue';
+import Breadcrumbs from '@/components/Breadcrumbs.vue';
+import Pagination from '@/components/Pagination.vue';
 import ProductCard from '@/components/ProductCard.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import Pagination from '@/components/Pagination.vue';
-import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import shop from '@/routes/shop';
 import type { PaginatedProducts, ProductFilters } from '@/types';
 

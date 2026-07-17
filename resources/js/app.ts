@@ -3,9 +3,9 @@ import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import type { DefineComponent } from 'vue';
 import { createApp, h } from 'vue';
 import '../css/app.css';
+import { Toaster } from 'vue-sonner';
 import { initializeTheme } from '@/composables/useAppearance';
 import { useFlashToast } from '@/composables/useFlashToast';
-import { Toaster } from 'vue-sonner';
 import 'vue-sonner/style.css';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';

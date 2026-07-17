@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Head, Link, useForm } from '@inertiajs/vue3';
-import { computed } from 'vue';
 import {
   MapPinIcon,
   PackageIcon,
@@ -11,12 +10,13 @@ import {
   HandCoinsIcon,
   SmartphoneIcon,
 } from 'lucide-vue-next';
-import { Badge } from '@/components/ui/badge';
+import { computed } from 'vue';
+import { toast } from 'vue-sonner';
 import InputError from '@/components/InputError.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import { toast } from 'vue-sonner';
+import { Badge } from '@/components/ui/badge';
 import shop from '@/routes/shop';
 import type { CheckoutPageProps, UserAddress } from '@/types';
 
@@ -61,6 +61,7 @@ const getPaymentIcon = (methodSlug: string) => {
   if (slug.includes('cash-on-delivery')) {
     return HandCoinsIcon;
   }
+
   if (slug.includes('pay-online')) {
     return SmartphoneIcon;
   }

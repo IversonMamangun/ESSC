@@ -1,2 +1,6 @@
 <script setup lang="ts"></script>
-<template></template>
+<template>
+    <div>
+    <!-- Your component content will go here -->
+  </div>
+</template>

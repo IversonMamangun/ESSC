@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
 import { Head, router, useForm } from '@inertiajs/vue3';
 import { Send, User, MoreVertical, MessageSquare } from 'lucide-vue-next';
-import TopBar from '@/components/sections/TopBar.vue';
-import Navbar from '@/components/sections/Navbar.vue';
+import { ref, onMounted } from 'vue';
 import Footer from '@/components/sections/Footer.vue';
+import Navbar from '@/components/sections/Navbar.vue';
+import TopBar from '@/components/sections/TopBar.vue';
 
 // 1. Define Standard Inertia Props coming from ChatController
 const props = defineProps<{
@@ -36,7 +36,9 @@ const form = useForm({
 });
 
 const sendMessage = () => {
-  if (!form.text.trim() || !props.activeStore) return;
+  if (!form.text.trim() || !props.activeStore) {
+return;
+}
 
   // Optimistic UI update: instantly show the message on screen
   localMessages.value.push({

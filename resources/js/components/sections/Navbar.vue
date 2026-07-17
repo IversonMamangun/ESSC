@@ -7,18 +7,32 @@ import {
   ShoppingCart,
   LayoutDashboard,
 } from 'lucide-vue-next';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, onUnmounted } from 'vue';
 import { logout, login, register } from '@/routes';
-import shop from '@/routes/shop';
 import seller from '@/routes/seller';
+import shop from '@/routes/shop';
 
 const isMenuOpen = ref(false);
 const activeLink = ref('Home');
 const isDarkMode = ref(false);
 const isDropdownOpen = ref(false);
+const dropdownContainer = ref<HTMLElement | null>(null);
+const userMenuButton = ref<HTMLElement | null>(null);
 
 const page = usePage();
 const user = computed(() => page.props.auth?.user);
+
+const closeMenuOutside = (event: MouseEvent) => {
+  if (
+    isDropdownOpen.value &&
+    dropdownContainer.value &&
+    !dropdownContainer.value.contains(event.target as Node) &&
+    userMenuButton.value &&
+    !userMenuButton.value.contains(event.target as Node)
+  ) {
+    isDropdownOpen.value = false;
+  }
+};
 
 onMounted(() => {
   if (
@@ -28,6 +42,12 @@ onMounted(() => {
     isDarkMode.value = true;
     document.documentElement.classList.add('dark');
   }
+  
+  document.addEventListener('click', closeMenuOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', closeMenuOutside);
 });
 
 const toggleMenu = () => {
@@ -158,6 +178,7 @@ const navLinks = [
 
           <template v-else>
             <button
+              ref="userMenuButton"
               @click="isDropdownOpen = !isDropdownOpen"
               class="ml-1 flex cursor-pointer items-center justify-center rounded-full border-2 border-transparent p-0.5 transition-colors hover:border-[#009933] focus:ring-2 focus:ring-[#009933] focus:ring-offset-1 focus:outline-none dark:focus:ring-offset-neutral-900"
             >
@@ -185,7 +206,7 @@ const navLinks = [
             >
               <div
                 v-if="isDropdownOpen"
-                @click.away="isDropdownOpen = false"
+                ref="dropdownContainer"
                 class="absolute top-full right-0 z-[100] mt-2 w-64 overflow-hidden rounded-2xl border border-neutral-100 bg-white py-2 shadow-xl dark:border-neutral-800 dark:bg-neutral-900"
               >
                 <div

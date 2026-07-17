@@ -1,15 +1,4 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   EyeIcon,
   PackageIcon,
@@ -17,6 +6,17 @@ import {
   TagIcon,
   BoxIcon,
 } from 'lucide-vue-next';
+import { computed, ref, watch } from 'vue';
+import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Separator } from '@/components/ui/separator';
 import type { ProductShow, ProductVariant } from '@/types';
 
 const props = defineProps<{
@@ -49,7 +49,9 @@ interface GalleryItem {
 }
 
 const galleryItems = computed<GalleryItem[]>(() => {
-  if (!props.product) return [];
+  if (!props.product) {
+return [];
+}
 
   const productImages = [...(props.product.images ?? [])]
     .sort((a, b) => a.sort_order - b.sort_order)
@@ -61,9 +63,14 @@ const galleryItems = computed<GalleryItem[]>(() => {
 
   // de-dupe by url in case a variant reuses a product photo
   const seen = new Set<string>();
+
   return [...productImages, ...variantImages].filter((item) => {
-    if (seen.has(item.url)) return false;
+    if (seen.has(item.url)) {
+return false;
+}
+
     seen.add(item.url);
+
     return true;
   });
 });
@@ -73,7 +80,10 @@ const activeImage = computed(
 );
 
 function openImageInNewTab(url: string | null | undefined) {
-  if (!url) return;
+  if (!url) {
+return;
+}
+
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 
@@ -93,10 +103,14 @@ const totalStock = computed(() =>
 );
 
 const priceRange = computed(() => {
-  if (variants.value.length === 0) return null;
+  if (variants.value.length === 0) {
+return null;
+}
+
   const prices = variants.value.map((v) => Number(v.price));
   const min = Math.min(...prices);
   const max = Math.max(...prices);
+
   return { min, max };
 });
 
@@ -109,13 +123,22 @@ function formatCurrency(value: number) {
 }
 
 function variantLabel(variant: ProductVariant) {
-  if (!variant.attributes?.length) return variant.sku;
+  if (!variant.attributes?.length) {
+return variant.sku;
+}
+
   return variant.attributes.map((a) => a.value).join(' / ');
 }
 
 function stockTone(stock: number) {
-  if (stock <= 0) return 'text-red-600 dark:text-red-400';
-  if (stock <= 10) return 'text-amber-600 dark:text-amber-400';
+  if (stock <= 0) {
+return 'text-red-600 dark:text-red-400';
+}
+
+  if (stock <= 10) {
+return 'text-amber-600 dark:text-amber-400';
+}
+
   return 'text-emerald-600 dark:text-emerald-400';
 }
 </script>

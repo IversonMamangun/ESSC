@@ -12,9 +12,18 @@ import {
   ChevronLeftIcon,
   SaveIcon,
 } from 'lucide-vue-next';
+import { ref, watchEffect, reactive } from 'vue';
+import AddressForm from '@/components/accounts/AddressForm.vue';
+import type { AddressFields } from '@/components/accounts/AddressForm.vue';
+import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
+import Breadcrumbs from '@/components/Breadcrumbs.vue';
+import InputError from '@/components/InputError.vue';
+import Footer from '@/components/sections/Footer.vue';
+import Navbar from '@/components/sections/Navbar.vue';
+import TopBar from '@/components/sections/TopBar.vue';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -22,18 +31,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ref, watchEffect, reactive } from 'vue';
 import { useAddress } from '@/composables/useAddress';
-import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
-import AddressForm from '@/components/accounts/AddressForm.vue';
-import InputError from '@/components/InputError.vue';
-import Breadcrumbs from '@/components/Breadcrumbs.vue';
-import Footer from '@/components/sections/Footer.vue';
-import Navbar from '@/components/sections/Navbar.vue';
-import TopBar from '@/components/sections/TopBar.vue';
 import shop from '@/routes/shop';
 import type { User, UserAddress } from '@/types';
-import type { AddressFields } from '@/components/accounts/AddressForm.vue';
 
 const props = defineProps<{
   user: User;

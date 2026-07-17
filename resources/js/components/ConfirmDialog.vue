@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, type Component } from 'vue';
+import { computed  } from 'vue';
+import type {Component} from 'vue';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -8,7 +10,6 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 
 interface Props {
   title: string;

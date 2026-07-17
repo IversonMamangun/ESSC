@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { Head, useForm, Link, router } from '@inertiajs/vue3';
 import { AlertCircleIcon } from 'lucide-vue-next';
-import Navbar from '@/components/sections/Navbar.vue';
-import TopBar from '@/components/sections/TopBar.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
-import SellerStoreHeader from '@/components/SellerStoreHeader.vue';
-import SalesStatCards from '@/components/sales/SalesStatCards.vue';
-import TopProductsChart from '@/components/sales/TopProductsChart.vue';
 import OrdersOverviewChart from '@/components/sales/OrdersOverviewChart.vue';
 import OrderStatusDonut from '@/components/sales/OrderStatusDonut.vue';
+import SalesStatCards from '@/components/sales/SalesStatCards.vue';
+import TopProductsChart from '@/components/sales/TopProductsChart.vue';
+import Navbar from '@/components/sections/Navbar.vue';
+import TopBar from '@/components/sections/TopBar.vue';
+import SellerStoreHeader from '@/components/SellerStoreHeader.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import seller from '@/routes/seller';
 import type {

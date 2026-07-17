@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useHttp, Head, router } from '@inertiajs/vue3';
-import { ref, computed, nextTick } from 'vue';
 import { Eye, EyeOff, LoaderCircle } from 'lucide-vue-next';
+import { ref, computed, nextTick } from 'vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -47,14 +47,18 @@ const startTimer = () => {
   countdown.value = 300;
   clearInterval(timerId);
   timerId = setInterval(() => {
-    if (countdown.value > 0) countdown.value--;
-    else clearInterval(timerId);
+    if (countdown.value > 0) {
+countdown.value--;
+} else {
+clearInterval(timerId);
+}
   }, 1000);
 };
 
 const formattedTime = computed(() => {
   const m = String(Math.floor(countdown.value / 60)).padStart(2, '0');
   const s = String(countdown.value % 60).padStart(2, '0');
+
   return `${m}:${s}`;
 });
 
@@ -94,10 +98,13 @@ const requestOtp = async () => {
     await http.post(send().url);
   } catch {
     globalError.value = 'Failed to send OTP.';
+
     return;
   }
 
-  if (hasFieldErrors()) return;
+  if (hasFieldErrors()) {
+return;
+}
 
   currentStep.value = 2;
   startTimer();
@@ -111,10 +118,13 @@ const verifyOtp = async () => {
     data = (await http.post(verify().url)) as { verification_token?: string };
   } catch {
     globalError.value = 'Verification failed.';
+
     return;
   }
 
-  if (hasFieldErrors()) return;
+  if (hasFieldErrors()) {
+return;
+}
 
   http.verification_token = data?.verification_token ?? '';
   currentStep.value = 3;
@@ -127,10 +137,13 @@ const resendOtp = async () => {
     await http.post(send().url);
   } catch {
     globalError.value = 'Failed to resend OTP.';
+
     return;
   }
 
-  if (hasFieldErrors()) return;
+  if (hasFieldErrors()) {
+return;
+}
 
   startTimer();
   resetOtpBoxes();
@@ -145,10 +158,13 @@ const createAccount = async () => {
     data = (await http.post(store().url)) as { redirect?: string };
   } catch {
     globalError.value = 'Failed to create account.';
+
     return;
   }
 
-  if (hasFieldErrors()) return;
+  if (hasFieldErrors()) {
+return;
+}
 
   successRedirect.value = data?.redirect ?? '/';
   currentStep.value = 4;

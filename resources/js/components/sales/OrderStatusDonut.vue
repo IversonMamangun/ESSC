@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { VisSingleContainer, VisDonut, VisTooltip } from '@unovis/vue';
 import { Donut } from '@unovis/ts';
+import { VisSingleContainer, VisDonut, VisTooltip } from '@unovis/vue';
 import { PieChartIcon } from 'lucide-vue-next';
-import { ChartContainer, type ChartConfig } from '@/components/ui/chart';
+import { ChartContainer  } from '@/components/ui/chart';
+import type {ChartConfig} from '@/components/ui/chart';
 import type { OrderStatusSlice } from '@/types';
 
 const props = defineProps<{ data: OrderStatusSlice[] }>();
 
 const chartConfig = props.data.reduce((acc, slice) => {
   acc[slice.key] = { label: slice.label, color: slice.color };
+
   return acc;
 }, {} as ChartConfig);
 
