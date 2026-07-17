@@ -8,14 +8,14 @@ import {
 } from 'lucide-vue-next';
 import { ref, computed } from 'vue';
 import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
+import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import InputError from '@/components/InputError.vue';
 import OrderCard from '@/components/orders/OrderCard.vue';
 import OrderReviewDetailsDialog from '@/components/orders/OrderReviewDetailsDialog.vue';
 import Pagination from '@/components/Pagination.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import InputError from '@/components/InputError.vue';
-import ConfirmDialog from '@/components/ConfirmDialog.vue';
 import shop from '@/routes/shop';
 import type {
   User,
@@ -91,7 +91,9 @@ const action = ref<Action | null>(null);
 const confirmOpen = computed({
   get: () => action.value !== null,
   set: (val: boolean) => {
-    if (!val) action.value = null;
+    if (!val) {
+action.value = null;
+}
   },
 });
 // config per action type
@@ -135,7 +137,10 @@ const completeOrder = (orderNo: string) => {
 };
 // confirm endpoint
 const handleConfirmAction = () => {
-  if (!action.value) return;
+  if (!action.value) {
+return;
+}
+
   const { type, orderNo } = action.value;
 
   const requests: Record<ActionType, () => void> = {

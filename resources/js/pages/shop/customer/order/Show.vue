@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { computed } from 'vue';
 import {
   PhoneIcon,
   ArrowLeftIcon,
@@ -9,11 +8,12 @@ import {
   StoreIcon,
   CircleXIcon,
 } from 'lucide-vue-next';
+import { computed } from 'vue';
+import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
+import OrderStatusBadge from '@/components/orders/OrderStatusBadge.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
-import OrderStatusBadge from '@/components/orders/OrderStatusBadge.vue';
 import shop from '@/routes/shop';
 import type { OrderShow } from '@/types';
 
@@ -36,7 +36,10 @@ function formatDate(value: string) {
   });
 }
 function openImageInNewTab(url: string | null | undefined) {
-  if (!url) return;
+  if (!url) {
+return;
+}
+
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 
@@ -55,15 +58,22 @@ const TIMESTAMP_LABELS: Record<string, string> = {
 };
 
 const fullAddress = computed(() => {
-  if (!props.order) return '';
+  if (!props.order) {
+return '';
+}
+
   const a = props.order.shipping_address;
+
   return [a.unit_bldg_house, a.street, a.barangay, a.city, a.province, a.region]
     .filter(Boolean)
     .join(', ')
     .concat(a.postal_code ? ` ${a.postal_code}` : '');
 });
 const timelineSteps = computed(() => {
-  if (!props.order) return [];
+  if (!props.order) {
+return [];
+}
+
   return Object.entries(props.order.timestamps ?? {})
     .filter(([, value]) => !!value)
     .map(([key, value]) => ({

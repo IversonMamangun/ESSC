@@ -2,10 +2,10 @@
 import { Head, Link } from '@inertiajs/vue3';
 import { ArrowLeftIcon } from 'lucide-vue-next';
 import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
+import CustomerForm from '@/components/review/CustomerForm.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
-import CustomerForm from '@/components/review/CustomerForm.vue';
 import shop from '@/routes/shop';
 import type { User, Order } from '@/types';
 
