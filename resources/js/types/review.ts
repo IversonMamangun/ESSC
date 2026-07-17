@@ -1,4 +1,6 @@
 import { OrderItem } from './order';
+import { LaravelPaginationItem } from './product';
+import { User } from './auth';
 
 interface Review {
   id: number;
@@ -25,4 +27,31 @@ export interface ReviewEdit extends OrderItem {
 
 export interface ReviewShow extends OrderItem {
   review: Review | null;
+}
+
+export interface SellerReviewIndex extends Review {
+  order_item: OrderItem;
+  user: User;
+}
+
+export interface PaginatedSellerReview {
+  data: SellerReviewIndex[];
+
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: LaravelPaginationItem[];
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
 }

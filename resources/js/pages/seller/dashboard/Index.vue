@@ -7,6 +7,7 @@ import {
   ShoppingBagIcon,
   AlertCircleIcon,
   MessageCircleMoreIcon,
+  StarIcon,
 } from 'lucide-vue-next';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
@@ -56,11 +57,19 @@ const props = defineProps<{
           :edit-store-href="seller.store.edit.url(props.store.slug)"
         >
           <template #actions>
-            <Link
-              class="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#009933] px-6 py-3.5 font-bold text-white shadow-md transition-colors hover:bg-green-700 active:scale-95"
-            >
-              <MessageCircleMoreIcon class="h-5 w-5" /> View Chats
-            </Link>
+            <div class="flex gap-2">
+              <Link
+                :href="seller.reviews.index()"
+                class="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#009933] px-6 py-3.5 font-bold text-white shadow-md transition-colors hover:bg-green-700 active:scale-95"
+              >
+                <StarIcon class="h-5 w-5" /> View Reviews
+              </Link>
+              <Link
+                class="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-[#009933] px-6 py-3.5 font-bold text-white shadow-md transition-colors hover:bg-green-700 active:scale-95"
+              >
+                <MessageCircleMoreIcon class="h-5 w-5" /> View Chats
+              </Link>
+            </div>
           </template>
         </SellerStoreHeader>
 

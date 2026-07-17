@@ -30,6 +30,7 @@ use App\Http\Controllers\Seller\ProductController as SellerProductController;
 use App\Http\Controllers\Seller\OrderController as SellerOrderController;
 use App\Http\Controllers\Seller\SalesController as SellerSalesController;
 use App\Http\Controllers\Seller\SalesAnalyticsController as SellerSalesAnalyticsController;
+use App\Http\Controllers\Seller\ReviewController as SellerReviewController;
 
 Route::inertia('/', 'Welcome', [
     'canRegister' => true,
@@ -183,13 +184,15 @@ Route::middleware([
     Route::patch('/orders/{order}/cancel', [SellerOrderController::class, 'cancel'])
         ->name('orders.cancel');
 
-
     Route::get('/sales', [SellerSalesController::class, 'index'])
         ->name('sales.index');
     Route::patch('/sales/{order}/action', [SellerSalesController::class, 'action'])
         ->name('sales.action');
     Route::get('/sales/analytics', [SellerSalesAnalyticsController::class, 'analytics'])
         ->name('sales.analytics');
+
+    Route::get('/reviews', [SellerReviewController::class, 'index'])
+        ->name('reviews.index');
 });
 
 // dedicated admin routes
