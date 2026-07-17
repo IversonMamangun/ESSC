@@ -39,6 +39,10 @@ defineProps<{
           Edit Store Profile
           <ExternalLinkIcon class="h-3 w-3" />
         </Link>
+
+        <div class="mt-1 flex items-center gap-2">
+          <slot name="details" />
+        </div>
       </div>
     </div>
 

@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
-import { AlertCircleIcon, MessageSquareOffIcon } from 'lucide-vue-next';
+import {
+  AlertCircleIcon,
+  MessageSquareOffIcon,
+  StarIcon,
+  AwardIcon,
+  BoxIcon,
+} from 'lucide-vue-next';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import Pagination from '@/components/Pagination.vue';
+import SellerStoreHeader from '@/components/SellerStoreHeader.vue';
 import SellerReviewCard from '@/components/review/SellerReviewCard.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Card, CardContent } from '@/components/ui/card';
@@ -36,24 +43,44 @@ const breadcrumbs = [
 
       <div v-if="props.store.is_active" class="flex flex-col gap-6">
         <!-- Header -->
-        <div
-          class="flex items-center justify-between rounded-2xl bg-card/40 px-6 py-4 shadow"
-        >
-          <div>
-            <h1 class="text-2xl font-semibold tracking-tight">Reviews</h1>
-            <p class="text-sm text-muted-foreground">
-              Feedback customers left on your products.
-            </p>
-          </div>
-          <div
-            class="flex items-center gap-2 rounded-lg border bg-card px-3 py-1.5"
-          >
-            <span class="text-sm font-medium">{{
-              props.reviews.meta.total
-            }}</span>
-            <span class="text-sm text-muted-foreground">total reviews</span>
-          </div>
-        </div>
+        <SellerStoreHeader :store="props.store">
+          <template #details>
+            <div
+              class="flex items-center rounded-lg border border-zinc-200 bg-zinc-100 px-3 py-1.5 text-sm text-zinc-600 transition-colors dark:border-zinc-700/50 dark:bg-zinc-800/50 dark:text-zinc-300"
+            >
+              <StarIcon class="mr-1.5 h-4 w-4 fill-current text-amber-400" />
+              <span class="font-bold text-zinc-800 dark:text-zinc-100">
+                {{ store.rating.toFixed(1) }}
+              </span>
+              <span class="ml-1 text-xs text-zinc-600 dark:text-zinc-400">
+                ({{ store.reviews_count }} reviews)
+              </span>
+            </div>
+
+            <div
+              class="flex items-center rounded-lg border border-zinc-200 bg-zinc-100 px-3 py-1.5 text-sm text-zinc-600 transition-colors dark:border-zinc-700/50 dark:bg-zinc-800/50 dark:text-zinc-300"
+            >
+              <BoxIcon
+                class="mr-1.5 h-4 w-4 fill-white text-zinc-400 dark:fill-black"
+              />
+              <span class="font-bold text-zinc-800 dark:text-zinc-100">
+                {{ store.sold_count }}
+              </span>
+              <span class="ml-1 text-xs text-zinc-600 dark:text-zinc-400"
+                >sold</span
+              >
+            </div>
+          </template>
+          <template #actions>
+            <span
+              v-if="store.is_official"
+              class="mx-auto flex w-max items-center rounded bg-[#009933] py-2 ps-2 pe-3.5 text-[10px] font-black tracking-wider text-white uppercase shadow-sm md:mx-0"
+            >
+              <AwardIcon class="mr-1.5 h-4 w-4 fill-amber-400" />
+              Official Store
+            </span>
+          </template>
+        </SellerStoreHeader>
 
         <!-- Empty state -->
         <Card v-if="props.reviews.data.length === 0">
