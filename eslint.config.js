@@ -52,17 +52,21 @@ export default defineConfigWithVueTs(
             'import/order': [
                 'error',
                 {
-                    groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+                    groups: [
+                        'builtin',
+                        'external',
+                        'internal',
+                        'parent',
+                        'sibling',
+                        'index',
+                    ],
                     alphabetize: {
                         order: 'asc',
                         caseInsensitive: true,
                     },
                 },
             ],
-            'import/consistent-type-specifier-style': [
-                'error',
-                'prefer-top-level',
-            ],
+            'import/consistent-type-specifier-style': ['error', 'prefer-top-level'],
         },
     },
     {
@@ -96,7 +100,7 @@ export default defineConfigWithVueTs(
             '@stylistic': stylistic,
         },
         rules: {
-            curly: ['error', 'all'],
+            curly: ['error', 'multi-line'],
             '@stylistic/brace-style': ['error', '1tbs', { allowSingleLine: false }],
         },
     },
