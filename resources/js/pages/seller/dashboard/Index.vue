@@ -8,12 +8,12 @@ import {
   AlertCircleIcon,
   MessageCircleMoreIcon,
 } from 'lucide-vue-next';
+import OrdersSummaryCard from '@/components/dashboard/OrdersSummaryCard.vue';
+import ProductsSummaryCard from '@/components/dashboard/ProductsSummaryCard.vue';
+import SalesSummaryCard from '@/components/dashboard/SalesSummaryCard.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import SellerStoreHeader from '@/components/SellerStoreHeader.vue';
-import ProductsSummaryCard from '@/components/dashboard/ProductsSummaryCard.vue';
-import OrdersSummaryCard from '@/components/dashboard/OrdersSummaryCard.vue';
-import SalesSummaryCard from '@/components/dashboard/SalesSummaryCard.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import seller from '@/routes/seller';
 import type {
