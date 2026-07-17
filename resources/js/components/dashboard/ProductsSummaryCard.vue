@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { VisSingleContainer, VisDonut, VisTooltip } from '@unovis/vue';
 import { Donut } from '@unovis/ts';
+import { VisSingleContainer, VisDonut, VisTooltip } from '@unovis/vue';
 import { PackageIcon, ArrowRightIcon } from 'lucide-vue-next';
-import { ChartContainer, type ChartConfig } from '@/components/ui/chart';
+import { ChartContainer  } from '@/components/ui/chart';
+import type {ChartConfig} from '@/components/ui/chart';
 import seller from '@/routes/seller';
 import type { ProductsSummary } from '@/types';
 
@@ -22,6 +23,7 @@ const color = (d: Segment) => `var(--color-${d.key})`;
 
 const tooltipTemplate = (d: { data: Segment }) => {
   const segment = d.data;
+
   return `
     <div class="flex items-center gap-2 rounded-xl border border-zinc-200 bg-white px-3 py-2 text-xs shadow-md dark:border-zinc-800 dark:bg-zinc-900">
       <span class="h-2.5 w-2.5 shrink-0 rounded-full" style="background-color:${color(segment)}"></span>

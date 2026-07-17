@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import type { InertiaForm } from '@inertiajs/vue3';
 import { MapPinIcon, Building2Icon, SaveIcon, PlusIcon } from 'lucide-vue-next';
+import { toRef } from 'vue';
+import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -10,8 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import InputError from '@/components/InputError.vue';
-import type { InertiaForm } from '@inertiajs/vue3';
 
 interface PsgcItem {
   code: string;
@@ -58,6 +59,10 @@ const props = defineProps<{
 const emit = defineEmits<{
   submit: [];
 }>();
+
+// Create local references to bypass 'vue/no-mutating-props' while preserving Inertia reactivity
+const localForm = toRef(props, 'form');
+const localAddress = toRef(props, 'userAddress');
 </script>
 
 <template>
@@ -73,14 +78,14 @@ const emit = defineEmits<{
         <Label
           class="relative flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border-2 p-3 transition-all"
           :class="
-            form.label === 'home'
+            localForm.label === 'home'
               ? 'border-[#009933] bg-green-50/50 text-[#009933] dark:bg-green-900/10'
               : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700'
           "
         >
           <input
             type="radio"
-            v-model="form.label"
+            v-model="localForm.label"
             value="home"
             class="hidden"
           />
@@ -91,14 +96,14 @@ const emit = defineEmits<{
         <Label
           class="relative flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border-2 p-3 transition-all"
           :class="
-            form.label === 'office'
+            localForm.label === 'office'
               ? 'border-[#009933] bg-green-50/50 text-[#009933] dark:bg-green-900/10'
               : 'border-zinc-200 bg-white text-zinc-600 hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700'
           "
         >
           <input
             type="radio"
-            v-model="form.label"
+            v-model="localForm.label"
             value="office"
             class="hidden"
           />
@@ -106,7 +111,7 @@ const emit = defineEmits<{
           <span class="text-sm font-bold">Office</span>
         </Label>
       </div>
-      <InputError :message="form.errors.label" />
+      <InputError :message="localForm.errors.label" />
     </div>
 
     <!-- Recipient -->
@@ -119,12 +124,12 @@ const emit = defineEmits<{
         </Label>
         <Input
           type="text"
-          v-model="form.recipient_name"
+          v-model="localForm.recipient_name"
           placeholder="e.g. John Doe"
           required
           class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
         />
-        <InputError :message="form.errors.recipient_name" />
+        <InputError :message="localForm.errors.recipient_name" />
       </div>
       <div>
         <Label
@@ -134,12 +139,12 @@ const emit = defineEmits<{
         </Label>
         <Input
           type="text"
-          v-model="form.recipient_number"
+          v-model="localForm.recipient_number"
           placeholder="e.g. 09123456789"
           required
           class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
         />
-        <InputError :message="form.errors.recipient_number" />
+        <InputError :message="localForm.errors.recipient_number" />
       </div>
     </div>
 
@@ -153,12 +158,12 @@ const emit = defineEmits<{
         </Label>
         <Input
           type="text"
-          v-model="form.unit_bldg_house"
+          v-model="localForm.unit_bldg_house"
           placeholder="e.g. Unit D, 2nd Floor, Blk 123"
           required
           class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
         />
-        <InputError :message="form.errors.unit_bldg_house" />
+        <InputError :message="localForm.errors.unit_bldg_house" />
       </div>
       <div>
         <Label
@@ -168,12 +173,12 @@ const emit = defineEmits<{
         </Label>
         <Input
           type="text"
-          v-model="form.street"
+          v-model="localForm.street"
           placeholder="e.g. 123 Main St"
           required
           class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
         />
-        <InputError :message="form.errors.street" />
+        <InputError :message="localForm.errors.street" />
       </div>
     </div>
 
@@ -186,7 +191,7 @@ const emit = defineEmits<{
         >
           Region
         </Label>
-        <Select v-model="userAddress.selectedRegion">
+        <Select v-model="localAddress.selectedRegion">
           <SelectTrigger
             class="w-full cursor-pointer rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none focus:ring-2 focus:ring-ring/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
           >
@@ -194,7 +199,7 @@ const emit = defineEmits<{
           </SelectTrigger>
           <SelectContent>
             <SelectItem
-              v-for="region in userAddress.regions"
+              v-for="region in localAddress.regions"
               :key="region.code"
               :value="region.name"
               class="cursor-pointer"
@@ -203,7 +208,7 @@ const emit = defineEmits<{
             </SelectItem>
           </SelectContent>
         </Select>
-        <InputError :message="form.errors.region" />
+        <InputError :message="localForm.errors.region" />
       </div>
 
       <!-- Province -->
@@ -214,17 +219,17 @@ const emit = defineEmits<{
           Province
         </Label>
         <Select
-          v-model="userAddress.selectedProvince"
-          :disabled="!userAddress.selectedRegion || userAddress.isNcr"
+          v-model="localAddress.selectedProvince"
+          :disabled="!localAddress.selectedRegion || localAddress.isNcr"
         >
           <SelectTrigger
             class="w-full cursor-pointer rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none focus:ring-2 focus:ring-ring/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
           >
             <SelectValue
               :placeholder="
-                !userAddress.selectedRegion
+                !localAddress.selectedRegion
                   ? 'Select region first'
-                  : userAddress.isNcr
+                  : localAddress.isNcr
                     ? 'NCR — proceed to city'
                     : 'Select province'
               "
@@ -232,7 +237,7 @@ const emit = defineEmits<{
           </SelectTrigger>
           <SelectContent>
             <SelectItem
-              v-for="province in userAddress.provinces"
+              v-for="province in localAddress.provinces"
               :key="province.code"
               :value="province.name"
               class="cursor-pointer"
@@ -241,7 +246,7 @@ const emit = defineEmits<{
             </SelectItem>
           </SelectContent>
         </Select>
-        <InputError :message="form.errors.province" />
+        <InputError :message="localForm.errors.province" />
       </div>
 
       <!-- City -->
@@ -252,15 +257,15 @@ const emit = defineEmits<{
           City / Municipality
         </Label>
         <Select
-          v-model="userAddress.selectedCity"
-          :disabled="!userAddress.isNcr && !userAddress.selectedProvince"
+          v-model="localAddress.selectedCity"
+          :disabled="!localAddress.isNcr && !localAddress.selectedProvince"
         >
           <SelectTrigger
             class="w-full cursor-pointer rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none focus:ring-2 focus:ring-ring/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
           >
             <SelectValue
               :placeholder="
-                !userAddress.isNcr && !userAddress.selectedProvince
+                !localAddress.isNcr && !localAddress.selectedProvince
                   ? 'Select province first'
                   : 'Select city'
               "
@@ -268,7 +273,7 @@ const emit = defineEmits<{
           </SelectTrigger>
           <SelectContent>
             <SelectItem
-              v-for="city in userAddress.cities"
+              v-for="city in localAddress.cities"
               :key="city.code"
               :value="city.name"
               class="cursor-pointer"
@@ -277,7 +282,7 @@ const emit = defineEmits<{
             </SelectItem>
           </SelectContent>
         </Select>
-        <InputError :message="form.errors.city" />
+        <InputError :message="localForm.errors.city" />
       </div>
 
       <!-- Barangay -->
@@ -288,15 +293,15 @@ const emit = defineEmits<{
           Barangay
         </Label>
         <Select
-          v-model="userAddress.selectedBarangay"
-          :disabled="!userAddress.selectedCity"
+          v-model="localAddress.selectedBarangay"
+          :disabled="!localAddress.selectedCity"
         >
           <SelectTrigger
             class="w-full cursor-pointer rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none focus:ring-2 focus:ring-ring/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
           >
             <SelectValue
               :placeholder="
-                !userAddress.selectedCity
+                !localAddress.selectedCity
                   ? 'Select city first'
                   : 'Select barangay'
               "
@@ -304,7 +309,7 @@ const emit = defineEmits<{
           </SelectTrigger>
           <SelectContent>
             <SelectItem
-              v-for="barangay in userAddress.barangays"
+              v-for="barangay in localAddress.barangays"
               :key="barangay.code"
               :value="barangay.name"
               class="cursor-pointer"
@@ -313,7 +318,7 @@ const emit = defineEmits<{
             </SelectItem>
           </SelectContent>
         </Select>
-        <InputError :message="form.errors.barangay" />
+        <InputError :message="localForm.errors.barangay" />
       </div>
 
       <!-- Postal Code -->
@@ -325,13 +330,13 @@ const emit = defineEmits<{
         </Label>
         <Input
           type="text"
-          v-model="form.postal_code"
+          v-model="localForm.postal_code"
           placeholder="e.g. 1234"
           maxlength="4"
           required
           class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none focus:ring-2 focus:ring-ring/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
         />
-        <InputError :message="form.errors.postal_code" />
+        <InputError :message="localForm.errors.postal_code" />
       </div>
 
       <!-- Landmark -->
@@ -343,11 +348,11 @@ const emit = defineEmits<{
         </Label>
         <Input
           type="text"
-          v-model="form.landmark"
+          v-model="localForm.landmark"
           placeholder="e.g. near the mall"
           class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-5 text-zinc-900 transition-all outline-none focus:ring-2 focus:ring-ring/50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
         />
-        <InputError :message="form.errors.landmark" />
+        <InputError :message="localForm.errors.landmark" />
       </div>
     </div>
 
@@ -356,7 +361,7 @@ const emit = defineEmits<{
       <Label
         class="flex cursor-pointer items-center gap-3 rounded-xl border-2 p-4 transition-all"
         :class="
-          form.is_default
+          localForm.is_default
             ? 'border-[#009933] bg-green-50/50 dark:bg-green-900/10'
             : 'border-zinc-200 bg-white dark:border-zinc-700 dark:bg-zinc-800'
         "
@@ -365,7 +370,7 @@ const emit = defineEmits<{
         <input
           id="is_default_toggle"
           type="checkbox"
-          v-model="form.is_default"
+          v-model="localForm.is_default"
           :disabled="isAlreadyDefault"
           class="h-4 w-4 cursor-pointer accent-[#009933] disabled:cursor-not-allowed"
         />
@@ -385,12 +390,12 @@ const emit = defineEmits<{
     <div class="flex justify-end">
       <Button
         type="submit"
-        :disabled="form.processing"
+        :disabled="localForm.processing"
         class="cursor-pointer gap-2"
       >
         <SaveIcon v-if="submitLabel !== 'Create Address'" class="h-4 w-4" />
         <PlusIcon v-else class="h-4 w-4" />
-        {{ form.processing ? 'Saving…' : (submitLabel ?? 'Save Address') }}
+        {{ localForm.processing ? 'Saving…' : (submitLabel ?? 'Save Address') }}
       </Button>
     </div>
   </form>
