@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import type { Order } from '@/types';
 import { Link } from '@inertiajs/vue3';
-import shop from '@/routes/shop';
 import {
   TruckIcon,
   StarIcon,
@@ -10,6 +8,7 @@ import {
   CircleXIcon,
   MessageSquareIcon,
 } from 'lucide-vue-next';
+import OrderStatusBadge from '@/components/orders/OrderStatusBadge.vue';
 import {
   Accordion,
   AccordionContent,
@@ -22,7 +21,8 @@ import {
   CardFooter,
   CardHeader,
 } from '@/components/ui/card';
-import OrderStatusBadge from '@/components/orders/OrderStatusBadge.vue';
+import shop from '@/routes/shop';
+import type { Order } from '@/types';
 
 const props = defineProps<{
   order: Order;

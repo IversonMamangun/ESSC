@@ -8,7 +8,8 @@ import {
   VisTooltip,
 } from '@unovis/vue';
 import { ActivityIcon } from 'lucide-vue-next';
-import { ChartContainer, type ChartConfig } from '@/components/ui/chart';
+import { ChartContainer  } from '@/components/ui/chart';
+import type {ChartConfig} from '@/components/ui/chart';
 import type { OrdersOverviewPoint } from '@/types';
 
 const props = defineProps<{ data: OrdersOverviewPoint[] }>();

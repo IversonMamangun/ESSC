@@ -7,10 +7,10 @@ import {
   VideoIcon,
   CameraIcon,
 } from 'lucide-vue-next';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Label } from '@/components/ui/label';
 import { ref, computed, onUnmounted } from 'vue';
 import InputError from '@/components/InputError.vue';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import shop from '@/routes/shop';
 import type { ReviewForm, ExistingReviewImage } from '@/types';
 
@@ -75,9 +75,14 @@ const hasVideo = (index: number) =>
 const handleImages = (index: number, e: Event) => {
   const input = e.target as HTMLInputElement;
   const files = Array.from(input.files ?? []);
-  if (!files.length) return;
 
-  if (!imagePreviews.value[index]) imagePreviews.value[index] = [];
+  if (!files.length) {
+return;
+}
+
+  if (!imagePreviews.value[index]) {
+imagePreviews.value[index] = [];
+}
 
   const remaining = MAX_IMAGES - totalImageCount(index);
   const allowed = files.slice(0, remaining);
@@ -103,9 +108,15 @@ const removeExistingImage = (index: number, imageId: number) => {
 };
 
 const handleVideo = (index: number, e: Event) => {
-  if (hasVideo(index).value) return;
+  if (hasVideo(index).value) {
+return;
+}
+
   const file = (e.target as HTMLInputElement).files?.[0];
-  if (!file) return;
+
+  if (!file) {
+return;
+}
 
   form.items[index].video = file;
   videoPreviews.value[index] = URL.createObjectURL(file);
@@ -113,8 +124,11 @@ const handleVideo = (index: number, e: Event) => {
 
 const removeNewVideo = (index: number) => {
   form.items[index].video = null;
-  if (videoPreviews.value[index])
-    URL.revokeObjectURL(videoPreviews.value[index]!);
+
+  if (videoPreviews.value[index]) {
+URL.revokeObjectURL(videoPreviews.value[index]!);
+}
+
   videoPreviews.value[index] = null;
 };
 

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Link } from '@inertiajs/vue3';
+import { StarIcon, PackageIcon } from 'lucide-vue-next';
 import {
   Dialog,
   DialogContent,
@@ -7,10 +9,8 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { StarIcon, PackageIcon } from 'lucide-vue-next';
-import { Link } from '@inertiajs/vue3';
-import type { ReviewShow } from '@/types';
 import shop from '@/routes/shop';
+import type { ReviewShow } from '@/types';
 
 const props = defineProps<{
   open: boolean;

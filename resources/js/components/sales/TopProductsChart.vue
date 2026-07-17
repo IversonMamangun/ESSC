@@ -1,13 +1,14 @@
 <script setup lang="ts">
+import { GroupedBar } from '@unovis/ts';
 import {
   VisXYContainer,
   VisGroupedBar,
   VisAxis,
   VisTooltip,
 } from '@unovis/vue';
-import { GroupedBar } from '@unovis/ts';
 import { TrophyIcon } from 'lucide-vue-next';
-import { ChartContainer, type ChartConfig } from '@/components/ui/chart';
+import { ChartContainer  } from '@/components/ui/chart';
+import type {ChartConfig} from '@/components/ui/chart';
 import type { TopProduct } from '@/types';
 
 const props = defineProps<{ products: TopProduct[] }>();
@@ -22,6 +23,7 @@ const x = (d: TopProduct) => d.value;
 const color = () => 'var(--color-value)';
 const tickFormat = (i: number) => {
   const label = props.products[i]?.label ?? '';
+
   return label.length > 18 ? `${label.slice(0, 18)}…` : label;
 };
 
