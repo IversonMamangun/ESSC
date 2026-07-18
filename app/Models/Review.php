@@ -19,6 +19,8 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
     'comment',
     'video',
     'is_anonymous',
+    'reply',
+    'replied_at',
 ])]
 #[ObservedBy([ReviewObserver::class])]
 class Review extends Model
@@ -34,6 +36,7 @@ class Review extends Model
             'product_id' => 'integer',
             'is_anonymous' => 'boolean',
             'rating' => 'integer',
+            'replied_at' => 'datetime',
         ];
     }
 

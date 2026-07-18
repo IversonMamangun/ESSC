@@ -21,6 +21,8 @@ return new class extends Migration
             $table->text('comment')->nullable();
             $table->string('video')->nullable();
             $table->boolean('is_anonymous')->default(false);
+            $table->text('reply')->nullable();
+            $table->timestamp('replied_at')->nullable();
             $table->timestamps();
         });
     }
