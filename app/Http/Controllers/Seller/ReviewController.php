@@ -63,6 +63,9 @@ class ReviewController extends Controller
             'replied_at' => now(),
         ]);
 
-        return back();
+        return back()->with(
+            'success',
+            'Reply sent successfully.'
+        );
     }
 }

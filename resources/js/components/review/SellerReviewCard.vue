@@ -1,11 +1,22 @@
 <script setup lang="ts">
-import { CheckCircle2Icon, StarIcon } from 'lucide-vue-next';
+import { ref } from 'vue';
+import { useForm } from '@inertiajs/vue3';
+import {
+  CheckCircle2Icon,
+  ReplyIcon,
+  StarIcon,
+  StoreIcon,
+} from 'lucide-vue-next';
+import InputError from '@/components/InputError.vue';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import seller from '@/routes/seller';
 import type { SellerReviewIndex } from '@/types';
 
-defineProps<{
+const props = defineProps<{
   review: SellerReviewIndex;
 }>();
 
@@ -29,6 +40,28 @@ function initials(name: string) {
 
 function getStars(rating: number, max = 5) {
   return Array.from({ length: max }, (_, i) => i < rating);
+}
+
+// --- Reply logic ---
+const showReplyForm = ref(false);
+const replyForm = useForm({
+  reply: '',
+});
+
+function submitReply() {
+  replyForm.patch(seller.reviews.reply(props.review.id).url, {
+    preserveScroll: true,
+    onSuccess: () => {
+      showReplyForm.value = false;
+      replyForm.reset();
+    },
+  });
+}
+
+function cancelReply() {
+  showReplyForm.value = false;
+  replyForm.reset();
+  replyForm.clearErrors();
 }
 </script>
 
@@ -139,6 +172,68 @@ function getStars(rating: number, max = 5) {
             Verified purchase
           </p>
         </div>
+      </div>
+
+      <Separator class="my-4" />
+
+      <!-- Seller reply -->
+      <div v-if="review.reply" class="rounded-lg border bg-muted/40 p-4">
+        <div class="mb-1.5 flex items-center justify-between">
+          <p class="flex items-center gap-1.5 text-sm font-medium">
+            <StoreIcon class="h-3.5 w-3.5" />
+            Your reply
+          </p>
+          <span class="text-xs text-muted-foreground">{{
+            formatDate(review.replied_at)
+          }}</span>
+        </div>
+        <p class="text-sm leading-relaxed text-foreground/90">
+          {{ review.reply }}
+        </p>
+      </div>
+
+      <div v-else>
+        <div v-if="!showReplyForm" class="me-2 flex justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            class="cursor-pointer"
+            @click="showReplyForm = true"
+          >
+            <ReplyIcon class="h-3.5 w-3.5" />
+            Reply
+          </Button>
+        </div>
+
+        <form v-else class="flex flex-col gap-2" @submit.prevent="submitReply">
+          <Textarea
+            v-model="replyForm.reply"
+            placeholder="Write a public reply to this review…"
+            rows="3"
+            :disabled="replyForm.processing"
+          />
+          <InputError :message="replyForm.errors.reply" />
+          <div class="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              class="cursor-pointer"
+              :disabled="replyForm.processing"
+              @click="cancelReply"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              size="sm"
+              class="cursor-pointer"
+              :disabled="replyForm.processing || !replyForm.reply.trim()"
+            >
+              {{ replyForm.processing ? 'Posting…' : 'Post reply' }}
+            </Button>
+          </div>
+        </form>
       </div>
     </CardContent>
   </Card>

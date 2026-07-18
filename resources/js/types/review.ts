@@ -9,6 +9,8 @@ interface Review {
   video: string | null;
   is_anonymous: boolean;
   created_at: string | null;
+  reply: string | null;
+  replied_at: string | null;
   images: ExistingReviewImage[];
 }
 
