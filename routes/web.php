@@ -193,6 +193,8 @@ Route::middleware([
 
     Route::get('/reviews', [SellerReviewController::class, 'index'])
         ->name('reviews.index');
+    Route::patch('reviews/{review}/reply', [SellerReviewController::class, 'reply'])
+        ->name('reviews.reply');
 });
 
 // dedicated admin routes

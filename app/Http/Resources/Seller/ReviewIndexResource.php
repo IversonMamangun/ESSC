@@ -20,6 +20,8 @@ class ReviewIndexResource extends JsonResource
             'rating' => $this->rating,
             'comment' => $this->comment,
             'video' => $this->video ? Storage::url($this->video) : null,
+            'reply' => $this->reply,
+            'replied_at' => $this->replied_at?->toIso8601String(),
             'created_at' => $this->created_at?->toIso8601String(),
             'images' => $this->images->map(fn ($image) => [
                 'id' => $image->id,

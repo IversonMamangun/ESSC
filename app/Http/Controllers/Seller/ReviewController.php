@@ -42,4 +42,27 @@ class ReviewController extends Controller
             ])
             ->latest();
     }
+
+    public function reply(Request $request, Review $review)
+    {
+        abort_unless(
+            $review->store_id === $request->user()->store?->id,
+            403
+        );
+
+        if ($review->reply !== null) {
+            abort(422, 'This review already has a reply.');
+        }
+
+        $validated = $request->validate([
+            'reply' => ['required', 'string', 'max:500'],
+        ]);
+
+        $review->update([
+            'reply' => $validated['reply'],
+            'replied_at' => now(),
+        ]);
+
+        return back();
+    }
 }
