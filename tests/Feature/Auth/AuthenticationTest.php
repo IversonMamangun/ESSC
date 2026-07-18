@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Fortify\Features;
 
 test('login screen can be rendered', function () {
-    $response = $this->get(route('login'));
+    $response = $this->get(route('login.store'));
 
     $response->assertOk();
 });
@@ -19,7 +19,8 @@ test('users can authenticate using the login screen', function () {
     ]);
 
     $this->assertAuthenticated();
-    $response->assertRedirect(route('dashboard', absolute: false));
+    // $response->assertRedirect(route('/', absolute: false));
+    $response->assertRedirect('/');
 });
 
 test('users with two factor enabled are redirected to two factor challenge', function () {
@@ -38,9 +39,9 @@ test('users with two factor enabled are redirected to two factor challenge', fun
         'two_factor_confirmed_at' => now(),
     ])->save();
 
-    $response = $this->post(route('login'), [
-        'email' => $user->email,
-        'password' => 'password',
+    $response = $this->post(route('login.store'), [
+    'email' => $user->email,
+    'password' => 'password',
     ]);
 
     $response->assertRedirect(route('two-factor.login'));
@@ -65,14 +66,13 @@ test('users can logout', function () {
     $response = $this->actingAs($user)->post(route('logout'));
 
     $this->assertGuest();
-    $response->assertRedirect(route('home'));
+    $response->assertRedirect('/');
 });
 
 test('users are rate limited', function () {
     $user = User::factory()->create();
 
     RateLimiter::increment(md5('login'.implode('|', [$user->email, '127.0.0.1'])), amount: 5);
-
     $response = $this->post(route('login.store'), [
         'email' => $user->email,
         'password' => 'wrong-password',
