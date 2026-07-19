@@ -12,6 +12,7 @@ import {
   VideoIcon,
   BadgeCheckIcon,
   LogOutIcon,
+  MessageSquareOffIcon,
 } from 'lucide-vue-next';
 import { ref, computed, onMounted } from 'vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
@@ -20,16 +21,11 @@ import InputError from '@/components/InputError.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
+import CustomerReviewCard from '@/components/review/CustomerReviewCard.vue';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { logout, login } from '@/routes';
 import shop from '@/routes/shop';
@@ -257,12 +253,12 @@ const cartForm = useForm({
 
 const handleAddToCart = () => {
   if (!checkUserAccess()) {
-return;
-}
+    return;
+  }
 
   if (!selectedVariant.value) {
-return;
-}
+    return;
+  }
 
   cartForm.product_variant_id = selectedVariant.value.id;
   cartForm.quantity = quantity.value;
@@ -274,8 +270,8 @@ return;
 
 const handleBuyNow = () => {
   if (!checkUserAccess()) {
-return;
-}
+    return;
+  }
 
   // route to checkout
 };
@@ -624,6 +620,41 @@ return;
           class="max-w-4xl text-lg leading-relaxed font-medium whitespace-pre-wrap text-zinc-600 dark:text-zinc-300"
         >
           {{ product.description }}
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      <div
+        v-if="product.reviews"
+        class="mt-8 rounded-4xl border border-zinc-200 bg-white p-8 shadow-sm transition-colors md:p-12 dark:border-zinc-800 dark:bg-zinc-900"
+      >
+        <div class="mb-8 flex items-center gap-4">
+          <div class="h-8 w-1.5 rounded-full bg-[#009933]"></div>
+          <h2
+            class="text-2xl font-black tracking-widest text-zinc-900 uppercase dark:text-white"
+          >
+            Reviews
+          </h2>
+        </div>
+        <Card v-if="product.reviews.length === 0">
+          <CardContent
+            class="flex flex-col items-center gap-3 py-16 text-center"
+          >
+            <MessageSquareOffIcon class="h-10 w-10 text-muted-foreground/50" />
+            <div>
+              <p class="font-medium">No reviews yet</p>
+              <p class="text-sm text-muted-foreground">
+                Reviews from customers will show up here once they leave one.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+        <div v-else class="flex flex-col gap-4">
+          <CustomerReviewCard
+            v-for="review in product.reviews"
+            :key="review.id"
+            :review="review"
+          />
         </div>
       </div>
     </main>

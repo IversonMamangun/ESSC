@@ -2,7 +2,7 @@ import { OrderItem } from './order';
 import { LaravelPaginationItem } from './product';
 import { User } from './auth';
 
-interface Review {
+export interface Review {
   id: number;
   rating: number;
   comment: string | null;

@@ -1,4 +1,6 @@
 import type { Store } from './store';
+import type { Review } from './review';
+import type { User } from './auth';
 
 export interface Product {
   id: string;
@@ -54,6 +56,10 @@ export interface PaginatedProducts {
   };
 }
 
+export interface ProductReview extends Review {
+  user: User;
+}
+
 export interface ProductShow extends Product {
   description: string | null;
   categories: Category[];
@@ -64,6 +70,7 @@ export interface ProductShow extends Product {
   rating: number;
   reviews_count: number;
   sold_count: number;
+  reviews: ProductReview[] | null;
 }
 
 export interface Category {
