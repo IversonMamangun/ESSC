@@ -71,6 +71,8 @@ class ProductController extends Controller
             'categories',
             'images',
             'variants.attributeValues.attribute',
+            'reviews.user',
+            'reviews.images',
         ]);
 
         return Inertia::render('shop/public/product/Show', [
