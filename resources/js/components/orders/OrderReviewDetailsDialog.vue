@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
-import { StarIcon, PackageIcon } from 'lucide-vue-next';
+import { StarIcon, PackageIcon, StoreIcon } from 'lucide-vue-next';
 import {
   Dialog,
   DialogContent,
@@ -23,6 +23,14 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'update:open', value: boolean): void;
 }>();
+
+function formatDate(date: string | null) {
+  if (!date) return '';
+  return new Date(date).toLocaleString('en-PH', {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  });
+}
 </script>
 
 <template>
@@ -76,17 +84,25 @@ const emit = defineEmits<{
             </p>
 
             <template v-if="item.review">
-              <div class="mt-2 flex items-center gap-1">
-                <StarIcon
-                  v-for="star in 5"
-                  :key="star"
-                  class="h-4 w-4"
-                  :class="
-                    star <= item.review.rating
-                      ? 'fill-amber-400 text-amber-400'
-                      : 'text-zinc-300 dark:text-zinc-600'
-                  "
-                />
+              <div class="mt-2 flex items-center gap-2">
+                <div class="flex items-center gap-1">
+                  <StarIcon
+                    v-for="star in 5"
+                    :key="star"
+                    class="h-4 w-4"
+                    :class="
+                      star <= item.review.rating
+                        ? 'fill-amber-400 text-amber-400'
+                        : 'text-zinc-300 dark:text-zinc-600'
+                    "
+                  />
+                </div>
+
+                <span
+                  v-if="item.review?.created_at"
+                  class="text-xs text-muted-foreground"
+                  >{{ formatDate(item.review.created_at) }}</span
+                >
               </div>
 
               <p
@@ -128,6 +144,24 @@ const emit = defineEmits<{
               >
                 Posted anonymously
               </p>
+
+              <div
+                v-if="item.review.reply"
+                class="mt-4 rounded-lg border bg-muted/40 p-4"
+              >
+                <div class="mb-1.5 flex items-center justify-between">
+                  <p class="flex items-center gap-1.5 text-sm font-medium">
+                    <StoreIcon class="h-3.5 w-3.5" />
+                    Seller reply
+                  </p>
+                  <span class="text-xs text-muted-foreground">{{
+                    formatDate(item.review.replied_at)
+                  }}</span>
+                </div>
+                <p class="text-sm leading-relaxed text-foreground/80">
+                  {{ item.review.reply }}
+                </p>
+              </div>
             </template>
 
             <p v-else class="mt-2 text-sm text-muted-foreground italic">

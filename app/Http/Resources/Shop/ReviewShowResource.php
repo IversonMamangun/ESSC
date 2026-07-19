@@ -30,6 +30,8 @@ class ReviewShowResource extends JsonResource
                     'comment' => $item->review->comment,
                     'video' => $item->review->video,
                     'is_anonymous' => $item->review->is_anonymous,
+                    'reply' => $item->review->reply,
+                    'replied_at' => $item->review->replied_at?->toIso8601String(),
                     'created_at' => $item->review->created_at?->toIso8601String(),
                     'images' => $item->review->images->map(fn ($image) => [
                         'id' => $image->id,
