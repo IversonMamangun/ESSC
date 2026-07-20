@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Shop;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Shop\ProductCardResource;
 use App\Http\Resources\Shop\ProductShowResource;
+use App\Http\Resources\Shop\ProductReviewShowResource;
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
@@ -66,17 +67,23 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        $product->load([
-            'store',
-            'categories',
-            'images',
-            'variants.attributeValues.attribute',
-            'reviews.user',
-            'reviews.images',
-        ]);
-
         return Inertia::render('shop/public/product/Show', [
-            'product' => ProductShowResource::make($product)->resolve(),
+            'product' => fn () => ProductShowResource::make(
+                $product->load([
+                    'store',
+                    'categories',
+                    'images',
+                    'variants.attributeValues.attribute',
+                ])
+            )->resolve(),
+
+            'reviews' => fn () => ProductReviewShowResource::collection(
+                $product->reviews()
+                    ->with(['user', 'images'])
+                    ->latest()
+                    ->paginate(10, ['*'], 'reviews_page')
+                    ->withQueryString()
+            ),
         ]);
     }
 }

@@ -63,37 +63,6 @@ class ProductShowResource extends JsonResource
                     : null,
                 'is_official' => $this->store->is_official,
             ],
-            'reviews' => $this->reviews->map(function ($review) {
-                return [
-                    'id' => $review->id,
-                    'rating' => $review->rating,
-                    'comment' => $review->comment,
-                    'video' => $review->video ? Storage::url($review->video) : null,
-                    'reply' => $review->reply,
-                    'replied_at' => $review->replied_at?->toIso8601String(),
-                    'created_at' => $review->created_at?->toIso8601String(),
-                    'images' => $review->images->map(fn ($image) => [
-                        'id' => $image->id,
-                        'url' => Storage::url($image->image),
-                    ]),
-                    'user' => [
-                        'name' => $review->is_anonymous 
-                            ? $this->maskName($review->user->name) 
-                            : $review->user->name,
-                        'avatar' => $review->user->avatar
-                            ? Storage::url($review->user->avatar)
-                            : null
-                    ],
-                ];
-            }),
         ];
-    }
-
-    private function maskName(?string $name): string
-    {
-        if (!$name) {
-            return '*****';
-        }
-        return mb_substr($name, 0, 1) . '***' . mb_substr($name, -1, 1);
     }
 }
