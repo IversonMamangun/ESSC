@@ -14,13 +14,13 @@ test('users can authenticate using the login screen', function () {
     $user = User::factory()->create();
 
     $response = $this->post(route('login.store'), [
-        'email' => $user->email,
+        'login' => $user->email, // Fixed to match your app
         'password' => 'password',
     ]);
 
     $this->assertAuthenticated();
     // $response->assertRedirect(route('/', absolute: false));
-    $response->assertRedirect('/');
+    $response->assertRedirect('/home');
 });
 
 test('users with two factor enabled are redirected to two factor challenge', function () {
@@ -40,8 +40,8 @@ test('users with two factor enabled are redirected to two factor challenge', fun
     ])->save();
 
     $response = $this->post(route('login.store'), [
-    'email' => $user->email,
-    'password' => 'password',
+        'login' => $user->email, // Fixed
+        'password' => 'password',
     ]);
 
     $response->assertRedirect(route('two-factor.login'));
@@ -53,7 +53,7 @@ test('users can not authenticate with invalid password', function () {
     $user = User::factory()->create();
 
     $this->post(route('login.store'), [
-        'email' => $user->email,
+        'login' => $user->email, // Fixed
         'password' => 'wrong-password',
     ]);
 
@@ -73,8 +73,9 @@ test('users are rate limited', function () {
     $user = User::factory()->create();
 
     RateLimiter::increment(md5('login'.implode('|', [$user->email, '127.0.0.1'])), amount: 5);
+    
     $response = $this->post(route('login.store'), [
-        'email' => $user->email,
+        'login' => $user->email, // Fixed
         'password' => 'wrong-password',
     ]);
 
