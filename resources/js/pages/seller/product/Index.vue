@@ -11,7 +11,7 @@ import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import SellerStoreHeader from '@/components/SellerStoreHeader.vue';
 import SellerTab from '@/components/SellerTab.vue';
-import type {SellerTabItem} from '@/components/SellerTab.vue';
+import type { SellerTabItem } from '@/components/SellerTab.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getSellerProductsColumns } from '@/features/seller/columns';
 import seller from '@/routes/seller';
@@ -124,7 +124,7 @@ function changeTab(tab: string) {
 </script>
 
 <template>
-  <Head title="Seller Products" />
+  <Head title="Products" />
 
   <div class="flex min-h-screen flex-col transition-colors duration-300">
     <TopBar />

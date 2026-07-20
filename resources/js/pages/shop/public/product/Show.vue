@@ -284,7 +284,7 @@ const handleBuyNow = () => {
 </script>
 
 <template>
-  <Head :title="`${product.name} - Store`" />
+  <Head :title="`${product.name}`" />
 
   <div class="flex min-h-screen flex-col transition-colors duration-300">
     <TopBar />

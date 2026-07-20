@@ -37,8 +37,8 @@ function formatDate(value: string) {
 }
 function openImageInNewTab(url: string | null | undefined) {
   if (!url) {
-return;
-}
+    return;
+  }
 
   window.open(url, '_blank', 'noopener,noreferrer');
 }
@@ -59,8 +59,8 @@ const TIMESTAMP_LABELS: Record<string, string> = {
 
 const fullAddress = computed(() => {
   if (!props.order) {
-return '';
-}
+    return '';
+  }
 
   const a = props.order.shipping_address;
 
@@ -71,8 +71,8 @@ return '';
 });
 const timelineSteps = computed(() => {
   if (!props.order) {
-return [];
-}
+    return [];
+  }
 
   return Object.entries(props.order.timestamps ?? {})
     .filter(([, value]) => !!value)
@@ -86,7 +86,7 @@ return [];
 </script>
 
 <template>
-  <Head :title="`Order Details #${order.id}`" />
+  <Head title="Order Details" />
 
   <div class="flex min-h-screen flex-col transition-colors duration-300">
     <TopBar />

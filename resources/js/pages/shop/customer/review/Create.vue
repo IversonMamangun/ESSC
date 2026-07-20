@@ -16,7 +16,7 @@ const props = defineProps<{
 </script>
 
 <template>
-  <Head :title="`Rate Order #${order.order_number}`" />
+  <Head title="Rate Order" />
 
   <div class="flex min-h-screen flex-col transition-colors duration-300">
     <TopBar />

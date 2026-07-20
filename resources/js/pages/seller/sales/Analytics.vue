@@ -44,7 +44,7 @@ const breadcrumbs = [
 </script>
 
 <template>
-  <Head title="Seller Dashboard" />
+  <Head title="Sales Analytics" />
 
   <div class="flex min-h-screen flex-col transition-colors duration-300">
     <TopBar />

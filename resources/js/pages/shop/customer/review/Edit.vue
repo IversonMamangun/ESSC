@@ -13,7 +13,7 @@ const props = defineProps<{ user: User; order: Order }>();
 </script>
 
 <template>
-  <Head :title="`Edit Review — Order #${order.order_number}`" />
+  <Head title="Edit Review" />
   <div class="flex min-h-screen flex-col transition-colors duration-300">
     <TopBar />
     <div class="sticky top-0 z-50 mt-8"><Navbar /></div>

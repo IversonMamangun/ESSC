@@ -8,7 +8,7 @@ import { initializeTheme } from '@/composables/useAppearance';
 import { useFlashToast } from '@/composables/useFlashToast';
 import 'vue-sonner/style.css';
 
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+const appName = import.meta.env.VITE_APP_NAME || 'ESSC';
 
 createInertiaApp({
   title: (title) => (title ? `${title} - ${appName}` : appName),

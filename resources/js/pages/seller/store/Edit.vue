@@ -58,7 +58,7 @@ const submit = () => {
 </script>
 
 <template>
-  <Head title="Edit Store Profile" />
+  <Head title="Edit Store" />
 
   <div
     class="flex min-h-screen flex-col bg-zinc-50 transition-colors duration-300 dark:bg-zinc-950"

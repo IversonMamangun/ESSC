@@ -13,7 +13,7 @@ import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import SellerStoreHeader from '@/components/SellerStoreHeader.vue';
 import SellerTab from '@/components/SellerTab.vue';
-import type {SellerTabItem} from '@/components/SellerTab.vue';
+import type { SellerTabItem } from '@/components/SellerTab.vue';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { getSellerOrdersColumns } from '@/features/seller/columns';
 import seller from '@/routes/seller';
@@ -104,8 +104,8 @@ function handleDetailsOpenChange(value: boolean) {
 
   if (!value) {
     if (detailsCloseTimeout) {
-clearTimeout(detailsCloseTimeout);
-}
+      clearTimeout(detailsCloseTimeout);
+    }
 
     detailsCloseTimeout = setTimeout(() => {
       detailsOrder.value = null;
@@ -131,8 +131,8 @@ const actionForm = useForm({
 
 const processOrderAction = () => {
   if (!selectedOrder.value || !selectedAction.value) {
-return;
-}
+    return;
+  }
 
   const resetState = () => {
     selectedOrder.value = null;
@@ -202,7 +202,7 @@ function changeTab(tab: string) {
 </script>
 
 <template>
-  <Head title="Seller Orders" />
+  <Head title="Orders" />
 
   <div class="flex min-h-screen flex-col transition-colors duration-300">
     <TopBar />
