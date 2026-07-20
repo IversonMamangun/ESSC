@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { CheckCircle2Icon, StarIcon } from 'lucide-vue-next';
+import { CheckCircle2Icon, StarIcon, StoreIcon } from 'lucide-vue-next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
@@ -116,6 +116,23 @@ function getStars(rating: number, max = 5) {
           preload="metadata"
           class="h-24 rounded-md border"
         />
+      </div>
+
+      <!-- Seller reply -->
+      <div
+        v-if="review.reply"
+        class="mt-4 rounded-lg border p-3 text-muted-foreground"
+      >
+        <div class="mb-1.5 flex items-center justify-between">
+          <p class="flex items-center gap-1.5 text-xs font-medium">
+            <StoreIcon class="h-3.5 w-3.5" />
+            Seller reply
+          </p>
+          <span class="text-xs">{{ formatDate(review.replied_at) }}</span>
+        </div>
+        <p class="text-xs leading-relaxed">
+          {{ review.reply }}
+        </p>
       </div>
     </CardContent>
   </Card>
