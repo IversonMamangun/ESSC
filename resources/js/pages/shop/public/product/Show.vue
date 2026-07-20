@@ -17,6 +17,7 @@ import {
 import { ref, computed, onMounted } from 'vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
+import Pagination from '@/components/Pagination.vue';
 import InputError from '@/components/InputError.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
@@ -29,10 +30,15 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { logout, login } from '@/routes';
 import shop from '@/routes/shop';
-import type { ProductShow, ProductVariant } from '@/types';
+import type {
+  ProductShow,
+  ProductVariant,
+  PaginatedProductReview,
+} from '@/types';
 
 const props = defineProps<{
   product: ProductShow;
+  reviews: PaginatedProductReview;
 }>();
 
 const breadcrumbs = computed(() => {
@@ -625,7 +631,6 @@ const handleBuyNow = () => {
 
       <!-- Reviews -->
       <div
-        v-if="product.reviews"
         class="mt-8 rounded-4xl border border-zinc-200 bg-white p-8 shadow-sm transition-colors md:p-12 dark:border-zinc-800 dark:bg-zinc-900"
       >
         <div class="mb-8 flex items-center gap-4">
@@ -636,7 +641,7 @@ const handleBuyNow = () => {
             Reviews
           </h2>
         </div>
-        <Card v-if="product.reviews.length === 0">
+        <Card v-if="reviews.data.length === 0">
           <CardContent
             class="flex flex-col items-center gap-3 py-16 text-center"
           >
@@ -651,10 +656,12 @@ const handleBuyNow = () => {
         </Card>
         <div v-else class="flex flex-col gap-4">
           <CustomerReviewCard
-            v-for="review in product.reviews"
+            v-for="review in reviews.data"
             :key="review.id"
             :review="review"
           />
+
+          <Pagination :links="props.reviews.meta.links" :only="['reviews']" />
         </div>
       </div>
     </main>
