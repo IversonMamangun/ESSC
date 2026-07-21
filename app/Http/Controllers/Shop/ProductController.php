@@ -19,10 +19,12 @@ class ProductController extends Controller
     {
         $validated = $request->validate([
             'type' => ['sometimes', 'string', Rule::in(['top-deals', 'discover'])],
+            'search' => ['sometimes', 'nullable', 'string', 'max:255'],
         ]);
 
         $filters = [
             'type' => $validated['type'] ?? 'top-deals',
+            'search' => $validated['search'] ?? null,
         ];
 
         return Inertia::render('shop/public/product/Index', [
@@ -57,13 +59,13 @@ class ProductController extends Controller
             ->where('is_active', true)
             ->when(
                 $filters['type'] === 'top-deals',
-                fn (Builder $query) => $query
-                    ->where('is_featured', true)
-                    ->latest(),
-
-                fn (Builder $query) => $query
-                    ->latest()
-            );
+                fn (Builder $query) => $query->where('is_featured', true),
+            )
+            ->when(
+                filled($filters['search'] ?? null),
+                fn (Builder $query) => $query->where('name', 'like', '%' . $filters['search'] . '%'),
+            )
+            ->latest();
     }
 
     public function show(Request $request, Product $product)

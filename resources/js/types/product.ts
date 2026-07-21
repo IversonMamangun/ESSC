@@ -15,7 +15,7 @@ export type ProductFilterType = 'top-deals' | 'discover';
 
 export interface ProductFilters {
   type: ProductFilterType;
-  search?: string;
+  search?: string | null;
   category?: string;
 }
 

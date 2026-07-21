@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, router, usePage, Link } from '@inertiajs/vue3';
 import { ref, onMounted, nextTick, computed } from 'vue';
+import { SearchIcon, StoreIcon } from 'lucide-vue-next';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import Pagination from '@/components/Pagination.vue';
 import ProductCard from '@/components/ProductCard.vue';
@@ -33,9 +34,31 @@ const breadcrumbs = computed(() => [
   { title: pageTitle.value, href: '#' },
 ]);
 
-// onMounted(() => {
-//   document.documentElement.classList.remove('dark');
-// });
+// search logic
+const search = ref(props.filters.search ?? '');
+let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+const runSearch = (value: string) => {
+  router.get(
+    shop.products.index().url,
+    {
+      type: props.filters.type,
+      search: value || undefined,
+    },
+    {
+      preserveState: true,
+      preserveScroll: true,
+      replace: true,
+      only: ['products', 'filters'],
+    },
+  );
+};
+const onSearchInput = (event: Event) => {
+  const value = (event.target as HTMLInputElement).value;
+  search.value = value;
+
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => runSearch(value), 350);
+};
 </script>
 
 <template>
@@ -74,7 +97,20 @@ const breadcrumbs = computed(() => [
         <Breadcrumbs :breadcrumbs="breadcrumbs" />
       </div>
 
-      <section class="mt-8 flex w-full justify-center px-4">
+      <div class="mx-auto mt-8 max-w-7xl px-4">
+        <div class="relative">
+          <SearchIcon class="absolute top-3.5 left-4 h-5 w-5 text-zinc-400" />
+          <input
+            type="text"
+            v-model="search"
+            @input="onSearchInput"
+            :placeholder="`Search Product in ${pageTitle}`"
+            class="w-full rounded-xl border border-zinc-200 bg-white py-3.5 pr-4 pl-12 text-sm text-zinc-900 shadow-sm transition-all outline-none focus:border-[#009933] focus:ring-2 focus:ring-[#009933]/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+          />
+        </div>
+      </div>
+
+      <section class="mt-4 flex w-full justify-center px-4">
         <div
           class="w-full max-w-7xl rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm transition-colors md:p-8 dark:border-zinc-800 dark:bg-zinc-900"
         >
@@ -89,6 +125,7 @@ const breadcrumbs = computed(() => [
 
           <!-- Products grid - Clickable -->
           <div
+            v-if="products.data.length > 0"
             class="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
           >
             <div
@@ -98,6 +135,22 @@ const breadcrumbs = computed(() => [
               class="cursor-pointer"
             >
               <ProductCard :product="product" />
+            </div>
+          </div>
+
+          <div v-else>
+            <div
+              class="rounded-3xl border border-zinc-200 bg-zinc-50 py-10 text-center text-zinc-500 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400"
+            >
+              <StoreIcon
+                class="mx-auto mb-4 h-10 w-10 text-zinc-300 dark:text-zinc-600"
+              />
+              <h2 class="font-black text-zinc-900 dark:text-white">
+                No products found
+              </h2>
+              <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                Try searching for something else.
+              </p>
             </div>
           </div>
 
