@@ -113,6 +113,8 @@ Route::middleware([
         ->name('checkout.index');
     Route::post('/checkout/select', [CustomerCheckoutController::class, 'select'])
         ->name('checkout.select');
+    Route::post('/checkout/buy-now', [CustomerCheckoutController::class, 'buyNow'])
+        ->name('checkout.buy-now');
     Route::post('/checkout', [CustomerCheckoutController::class, 'store'])
         ->name('checkout.store');
 

@@ -256,7 +256,6 @@ const cartForm = useForm({
   product_variant_id: null as number | null,
   quantity: 1,
 });
-
 const handleAddToCart = () => {
   if (!checkUserAccess()) {
     return;
@@ -274,12 +273,25 @@ const handleAddToCart = () => {
   });
 };
 
+const buyNowForm = useForm({
+  product_variant_id: null as number | null,
+  quantity: 1,
+});
 const handleBuyNow = () => {
   if (!checkUserAccess()) {
     return;
   }
 
-  // route to checkout
+  if (!selectedVariant.value || selectedVariant.value.stock <= 0) {
+    return;
+  }
+
+  buyNowForm.product_variant_id = selectedVariant.value.id;
+  buyNowForm.quantity = quantity.value;
+
+  buyNowForm.post(shop.checkout.buyNow.url(), {
+    preserveScroll: true,
+  });
 };
 </script>
 
@@ -566,8 +578,9 @@ const handleBuyNow = () => {
                 <ShoppingCartIcon class="h-5 w-5" /> Add To Cart
               </button>
               <button
+                :disabled="!selectedVariant || selectedVariant.stock <= 0"
                 @click="handleBuyNow"
-                class="flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-2xl bg-[#009933] py-4 font-black tracking-widest text-white uppercase shadow-lg shadow-green-900/20 transition-all hover:bg-green-700 active:scale-95"
+                class="flex flex-1 cursor-pointer items-center justify-center gap-3 rounded-2xl bg-[#009933] py-4 font-black tracking-widest text-white uppercase shadow-lg shadow-green-900/20 transition-all hover:bg-green-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-20 disabled:active:scale-100 dark:hover:bg-green-600"
               >
                 <ZapIcon class="h-5 w-5 fill-current" /> Buy Now
               </button>
