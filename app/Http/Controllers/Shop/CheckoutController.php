@@ -8,9 +8,11 @@ use App\Http\Requests\Shop\CheckoutCreateRequest;
 use App\Http\Resources\Shop\CheckoutItemResource;
 use App\Http\Resources\Shop\PaymentMethodResource;
 use App\Http\Resources\Shop\UserAddressResource;
+use App\Http\Requests\Shop\BuyNowRequest;
 use App\Services\CheckoutService;
 use App\Models\CartItem;
 use App\Models\PaymentMethod;
+use App\Models\ProductVariant;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -54,72 +56,89 @@ class CheckoutController extends Controller
         return redirect()->route('shop.checkout.index');
     }
 
-    public function index(Request $request)
+    public function buyNow(BuyNowRequest $request)
     {
-        $checkout = session('checkout');
+        $variant = ProductVariant::with('product')
+            ->findOrFail($request->product_variant_id);
 
-        if (! $checkout) {
-            return redirect()
-                ->route('shop.cart.index');
+        if (! $variant->product->is_active) {
+            return back()->with('error', 'Product is unavailable.');
         }
 
-        $user = $request->user();
+        if ($variant->stock <= 0) {
+            return back()->with('error', 'Product is out of stock.');
+        }
 
-        $cartItems = CartItem::query()
-            ->whereHas('cart', function ($query) use ($user) {
-                $query->where('user_id', $user->id);
-            })
-            ->whereIn(
-                'id',
-                $checkout['cart_item_ids']
-            )
+        session([
+            'checkout' => [
+                'type' => 'buy_now',
+                'product_variant_id' => $variant->id,
+                'quantity' => min($request->integer('quantity'), $variant->stock),
+            ],
+        ]);
+
+        return redirect()->route('shop.checkout.index');
+    }
+
+    private function resolveCheckoutItems(array $checkout, $user)
+    {
+        if (($checkout['type'] ?? null) === 'buy_now') {
+            $variant = ProductVariant::with([
+                'product.store',
+                'attributeValues.attribute',
+            ])->find($checkout['product_variant_id'] ?? null);
+
+            if (! $variant || ! $variant->product->is_active || $variant->stock <= 0) {
+                return collect();
+            }
+
+            $item = new CartItem([
+                'quantity' => min($checkout['quantity'] ?? 1, $variant->stock),
+            ]);
+            $item->setRelation('productVariant', $variant);
+
+            return collect([$item]);
+        }
+
+        return CartItem::query()
+            ->whereHas('cart', fn ($q) => $q->where('user_id', $user->id))
+            ->whereIn('id', $checkout['cart_item_ids'] ?? [])
             ->with([
                 'productVariant.product.store',
                 'productVariant.attributeValues.attribute',
             ])
             ->get();
-
-        if ($cartItems->isEmpty()) {
-            session()->forget('checkout');
-
-            return redirect()
-                ->route('shop.cart.index');
+    }
+    public function index(Request $request)
+    {
+        $checkout = session('checkout');
+        if (! $checkout) {
+            return redirect()->route('shop.cart.index');
         }
 
-        $addresses = $user->addresses()
-            ->orderByDesc('is_default')
-            ->latest()
-            ->get();
+        $cartItems = $this->resolveCheckoutItems($checkout, $request->user());
+        if ($cartItems->isEmpty()) {
+            session()->forget('checkout');
+            return redirect()->route('shop.cart.index');
+        }
 
-        $paymentMethods = PaymentMethod::query()
-            ->orderBy('name')
-            ->get();
+        $addresses = $request->user()->addresses()->orderByDesc('is_default')->latest()->get();
+        $paymentMethods = PaymentMethod::query()->orderBy('name')->get();
 
-        $subtotal = $cartItems->sum(
-            fn ($item) => $item->quantity * $item->productVariant->price
-        );
+        $subtotal = $cartItems->sum(fn ($item) => $item->quantity * $item->productVariant->price);
+        $shippingFee = $cartItems->groupBy(fn ($item) => $item->productVariant->product->store_id)->count() * 60;
 
-        // temporary
-        $shippingFee = $cartItems
-            ->groupBy(
-                fn ($item) => $item->productVariant->product->store_id
-            )
-            ->count() * 60;
-
-        return Inertia::render(
-            'shop/customer/checkout/Index',
-            [
-                'addresses' => UserAddressResource::collection($addresses)->resolve(),
-                'paymentMethods' => PaymentMethodResource::collection($paymentMethods)->resolve(),
-                'items' => CheckoutItemResource::collection($cartItems)->resolve(),
-                'summary' => [
-                    'subtotal' => $subtotal,
-                    'shipping_fee' => $shippingFee,
-                    'discount' => 0,
-                    'total' => $subtotal + $shippingFee,
-                ],
-            ]
-        );
+        return Inertia::render('shop/customer/checkout/Index', [
+            'addresses' => UserAddressResource::collection($addresses)->resolve(),
+            'paymentMethods' => PaymentMethodResource::collection($paymentMethods)->resolve(),
+            'items' => CheckoutItemResource::collection($cartItems)->resolve(),
+            'summary' => [
+                'subtotal' => $subtotal,
+                'shipping_fee' => $shippingFee,
+                'discount' => 0,
+                'total' => $subtotal + $shippingFee,
+            ],
+        ]);
     }
 
     public function store(CheckoutCreateRequest $request)
@@ -145,35 +164,19 @@ class CheckoutController extends Controller
         };
     }
 
-    private function getCheckoutData(CheckoutCreateRequest $request): array {
+    private function getCheckoutData(CheckoutCreateRequest $request): array
+    {
         $checkout = session('checkout');
-        $cartItemIds = ($checkout && ($checkout['type'] ?? null) === 'cart') 
-            ? ($checkout['cart_item_ids'] ?? []) 
-            : [];
-
-        if (empty($cartItemIds)) {
+        if (! $checkout) {
             abort(422, 'No checkout items selected.');
         }
 
-        $cartItems = $request->user()
-            ->cart
-            ->items()
-            ->whereIn('id', $cartItemIds)
-            ->with([
-                'productVariant.product.store',
-                'productVariant.attributeValues',
-            ])
-            ->get();
-
+        $cartItems = $this->resolveCheckoutItems($checkout, $request->user());
         if ($cartItems->isEmpty()) {
             abort(422, 'No valid checkout items.');
         }
 
-        $address = $request->user()
-            ->addresses()
-            ->findOrFail(
-                $request->address_id
-            );
+        $address = $request->user()->addresses()->findOrFail($request->address_id);
 
         return [
             'cartItems' => $cartItems,
