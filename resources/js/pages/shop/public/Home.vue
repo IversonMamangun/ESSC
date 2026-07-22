@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, router, usePage, Link } from '@inertiajs/vue3';
 import { ref, onMounted, nextTick, computed } from 'vue';
+import { StoreIcon } from 'lucide-vue-next';
 import StoreAds from '@/components/ads/StoreAds.vue';
 import Pagination from '@/components/Pagination.vue';
 import ProductCard from '@/components/ProductCard.vue';
@@ -47,7 +48,7 @@ const navigateToProduct = (type: string) => {
       <Navbar />
     </div>
 
-    <main class="flex-grow pb-20">
+    <main class="grow pb-20">
       <section class="flex w-full justify-center p-4">
         <div
           class="group relative flex w-full max-w-7xl items-center justify-center overflow-hidden rounded-3xl border border-zinc-200 shadow-sm"
@@ -98,7 +99,10 @@ const navigateToProduct = (type: string) => {
           </div>
 
           <!-- Products grid - Clickable -->
-          <div class="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4">
+          <div
+            v-if="productsTopDeals.data.length > 0"
+            class="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4"
+          >
             <div
               v-for="product in productsTopDeals.data"
               :key="'top-deals-' + product.slug"
@@ -106,6 +110,22 @@ const navigateToProduct = (type: string) => {
               class="cursor-pointer"
             >
               <ProductCard :product="product" />
+            </div>
+          </div>
+
+          <div v-else>
+            <div
+              class="rounded-3xl border border-zinc-200 bg-zinc-50 py-10 text-center text-zinc-500 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400"
+            >
+              <StoreIcon
+                class="mx-auto mb-4 h-10 w-10 text-zinc-300 dark:text-zinc-600"
+              />
+              <h2 class="font-black text-zinc-900 dark:text-white">
+                No products found
+              </h2>
+              <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                Try searching for something else.
+              </p>
             </div>
           </div>
         </div>
@@ -130,6 +150,7 @@ const navigateToProduct = (type: string) => {
 
           <!-- Products grid - Clickable -->
           <div
+            v-if="productsDiscover.data.length > 0"
             class="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
           >
             <div
@@ -139,6 +160,22 @@ const navigateToProduct = (type: string) => {
               class="cursor-pointer"
             >
               <ProductCard :product="product" />
+            </div>
+          </div>
+
+          <div v-else>
+            <div
+              class="rounded-3xl border border-zinc-200 bg-zinc-50 py-10 text-center text-zinc-500 shadow-sm transition-colors dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400"
+            >
+              <StoreIcon
+                class="mx-auto mb-4 h-10 w-10 text-zinc-300 dark:text-zinc-600"
+              />
+              <h2 class="font-black text-zinc-900 dark:text-white">
+                No products found
+              </h2>
+              <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                Try searching for something else.
+              </p>
             </div>
           </div>
 
