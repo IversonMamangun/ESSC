@@ -34,6 +34,11 @@ export type OrderRawStatus =
   | 'return_approved'
   | 'returned';
 
+export interface OrderIndexFilters {
+  status: OrderFilterStatus;
+  search?: string | null;
+}
+
 export interface OrderItem {
   id: number;
   product_sku: string;

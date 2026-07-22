@@ -19,7 +19,7 @@ import TopBar from '@/components/sections/TopBar.vue';
 import shop from '@/routes/shop';
 import type {
   User,
-  OrderFilterStatus,
+  OrderIndexFilters,
   PaginatedOrders,
   ReviewShow,
 } from '@/types';
@@ -27,9 +27,7 @@ import type {
 const props = defineProps<{
   user: User;
   orders: PaginatedOrders;
-  filters: {
-    status: OrderFilterStatus;
-  };
+  filters: OrderIndexFilters;
 }>();
 
 const tabs = [
@@ -67,19 +65,36 @@ const tabs = [
   },
 ];
 
-function changeStatus(status: string) {
+// search & status tab filters
+const search = ref(props.filters.search ?? '');
+let debounceTimer: ReturnType<typeof setTimeout> | undefined;
+const applyFilters = (
+  overrides: Partial<{ status: string; search: string }> = {},
+) => {
   router.get(
     shop.orders.index.url(),
     {
-      status,
+      status: overrides.status ?? props.filters.status,
+      search: (overrides.search ?? search.value) || undefined,
     },
     {
       preserveState: true,
       preserveScroll: true,
       replace: true,
+      only: ['orders', 'filters'],
     },
   );
+};
+function changeStatus(status: string) {
+  applyFilters({ status });
 }
+const onSearchInput = (event: Event) => {
+  const value = (event.target as HTMLInputElement).value;
+  search.value = value;
+
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => applyFilters({ search: value }), 350);
+};
 
 // cancel & complete
 type ActionType = 'complete' | 'cancel';
@@ -91,9 +106,7 @@ const action = ref<Action | null>(null);
 const confirmOpen = computed({
   get: () => action.value !== null,
   set: (val: boolean) => {
-    if (!val) {
-action.value = null;
-}
+    if (!val) action.value = null;
   },
 });
 // config per action type
@@ -137,9 +150,7 @@ const completeOrder = (orderNo: string) => {
 };
 // confirm endpoint
 const handleConfirmAction = () => {
-  if (!action.value) {
-return;
-}
+  if (!action.value) return;
 
   const { type, orderNo } = action.value;
 
@@ -240,7 +251,9 @@ const viewRatingOrder = async (orderNo: string) => {
             <SearchIcon class="absolute top-3.5 left-4 h-5 w-5 text-zinc-400" />
             <input
               type="text"
-              placeholder="Search by Order ID or Product Name"
+              v-model="search"
+              @input="onSearchInput"
+              placeholder="Search by Store or Product"
               class="w-full rounded-xl border border-zinc-200 bg-white py-3.5 pr-4 pl-12 text-sm text-zinc-900 shadow-sm transition-all outline-none focus:border-[#009933] focus:ring-2 focus:ring-[#009933]/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
             />
           </div>
