@@ -4,15 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 use App\Models\UserType;
-use App\Http\Controllers\StoreController;
-use App\Http\Controllers\Auth\RegisterController; 
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\ProductController;
-use App\Http\Controllers\SellerController;
-use App\Http\Controllers\BuyerController; 
 use App\Http\Controllers\Auth\RegistrationController;
-use App\Http\Controllers\Shop\ChatController;
 use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\Shop\HomeController as ShopHomeController;
 use App\Http\Controllers\Shop\ProductController as ShopProductController;
@@ -210,5 +202,3 @@ Route::middleware([
 
 
 });
-
-require __DIR__.'/settings.php';
