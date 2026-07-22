@@ -19,10 +19,12 @@ class OrderController extends Controller
         $user = $request->user();
         $validated = $request->validate([
             'status' => ['sometimes', 'string', Rule::in(['all', 'to-pay', 'to-ship', 'to-receive', 'delivered', 'completed', 'cancelled', 'returned'])],
+            'search' => ['sometimes', 'nullable', 'string', 'max:255'],
         ]);
 
         $filters = [
             'status' => $validated['status'] ?? 'all',
+            'search' => $validated['search'] ?? null,
         ];
 
         return Inertia::render('shop/customer/order/Index', [
@@ -63,10 +65,11 @@ class OrderController extends Controller
             ])
             ->when(
                 $filters['status'] !== 'all',
-                fn (Builder $query) => $this->applyStatusFilter(
-                    $query,
-                    $filters['status']
-                )
+                fn (Builder $query) => $this->applyStatusFilter($query, $filters['status'])
+            )
+            ->when(
+                filled($filters['search'] ?? null),
+                fn (Builder $query) => $this->applySearchFilter($query, $filters['search'])
             );
     }
 
@@ -102,6 +105,21 @@ class OrderController extends Controller
             ]),
             default => $query,
         };
+    }
+
+    private function applySearchFilter(Builder $query, string $search): Builder
+    {
+        return $query->where(function (Builder $query) use ($search) {
+            $query
+                ->whereHas(
+                    'store',
+                    fn (Builder $query) => $query->where('name', 'like', "%{$search}%")
+                )
+                ->orWhereHas(
+                    'items',
+                    fn (Builder $query) => $query->where('product_name', 'like', "%{$search}%")
+                );
+        });
     }
 
     public function show(Request $request, Order $order)
