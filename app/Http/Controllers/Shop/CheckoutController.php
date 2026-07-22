@@ -93,6 +93,7 @@ class CheckoutController extends Controller
             }
 
             $item = new CartItem([
+                'product_variant_id' => $variant->id,
                 'quantity' => min($checkout['quantity'] ?? 1, $variant->stock),
             ]);
             $item->setRelation('productVariant', $variant);
