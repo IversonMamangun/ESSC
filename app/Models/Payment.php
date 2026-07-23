@@ -11,9 +11,9 @@ use App\Enums\PaymentStatus;
 #[Fillable([
     'checkout_id',
     'payment_method_id',
-    'is_paid',
     'payment_date',
     'amount',
+    'cancelled_amount',
     'gateway',
     'gateway_payment_intent_id',
     'gateway_payment_id',
@@ -32,6 +32,7 @@ class Payment extends Model
             'status' => PaymentStatus::class,
             'payment_date' => 'date',
             'amount' => 'integer',
+            'cancelled_amount' => 'integer',
             'gateway_response' => 'array',
             'meta' => 'array',
         ];
