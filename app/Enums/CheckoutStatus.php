@@ -26,11 +26,14 @@ enum CheckoutStatus: string
  * checkout created -> PENDING_PAYMENT (checkout status)
  * all orders payment created -> PENDING (payment status)
  * 
- * if one order is cancelled -> both checkout and that 
- *      order payment are CANCELLED (only applies to that specific order, other orders can be paid)
+ * if one order is cancelled -> exclude that order in checkout and payment 
+ *       (only applies to that specific order, other orders can be paid)
  * 
  * if one order is "delivered" -> only that specific order payment PAID
- * if all orders "delivered" and are considered financially paid -> both checkout and all orders payment PAID
+ *       (check if all orders are delivered, if so -> both checkout and payment PAID)
+ *       (check if all orders are cancelled, if so -> both checkout and payment CANCELLED)
+ *       (check if there is cancelled order but have delivered order, 
+ *              if so -> both checkout and payment PAID - exclude the cancelled order total in the amount of payment)
  * 
  * -- online --
  * order created -> PENDING_PAYMENT (checkout status)

@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Models\Order;
 use App\Enums\OrderStatus;
+use App\Services\CheckoutStatusSyncService;
 use Illuminate\Support\Facades\DB;
 
 class OrderObserver
@@ -27,6 +28,14 @@ class OrderObserver
 
         if ($order->status === OrderStatus::COMPLETED) {
             $this->adjustSoldCount($order, 1);
+        }
+
+        if (in_array($order->status, [OrderStatus::CANCELLED, OrderStatus::DELIVERED], true)) {
+            $order->loadMissing('checkout');
+
+            if ($order->checkout) {
+                app(CheckoutStatusSyncService::class)->sync($order->checkout);
+            }
         }
     }
 
