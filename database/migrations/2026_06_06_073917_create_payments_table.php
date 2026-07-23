@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('status')->default(PaymentStatus::PENDING->value);
             $table->date('payment_date')->nullable();
             $table->unsignedBigInteger('amount');
+            $table->unsignedBigInteger('cancelled_amount')->default(0);
             
             $table->string('gateway')->nullable();
             $table->string('gateway_payment_intent_id')->nullable()->index();
