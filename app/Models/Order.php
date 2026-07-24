@@ -51,6 +51,8 @@ class Order extends Model
 {
     use HasFactory;
 
+    public const AUTO_COMPLETE_AFTER_DAYS = 5;
+
     protected function casts(): array
     {
         return [

@@ -47,6 +47,9 @@ return new class extends Migration
             $table->timestamp('return_approved_at')->nullable();
             $table->timestamp('returned_at')->nullable();
             $table->timestamps();
+
+            // index for cron jobs auto completion of orders
+            $table->index(['status', 'delivered_at']);
         });
     }
 
