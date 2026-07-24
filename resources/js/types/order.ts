@@ -62,6 +62,7 @@ export interface Order {
   is_edit_rate_eligible?: boolean;
   is_return_eligible?: boolean;
   items: OrderItem[];
+  auto_complete_in_days: number | null;
 }
 
 export interface OrderShow extends Order {

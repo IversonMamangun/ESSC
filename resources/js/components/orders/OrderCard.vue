@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import {
   TruckIcon,
   StarIcon,
@@ -43,6 +44,14 @@ const formatPrice = (value: number) => {
     currency: 'PHP',
   }).format(value);
 };
+
+const autoCompleteText = computed(() => {
+  const days = props.order.auto_complete_in_days;
+  if (days === null || days === undefined) return null;
+
+  const unit = days === 1 ? 'day' : 'days';
+  return `Auto-completes in ${days} ${unit} if no action is taken`;
+});
 </script>
 
 <template>
@@ -142,6 +151,13 @@ const formatPrice = (value: number) => {
             <CornerDownLeftIcon class="mr-2 h-4 w-4" />
             Request Return
           </button>
+
+          <p
+            v-if="order.auto_complete_in_days !== null"
+            class="w-full text-xs text-muted-foreground"
+          >
+            {{ autoCompleteText }}
+          </p>
         </template>
 
         <template v-if="order.status === 'completed'">

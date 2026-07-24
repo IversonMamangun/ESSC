@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
 use App\Enums\OrderStatus;
+use App\models\Order;
 
 class OrderIndexResource extends JsonResource
 {
@@ -31,6 +32,16 @@ class OrderIndexResource extends JsonResource
         $total = $isReturnGroup 
             ? (float) $displayItems->sum(fn ($item) => $item->price * $item->quantity) 
             : (float) $this->total;
+
+        if ($this->status === OrderStatus::DELIVERED && $this->delivered_at) {
+            $autoCompleteAt = $this->delivered_at
+                ->copy()
+                ->addDays(Order::AUTO_COMPLETE_AFTER_DAYS);
+
+            $autoCompleteInDays = max(0, (int) ceil(
+                now()->floatDiffInDays($autoCompleteAt, false)
+            ));
+        }
 
         return [
             'id' => $this->id,
@@ -65,6 +76,8 @@ class OrderIndexResource extends JsonResource
             'is_edit_rate_eligible' => $this->isEligibleForEditingRating(),
             'is_return_eligible' => $this->isEligibleForReturn(),
             'created_at' => $this->created_at,
+            'auto_complete_at' => $autoCompleteAt ?? null,
+            'auto_complete_in_days' => $autoCompleteInDays ?? null,
         ];
     }
 }
