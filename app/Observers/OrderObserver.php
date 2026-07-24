@@ -5,7 +5,7 @@ namespace App\Observers;
 use App\Models\Order;
 use App\Enums\OrderStatus;
 use App\Services\CheckoutStatusSyncService;
-use Illuminate\Support\Facades\DB;
+use App\Services\ProductSoldCountService;
 
 class OrderObserver
 {
@@ -65,30 +65,6 @@ class OrderObserver
 
     protected function adjustSoldCount(Order $order, int $direction): void
     {
-        $order->loadMissing('items');
-
-        $quantities = $order->items
-            ->groupBy('product_id')
-            ->map(fn ($items) => $items->sum('quantity'));
-
-        $totalQuantity = 0;
-
-        foreach ($quantities as $productId => $quantity) {
-            if (! $productId) {
-                continue;
-            }
-
-            DB::table('products')
-                ->where('id', $productId)
-                ->increment('sold_count', $quantity * $direction);
-
-            $totalQuantity += $quantity;
-        }
-
-        if ($totalQuantity > 0) {
-            DB::table('stores')
-                ->where('id', $order->store_id)
-                ->increment('sold_count', $totalQuantity * $direction);
-        }
+        app(ProductSoldCountService::class)->applyForOrder($order, $direction);
     }
 }
