@@ -21,8 +21,18 @@ class CheckoutStatusSyncService
 
         // All orders cancelled -> checkout + payment cancelled
         if ($orders->every(fn ($o) => $o->status === OrderStatus::CANCELLED)) {
-            $checkout->update(['status' => CheckoutStatus::CANCELLED]);
-            $checkout->payment?->update(['status' => PaymentStatus::CANCELLED]);
+            $allCancelledTotal = (float) $orders->sum('total');
+
+            $checkout->update([
+                'status' => CheckoutStatus::CANCELLED,
+                'cancelled_amount' => $allCancelledTotal,
+            ]);
+
+            $checkout->payment?->update([
+                'status' => PaymentStatus::CANCELLED,
+                'cancelled_amount' => (int) round($allCancelledTotal * 100),
+            ]);
+
             return;
         }
 
@@ -46,12 +56,12 @@ class CheckoutStatusSyncService
 
         $checkout->update([
             'status' => CheckoutStatus::PAID,
-            'refunded_amount' => $cancelledTotal,
+            'cancelled_amount' => $cancelledTotal,
         ]);
 
         $checkout->payment?->update([
             'status' => PaymentStatus::PAID,
-            'refunded_amount' => (int) round($cancelledTotal * 100),
+            'cancelled_amount' => (int) round($cancelledTotal * 100),
         ]);
     }
 }
