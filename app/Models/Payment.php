@@ -11,6 +11,7 @@ use App\Enums\PaymentStatus;
 #[Fillable([
     'checkout_id',
     'payment_method_id',
+    'status',
     'payment_date',
     'amount',
     'cancelled_amount',
