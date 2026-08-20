@@ -20,20 +20,9 @@ class CreateNewUser implements CreatesNewUsers
      */
     public function create(array $input): User
     {
-        Validator::make($input, [
-            ...$this->profileRules(),
-            'phone' => ['required', 'string', 'max:20', 'unique:users'], 
-            'password' => $this->passwordRules(),
-        ])->validate();
-
-        $buyerRole = UserType::where('slug', 'buyer')->firstOrFail();
-
+        // deprecated (using custom user creation with verification) auth folder
         return User::create([
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'phone' => $input['phone'],
-            'user_type_id' => $buyerRole->id,
-            'password' => $input['password'],
+            //
         ]);
     }
 }
