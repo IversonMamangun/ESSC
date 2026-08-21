@@ -10,6 +10,7 @@ use App\Http\Controllers\Shop\HomeController as ShopHomeController;
 use App\Http\Controllers\Shop\ProductController as ShopProductController;
 use App\Http\Controllers\Shop\StoreController as ShopStoreController;
 use App\Http\Controllers\Shop\ProfileController as CustomerProfileController;
+use App\Http\Controllers\Shop\ProfileVerificationController as CustomerProfileVerificationController;
 use App\Http\Controllers\Shop\UserAddressController as CustomerUserAddressController;
 use App\Http\Controllers\Shop\CartController as CustomerCartController;
 use App\Http\Controllers\Shop\CheckoutController as CustomerCheckoutController;
@@ -78,6 +79,10 @@ Route::middleware([
         ->name('account.profile.edit');
     Route::patch('/account/profile', [CustomerProfileController::class, 'update'])
         ->name('account.profile.update');
+    Route::post('/account/profile/otp/send', [CustomerProfileVerificationController::class, 'send'])
+        ->name('account.profile.otp.send');
+    Route::post('/account/profile/otp/verify', [CustomerProfileVerificationController::class, 'verify'])
+        ->name('account.profile.otp.verify');
 
     Route::get('/account/addresses', [CustomerUserAddressController::class, 'index'])
         ->name('account.addresses.index');
