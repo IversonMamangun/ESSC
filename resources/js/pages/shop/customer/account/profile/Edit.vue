@@ -1,52 +1,128 @@
 <script setup lang="ts">
-import { Head, Link, useForm } from '@inertiajs/vue3';
-import {
-  UserIcon,
-  MapPin,
-  Package,
-  Camera,
-  ChevronRight,
-  CheckCircle2,
-} from 'lucide-vue-next';
-import { ref } from 'vue';
+import { Head, useForm, useHttp } from '@inertiajs/vue3';
+import { UserIcon, Camera, CheckCircle2 } from 'lucide-vue-next';
+import { computed, watch, ref } from 'vue';
 import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import shop from '@/routes/shop';
-import type { User } from '@/types';
+import type { User, SendOtpResponse, VerifyOtpResponse } from '@/types';
+import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from '@/components/ui/input-otp';
 
 const props = defineProps<{
   user: User;
 }>();
 
+const originalEmail = props.user.email ?? '';
+const originalPhone = props.user.phone ?? '';
+
 const form = useForm({
   _method: 'PATCH',
-  name: props.user.name || '',
-  email: props.user.email || '',
-  phone: props.user.phone || '',
+  name: props.user.name ?? '',
+  email: originalEmail,
+  phone: originalPhone,
   avatar: null as File | null,
-  otp: '',
+  verification_token: '',
 });
 
-const avatarPreview = ref<string | null>(
-  props.user.avatar ? `/storage/${props.user.avatar}` : null,
+const avatarPreview = computed(() =>
+  form.avatar
+    ? URL.createObjectURL(form.avatar)
+    : props.user.avatar
+      ? `/storage/${props.user.avatar}`
+      : null,
 );
+
+const needsVerification = computed(
+  () => form.email !== originalEmail || form.phone !== originalPhone,
+);
+const purpose = computed(() =>
+  form.phone !== originalPhone ? 'change_phone' : 'change_email',
+);
+
+watch([() => form.email, () => form.phone], () => {
+  form.verification_token = '';
+});
 
 const handleAvatarChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
-
-  if (target.files && target.files.length > 0) {
-    const file = target.files[0];
-    form.avatar = file;
-    avatarPreview.value = URL.createObjectURL(file);
+  if (target.files?.length) {
+    form.avatar = target.files[0];
   }
 };
 
 const submitProfile = () => {
+  if (needsVerification.value && !form.verification_token) {
+    openOtpDialog();
+    return;
+  }
+
   form.post(shop.account.profile.update.url(), {
     forceFormData: true,
     preserveScroll: true,
+    onSuccess: () => {
+      form.verification_token = '';
+    },
+  });
+};
+
+// --- OTP send/verify (plain HTTP, no page visit) ---
+const sendHttp = useHttp<{ purpose: string; phone?: string }, SendOtpResponse>({
+  purpose: '',
+  phone: undefined,
+});
+const verifyHttp = useHttp<
+  { purpose: string; phone?: string; otp: string },
+  VerifyOtpResponse
+>({
+  purpose: '',
+  phone: undefined,
+  otp: '',
+});
+
+const otpOpen = ref(false);
+const maskedTarget = ref('');
+
+const openOtpDialog = () => {
+  verifyHttp.otp = '';
+  otpOpen.value = true;
+  sendOtp();
+};
+
+const sendOtp = () => {
+  sendHttp.purpose = purpose.value;
+  sendHttp.phone = purpose.value === 'change_phone' ? form.phone : undefined;
+
+  sendHttp.post(shop.account.profile.otp.send.url(), {
+    onSuccess: (data) => {
+      maskedTarget.value = data.target;
+    },
+  });
+};
+
+const verifyOtp = () => {
+  verifyHttp.purpose = purpose.value;
+  verifyHttp.phone = purpose.value === 'change_phone' ? form.phone : undefined;
+
+  verifyHttp.post(shop.account.profile.otp.verify.url(), {
+    onSuccess: (data) => {
+      form.verification_token = data.verification_token;
+      otpOpen.value = false;
+      submitProfile();
+    },
   });
 };
 </script>
@@ -54,7 +130,6 @@ const submitProfile = () => {
 <template>
   <Head title="My Profile" />
 
-  <!-- REMOVED bg-zinc-50 dark:bg-zinc-950 to use your default app background -->
   <div class="flex min-h-screen flex-col transition-colors duration-300">
     <TopBar />
     <div class="sticky top-0 z-50 mt-8">
@@ -68,7 +143,6 @@ const submitProfile = () => {
         <UserAccountSidebar :name="user.name" :avatar="user.avatar" />
 
         <div class="min-w-0 flex-1">
-          <!-- Adjusted card background to stand out from default bg -->
           <div
             class="rounded-3xl border border-zinc-200 bg-zinc-50 p-6 shadow-sm transition-colors md:p-10 dark:border-zinc-800 dark:bg-zinc-900"
           >
@@ -109,6 +183,12 @@ const submitProfile = () => {
                     v-model="form.email"
                     class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-zinc-900 transition-all outline-none focus:border-[#009933] focus:ring-2 focus:ring-[#009933]/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                   />
+                  <p
+                    v-if="form.email !== originalEmail"
+                    class="mt-1 text-xs text-zinc-500"
+                  >
+                    You'll need to verify this via SMS OTP.
+                  </p>
                 </div>
                 <div>
                   <label
@@ -120,6 +200,12 @@ const submitProfile = () => {
                     v-model="form.phone"
                     class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-zinc-900 transition-all outline-none focus:border-[#009933] focus:ring-2 focus:ring-[#009933]/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                   />
+                  <p
+                    v-if="form.phone !== originalPhone"
+                    class="mt-1 text-xs text-zinc-500"
+                  >
+                    You'll need to verify this via SMS OTP.
+                  </p>
                 </div>
 
                 <button
@@ -127,7 +213,12 @@ const submitProfile = () => {
                   :disabled="form.processing"
                   class="mt-4 flex items-center gap-2 rounded-xl bg-[#009933] px-8 py-3.5 font-black text-white shadow-md transition-all hover:bg-green-700 active:scale-95"
                 >
-                  <CheckCircle2 class="h-5 w-5" /> Save Profile
+                  <CheckCircle2 class="h-5 w-5" />
+                  {{
+                    needsVerification && !form.verification_token
+                      ? 'Verify & Save'
+                      : 'Save Profile'
+                  }}
                 </button>
                 <p
                   v-if="form.recentlySuccessful"
@@ -172,5 +263,64 @@ const submitProfile = () => {
       </div>
     </main>
     <Footer />
+
+    <Dialog v-model:open="otpOpen">
+      <DialogContent class="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Verify it's you</DialogTitle>
+          <DialogDescription>
+            We sent a 6-digit code to
+            {{ maskedTarget || 'your registered number' }}.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div class="flex justify-center py-2">
+          <InputOTP
+            v-model="verifyHttp.otp"
+            :maxlength="6"
+            @complete="verifyOtp"
+          >
+            <InputOTPGroup>
+              <InputOTPSlot :index="0" />
+              <InputOTPSlot :index="1" />
+              <InputOTPSlot :index="2" />
+              <InputOTPSlot :index="3" />
+              <InputOTPSlot :index="4" />
+              <InputOTPSlot :index="5" />
+            </InputOTPGroup>
+          </InputOTP>
+        </div>
+
+        <p
+          v-if="verifyHttp.errors.otp"
+          class="text-center text-sm font-medium text-red-600"
+        >
+          {{ verifyHttp.errors.otp }}
+        </p>
+        <p
+          v-if="sendHttp.errors.phone"
+          class="text-center text-sm font-medium text-red-600"
+        >
+          {{ sendHttp.errors.phone }}
+        </p>
+
+        <div class="flex items-center justify-between pt-2">
+          <button
+            type="button"
+            :disabled="sendHttp.processing"
+            @click="sendOtp"
+            class="text-sm font-bold text-[#009933] disabled:opacity-50"
+          >
+            {{ sendHttp.processing ? 'Sending…' : 'Resend code' }}
+          </button>
+          <Button
+            :disabled="verifyHttp.processing || verifyHttp.otp.length !== 6"
+            @click="verifyOtp"
+          >
+            {{ verifyHttp.processing ? 'Verifying…' : 'Verify' }}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   </div>
 </template>
