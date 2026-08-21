@@ -43,3 +43,12 @@ export type UserAddress = {
   full_address?: string;
   is_default: boolean;
 };
+
+// OTP change profile types
+export interface SendOtpResponse {
+  message: string;
+  target: string;
+}
+export interface VerifyOtpResponse {
+  verification_token: string;
+}
