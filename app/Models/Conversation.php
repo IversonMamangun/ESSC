@@ -1,0 +1,42 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+
+#[Fillable([
+    'user_id',
+    'store_id',
+    'user_unread_count',
+    'store_unread_count',
+    'last_message_at',
+])]
+class Conversation extends Model
+{
+    protected function casts(): array
+    {
+        return [
+            'user_unread_count' => 'integer',
+            'store_unread_count' => 'integer',
+            'last_message_at' => 'datetime',
+        ];
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Store::class);
+    }
+
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class);
+    }
+}
