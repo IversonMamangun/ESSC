@@ -80,4 +80,9 @@ class Store extends Model
     {
         return $this->hasMany(Review::class);
     }
+
+    public function conversations(): HasMany
+    {
+        return $this->hasMany(Conversation::class);
+    }
 }
