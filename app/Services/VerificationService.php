@@ -39,7 +39,7 @@ class VerificationService
 
         SendOtpSmsJob::dispatch(
             phone: $phone,
-            message: "Your verification code is {$otp}"
+            message: $otp
         );
     }
 
