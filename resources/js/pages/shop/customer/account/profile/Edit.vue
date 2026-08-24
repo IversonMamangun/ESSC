@@ -6,6 +6,7 @@ import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
 import Footer from '@/components/sections/Footer.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
+import InputError from '@/components/InputError.vue';
 import shop from '@/routes/shop';
 import type { User, SendOtpResponse, VerifyOtpResponse } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -26,8 +27,16 @@ const props = defineProps<{
   user: User;
 }>();
 
+const normalizePhone = (phone: string) => {
+  if (phone.startsWith('0')) {
+    return phone.slice(1);
+  }
+
+  return phone;
+};
+
 const originalEmail = props.user.email ?? '';
-const originalPhone = props.user.phone ?? '';
+const originalPhone = normalizePhone(props.user.phone ?? '');
 
 const form = useForm({
   _method: 'PATCH',
@@ -181,6 +190,7 @@ const verifyOtp = () => {
                   <input
                     type="email"
                     v-model="form.email"
+                    placeholder="bM8v0@example.com"
                     class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-zinc-900 transition-all outline-none focus:border-[#009933] focus:ring-2 focus:ring-[#009933]/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                   />
                   <p
@@ -189,29 +199,44 @@ const verifyOtp = () => {
                   >
                     You'll need to verify this via SMS OTP.
                   </p>
+                  <InputError :message="form.errors.email" />
                 </div>
                 <div>
                   <label
                     class="mb-2 block text-sm font-bold text-zinc-700 dark:text-zinc-300"
                     >Phone Number</label
                   >
-                  <input
-                    type="text"
-                    v-model="form.phone"
-                    class="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-zinc-900 transition-all outline-none focus:border-[#009933] focus:ring-2 focus:ring-[#009933]/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-                  />
+                  <div
+                    class="flex h-12 w-full items-center overflow-hidden rounded-xl border border-zinc-200 bg-white px-4 py-3 text-zinc-900 transition-all outline-none focus-within:border-[#009933] focus-within:ring-2 focus-within:ring-[#009933]/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                  >
+                    <div
+                      class="flex h-full items-center justify-center border-r border-zinc-300 pe-4 font-bold text-zinc-700 dark:border-zinc-600 dark:text-zinc-300"
+                    >
+                      +63
+                    </div>
+
+                    <input
+                      id="phone"
+                      :value="form.phone"
+                      type="tel"
+                      maxlength="10"
+                      placeholder="9123456789"
+                      class="h-full w-full bg-transparent px-3 outline-none"
+                    />
+                  </div>
                   <p
                     v-if="form.phone !== originalPhone"
                     class="mt-1 text-xs text-zinc-500"
                   >
                     You'll need to verify this via SMS OTP.
                   </p>
+                  <InputError :message="form.errors.phone" />
                 </div>
 
                 <button
                   type="submit"
-                  :disabled="form.processing"
-                  class="mt-4 flex items-center gap-2 rounded-xl bg-[#009933] px-8 py-3.5 font-black text-white shadow-md transition-all hover:bg-green-700 active:scale-95"
+                  :disabled="form.processing || !form.isDirty"
+                  class="mt-4 flex cursor-pointer items-center gap-2 rounded-xl bg-[#009933] px-8 py-3.5 font-black text-white shadow-md transition-all hover:bg-green-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#009933] disabled:active:scale-100"
                 >
                   <CheckCircle2 class="h-5 w-5" />
                   {{
