@@ -6,7 +6,6 @@ import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { store } from '@/routes/register';
 import { send, verify } from '@/routes/verifications';
 
@@ -15,7 +14,6 @@ const http = useHttp({
   name: '',
   email: '',
   phone: '',
-  user_type_id: '3',
   purpose: 'registration',
   otp: '',
   password: '',
@@ -48,10 +46,10 @@ const startTimer = () => {
   clearInterval(timerId);
   timerId = setInterval(() => {
     if (countdown.value > 0) {
-countdown.value--;
-} else {
-clearInterval(timerId);
-}
+      countdown.value--;
+    } else {
+      clearInterval(timerId);
+    }
   }, 1000);
 };
 
@@ -89,22 +87,38 @@ const resetOtpBoxes = () => {
   http.otp = '';
 };
 
-// useHttp posts the hook's own reactive data (http.name,
-// http.phone, etc.) and auto-populates http.errors on a 422 response
+function extractErrorMessage(e: any, fallback: string): string {
+  const status = e?.response?.status;
+  const safeStatuses = [401, 403, 404, 422, 429];
+
+  if (!safeStatuses.includes(status)) {
+    return fallback;
+  }
+
+  const raw = e?.response?.data;
+  let parsed = raw;
+
+  if (typeof raw === 'string') {
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      return fallback;
+    }
+  }
+
+  return parsed?.message ?? fallback;
+}
+
 const requestOtp = async () => {
   globalError.value = '';
 
   try {
     await http.post(send().url);
-  } catch {
-    globalError.value = 'Failed to send OTP.';
-
+  } catch (e: any) {
+    globalError.value = extractErrorMessage(e, 'Failed to send OTP.');
     return;
   }
-
-  if (hasFieldErrors()) {
-return;
-}
+  if (hasFieldErrors()) return;
 
   currentStep.value = 2;
   startTimer();
@@ -116,15 +130,12 @@ const verifyOtp = async () => {
 
   try {
     data = (await http.post(verify().url)) as { verification_token?: string };
-  } catch {
-    globalError.value = 'Verification failed.';
+  } catch (e: any) {
+    globalError.value = extractErrorMessage(e, 'Verification failed.');
 
     return;
   }
-
-  if (hasFieldErrors()) {
-return;
-}
+  if (hasFieldErrors()) return;
 
   http.verification_token = data?.verification_token ?? '';
   currentStep.value = 3;
@@ -135,15 +146,12 @@ const resendOtp = async () => {
 
   try {
     await http.post(send().url);
-  } catch {
-    globalError.value = 'Failed to resend OTP.';
+  } catch (e: any) {
+    globalError.value = extractErrorMessage(e, 'Failed to resend OTP.');
 
     return;
   }
-
-  if (hasFieldErrors()) {
-return;
-}
+  if (hasFieldErrors()) return;
 
   startTimer();
   resetOtpBoxes();
@@ -156,15 +164,12 @@ const createAccount = async () => {
 
   try {
     data = (await http.post(store().url)) as { redirect?: string };
-  } catch {
-    globalError.value = 'Failed to create account.';
+  } catch (e: any) {
+    globalError.value = extractErrorMessage(e, 'Failed to create account.');
 
     return;
   }
-
-  if (hasFieldErrors()) {
-return;
-}
+  if (hasFieldErrors()) return;
 
   successRedirect.value = data?.redirect ?? '/';
   currentStep.value = 4;
@@ -218,76 +223,13 @@ return;
         </div>
 
         <div class="flex grow flex-col">
-          <!-- Step 1: account details -->
+          <!-- Step 1: phone -->
           <form
             v-if="currentStep === 1"
             class="flex grow flex-col"
             @submit.prevent="requestOtp"
           >
             <div class="flex grow flex-col justify-center gap-4">
-              <div>
-                <Label class="text-zinc-500">I'm registering as</Label>
-                <RadioGroup
-                  v-model="http.user_type_id"
-                  class="mt-2 grid grid-cols-2 gap-3"
-                >
-                  <div>
-                    <RadioGroupItem
-                      id="customer"
-                      value="3"
-                      class="peer sr-only"
-                    />
-                    <Label
-                      for="customer"
-                      class="flex h-11 cursor-pointer items-center justify-center rounded-xl border-2 border-gray-200 font-semibold text-gray-500 peer-data-[state=checked]:border-[#009933] peer-data-[state=checked]:text-[#009933]"
-                    >
-                      Buyer
-                    </Label>
-                  </div>
-                  <div>
-                    <RadioGroupItem
-                      id="seller"
-                      value="2"
-                      class="peer sr-only"
-                    />
-                    <Label
-                      for="seller"
-                      class="flex h-11 cursor-pointer items-center justify-center rounded-xl border-2 border-gray-200 font-semibold text-gray-500 peer-data-[state=checked]:border-[#009933] peer-data-[state=checked]:text-[#009933]"
-                    >
-                      Seller
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </div>
-
-              <div>
-                <Label for="name" class="text-zinc-500">Full Name</Label>
-                <Input
-                  id="name"
-                  v-model="http.name"
-                  type="text"
-                  placeholder="John Doe"
-                  class="mt-1 flex h-11 w-full items-center justify-center overflow-hidden rounded-xl border border-r border-[#009933] bg-white px-4 font-medium text-gray-800 shadow-sm focus-visible:border-[#009933] focus-visible:ring-0 dark:bg-white dark:text-gray-800"
-                  autocomplete="name"
-                  required
-                />
-                <InputError :message="http.errors.name" class="mt-1" />
-              </div>
-
-              <div>
-                <Label for="email" class="text-zinc-500">Email</Label>
-                <Input
-                  id="email"
-                  v-model="http.email"
-                  type="email"
-                  placeholder="bM8v0@example.com"
-                  class="mt-1 flex h-11 w-full items-center justify-center overflow-hidden rounded-xl border border-r border-[#009933] bg-white px-4 font-medium text-gray-800 shadow-sm focus-visible:border-[#009933] focus-visible:ring-0 dark:bg-white dark:text-gray-800"
-                  autocomplete="email"
-                  required
-                />
-                <InputError :message="http.errors.email" class="mt-1" />
-              </div>
-
               <div>
                 <Label for="phone" class="text-zinc-500">Mobile Number</Label>
                 <div
@@ -415,7 +357,7 @@ return;
             </div>
           </form>
 
-          <!-- Step 3: password -->
+          <!-- Step 3: account details -->
           <form
             v-if="currentStep === 3"
             class="flex grow flex-col"
@@ -423,17 +365,49 @@ return;
           >
             <div class="flex grow flex-col justify-center gap-4">
               <div>
-                <Label for="password">Set Password</Label>
+                <Label for="name" class="text-zinc-500">Full Name</Label>
+                <Input
+                  id="name"
+                  v-model="http.name"
+                  type="text"
+                  placeholder="John Doe"
+                  class="mt-1 flex h-11 w-full items-center justify-center overflow-hidden rounded-xl border border-r border-[#009933] bg-white px-4 font-medium text-gray-800 shadow-sm focus-visible:border-[#009933] focus-visible:ring-0 dark:bg-white dark:text-gray-800"
+                  autocomplete="name"
+                  required
+                />
+                <InputError :message="http.errors.name" class="mt-1" />
+              </div>
+
+              <div>
+                <Label for="email" class="text-zinc-500">Email</Label>
+                <Input
+                  id="email"
+                  v-model="http.email"
+                  type="email"
+                  placeholder="bM8v0@example.com"
+                  class="mt-1 flex h-11 w-full items-center justify-center overflow-hidden rounded-xl border border-r border-[#009933] bg-white px-4 font-medium text-gray-800 shadow-sm focus-visible:border-[#009933] focus-visible:ring-0 dark:bg-white dark:text-gray-800"
+                  autocomplete="email"
+                  required
+                />
+                <InputError :message="http.errors.email" class="mt-1" />
+              </div>
+
+              <div>
+                <Label for="password" class="text-zinc-500">Set Password</Label>
                 <div class="relative mt-1">
                   <Input
-                    :id="'password'"
+                    id="password"
                     v-model="http.password"
                     :type="showPassword ? 'text' : 'password'"
+                    placeholder="••••••••"
+                    class="mt-1 flex h-11 w-full items-center justify-center overflow-hidden rounded-xl border border-r border-[#009933] bg-white px-4 font-medium text-gray-800 shadow-sm focus-visible:border-[#009933] focus-visible:ring-0 dark:bg-white dark:text-gray-800"
+                    autocomplete="new-password"
+                    required
                   />
                   <button
                     type="button"
                     @click="showPassword = !showPassword"
-                    class="absolute inset-y-0 right-3 flex items-center text-gray-400"
+                    class="absolute inset-y-0 right-3 flex cursor-pointer items-center text-gray-400"
                   >
                     <EyeOff v-if="showPassword" class="h-4 w-4" />
                     <Eye v-else class="h-4 w-4" />
@@ -443,13 +417,28 @@ return;
               </div>
 
               <div>
-                <Label for="password_confirmation">Retype Password</Label>
-                <Input
-                  id="password_confirmation"
-                  v-model="http.password_confirmation"
-                  :type="showPassword ? 'text' : 'password'"
-                  class="mt-1"
-                />
+                <Label for="password_confirmation" class="text-zinc-500"
+                  >Retype Password</Label
+                >
+                <div class="relative mt-1">
+                  <Input
+                    id="password_confirmation"
+                    v-model="http.password_confirmation"
+                    :type="showPassword ? 'text' : 'password'"
+                    placeholder="••••••••"
+                    class="mt-1 flex h-11 w-full items-center justify-center overflow-hidden rounded-xl border border-r border-[#009933] bg-white px-4 font-medium text-gray-800 shadow-sm focus-visible:border-[#009933] focus-visible:ring-0 dark:bg-white dark:text-gray-800"
+                    autocomplete="new-password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    @click="showPassword = !showPassword"
+                    class="absolute inset-y-0 right-3 flex cursor-pointer items-center text-gray-400"
+                  >
+                    <EyeOff v-if="showPassword" class="h-4 w-4" />
+                    <Eye v-else class="h-4 w-4" />
+                  </button>
+                </div>
                 <InputError
                   :message="http.errors.password_confirmation"
                   class="mt-1"
