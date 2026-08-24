@@ -257,7 +257,7 @@ const createAccount = async () => {
               <Button
                 type="submit"
                 :disabled="http.processing"
-                class="h-11 w-full bg-[#009933] font-bold hover:bg-green-700"
+                class="h-11 w-full cursor-pointer bg-[#009933] font-bold hover:bg-green-700"
               >
                 <LoaderCircle
                   v-if="http.processing"
@@ -346,13 +346,13 @@ const createAccount = async () => {
               <Button
                 type="submit"
                 :disabled="http.otp.length < 6 || http.processing"
-                class="h-11 w-full bg-[#009933] font-bold hover:bg-green-700"
+                class="h-11 w-full cursor-pointer bg-[#009933] font-bold hover:bg-green-700"
               >
                 <LoaderCircle
                   v-if="http.processing"
                   class="h-4 w-4 animate-spin"
                 />
-                <span v-else>Next</span>
+                <span v-else class="text-white">Next</span>
               </Button>
             </div>
           </form>
@@ -450,13 +450,13 @@ const createAccount = async () => {
               <Button
                 type="submit"
                 :disabled="http.processing"
-                class="h-11 w-full bg-[#009933] font-bold hover:bg-green-700"
+                class="h-11 w-full cursor-pointer bg-[#009933] font-bold hover:bg-green-700"
               >
                 <LoaderCircle
                   v-if="http.processing"
                   class="h-4 w-4 animate-spin"
                 />
-                <span v-else>Complete Registration</span>
+                <span v-else class="text-white">Complete Registration</span>
               </Button>
             </div>
           </form>
@@ -491,7 +491,7 @@ const createAccount = async () => {
 
           <div class="mt-auto w-full shrink-0 pt-8">
             <Button
-              class="h-11 w-full bg-[#009933] font-bold hover:bg-green-700"
+              class="h-11 w-full cursor-pointer bg-[#009933] font-bold text-white hover:bg-green-700"
               @click="router.visit(successRedirect)"
             >
               Continue
