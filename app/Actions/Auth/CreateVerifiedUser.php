@@ -3,6 +3,7 @@
 namespace App\Actions\Auth;
 
 use App\Models\User;
+use App\Models\UserType;
 use App\Services\VerificationService;
 use Illuminate\Support\Facades\Hash;
 
@@ -24,7 +25,7 @@ class CreateVerifiedUser
             'name' => $input['name'],
             'email' => $input['email'],
             'phone' => $verification->target,
-            'user_type_id' => $input['user_type_id'],
+            'user_type_id' => UserType::CUSTOMER,
             'password' => Hash::make($input['password']),
         ]);
 

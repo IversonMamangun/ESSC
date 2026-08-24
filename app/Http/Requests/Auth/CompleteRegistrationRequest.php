@@ -46,11 +46,6 @@ class CompleteRegistrationRequest extends FormRequest
                 'string',
             ],
 
-            'user_type_id' => [
-                'required',
-                Rule::in([UserType::SELLER, UserType::CUSTOMER]),
-            ],
-
             'password' => [
                 'required',
                 'confirmed',
