@@ -41,15 +41,12 @@ const hasFieldErrors = () => Object.keys(http.errors).length > 0;
 const countdown = ref(300);
 let timerId: ReturnType<typeof setInterval>;
 
-const startTimer = () => {
-  countdown.value = 300;
+const startTimer = (seconds = 300) => {
+  countdown.value = Math.max(0, seconds);
   clearInterval(timerId);
   timerId = setInterval(() => {
-    if (countdown.value > 0) {
-      countdown.value--;
-    } else {
-      clearInterval(timerId);
-    }
+    if (countdown.value > 0) countdown.value--;
+    else clearInterval(timerId);
   }, 1000);
 };
 
@@ -111,9 +108,10 @@ function extractErrorMessage(e: any, fallback: string): string {
 
 const requestOtp = async () => {
   globalError.value = '';
+  let data: { expires_in?: number } | undefined;
 
   try {
-    await http.post(send().url);
+    data = (await http.post(send().url)) as { expires_in?: number };
   } catch (e: any) {
     globalError.value = extractErrorMessage(e, 'Failed to send OTP.');
     return;
@@ -121,7 +119,7 @@ const requestOtp = async () => {
   if (hasFieldErrors()) return;
 
   currentStep.value = 2;
-  startTimer();
+  startTimer(data?.expires_in ?? 300);
   nextTick(() => otpRefs.value[0]?.focus());
 };
 
@@ -335,7 +333,7 @@ const createAccount = async () => {
                   v-else
                   type="button"
                   @click="resendOtp"
-                  class="font-bold text-[#009933] hover:underline"
+                  class="cursor-pointer font-bold text-[#009933] hover:underline"
                 >
                   Resend Code
                 </button>
@@ -345,6 +343,7 @@ const createAccount = async () => {
             <div class="mt-auto shrink-0 pt-8">
               <Button
                 type="submit"
+                @click="(http.clearErrors(), (globalError = ''))"
                 :disabled="http.otp.length < 6 || http.processing"
                 class="h-11 w-full cursor-pointer bg-[#009933] font-bold hover:bg-green-700"
               >
