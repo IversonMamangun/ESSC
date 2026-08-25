@@ -6,6 +6,8 @@ use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use App\Enums\VerificationCodePurpose;
+use App\Models\User;
+use App\Support\Phone;
 
 class SendOtpRequest extends FormRequest
 {
@@ -25,15 +27,19 @@ class SendOtpRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'phone' => [
+        'phone' => [
                 'required',
                 'regex:/^639\d{9}$/',
-                Rule::unique('users', 'phone'),
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    if (User::where('phone', Phone::toLocal($value))->exists()) {
+                        $fail('This phone number is already registered.');
+                    }
+                },
             ],
 
             'purpose' => [
                 'required',
-                Rule::enum(VerificationCodePurpose::class),        
+                Rule::enum(VerificationCodePurpose::class),
             ],
         ];
     }
