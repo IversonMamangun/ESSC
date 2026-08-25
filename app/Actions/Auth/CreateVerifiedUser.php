@@ -5,6 +5,7 @@ namespace App\Actions\Auth;
 use App\Models\User;
 use App\Models\UserType;
 use App\Services\VerificationService;
+use App\Support\Phone;
 use Illuminate\Support\Facades\Hash;
 
 class CreateVerifiedUser
@@ -24,14 +25,12 @@ class CreateVerifiedUser
         $user = User::create([
             'name' => $input['name'],
             'email' => $input['email'],
-            'phone' => $verification->target,
+            'phone' => Phone::toLocal($verification->target),
             'user_type_id' => UserType::CUSTOMER,
             'password' => Hash::make($input['password']),
         ]);
 
-        $this->verification->consumeToken(
-            $input['verification_token']
-        );
+        $this->verification->deleteVerifications($verification->target);
 
         return $user;
     }
