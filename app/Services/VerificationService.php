@@ -15,19 +15,30 @@ class VerificationService
         // 
     }
 
-    public function sendPhoneOtp(string $phone, string $purpose): void 
+    public function sendPhoneOtp(string $phone, string $purpose): array
     {
+        $existing = VerificationCode::query()
+            ->where('type', 'phone')
+            ->where('target', $phone)
+            ->where('purpose', $purpose)
+            ->whereNull('verified_at')
+            ->where('expires_at', '>', now())
+            ->latest()
+            ->first();
+
+        if ($existing) {
+            return [
+                'resumed' => true,
+                'expires_in' => max(0, $existing->expires_at->getTimestamp() - now()->getTimestamp()),
+            ];
+        }
+
         VerificationCode::query()
             ->where('target', $phone)
             ->where('purpose', $purpose)
-            ->update([
-                'expires_at' => now(),
-            ]);
+            ->update(['expires_at' => now()]);
 
-        $otp = (string) random_int(
-            100000,
-            999999
-        );
+        $otp = (string) random_int(100000, 999999);
 
         VerificationCode::create([
             'type' => 'phone',
@@ -37,10 +48,12 @@ class VerificationService
             'expires_at' => now()->addMinutes(5),
         ]);
 
-        SendOtpSmsJob::dispatch(
-            phone: $phone,
-            message: $otp
-        );
+        SendOtpSmsJob::dispatch(phone: $phone, message: $otp);
+
+        return [
+            'resumed' => false,
+            'expires_in' => 300,
+        ];
     }
 
     public function verifyPhoneOtp(string $phone, string $otp, string $purpose): string 

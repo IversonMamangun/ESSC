@@ -10,15 +10,13 @@ use Illuminate\Http\Request;
 
 class VerificationController extends Controller
 {
-    public function send(SendOtpRequest $request, VerificationService $service) 
+    public function send(SendOtpRequest $request, VerificationService $service)
     {
-        $service->sendPhoneOtp(
-            $request->phone,
-            $request->purpose
-        );
+        $result = $service->sendPhoneOtp($request->phone, $request->purpose);
 
         return response()->json([
-            'message' => 'OTP sent.',
+            'message' => $result['resumed'] ? 'A code is already active for this number.' : 'OTP sent.',
+            'expires_in' => $result['expires_in'],
         ]);
     }
 
