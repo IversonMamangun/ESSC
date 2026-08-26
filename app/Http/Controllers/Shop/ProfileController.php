@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Shop;
 use App\Http\Controllers\Controller;
 use App\Enums\VerificationCodePurpose;
 use App\Http\Requests\Shop\UpdateProfileRequest;
+use App\Http\Requests\Shop\ValidateProfileRequest;
 use App\Services\VerificationService;
+use App\Support\Phone;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
@@ -20,13 +22,19 @@ class ProfileController extends Controller
         ]);
     }
 
+    public function validate(ValidateProfileRequest $request)
+    {
+        return response()->json(['message' => 'Valid.']);
+    }
+
     public function update(UpdateProfileRequest $request, VerificationService $verification)
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
         $validated = $request->validated();
 
-        $phoneChanged = $validated['phone'] !== $user->phone;
+        $newPhoneLocal = Phone::toLocal($validated['phone']);
+        $phoneChanged = $newPhoneLocal !== $user->phone;
         $emailChanged = $validated['email'] !== $user->email;
 
         if ($phoneChanged || $emailChanged) {
@@ -34,7 +42,9 @@ class ProfileController extends Controller
                 ? VerificationCodePurpose::CHANGE_PHONE
                 : VerificationCodePurpose::CHANGE_EMAIL;
 
-            $expectedTarget = $phoneChanged ? $validated['phone'] : $user->phone;
+            // Always verify against the phone the user currently owns —
+            // the OTP proves "this is really you", not "you own the new number".
+            $expectedTarget = Phone::toInternational($user->phone);
 
             $code = $verification->validateToken($validated['verification_token'], $purpose->value);
 
@@ -56,7 +66,7 @@ class ProfileController extends Controller
 
         $user->name = $validated['name'];
         $user->email = $validated['email'];
-        $user->phone = $validated['phone'];
+        $user->phone = $newPhoneLocal;
         $user->save();
 
         return back()->with('success', 'Profile updated successfully.');
