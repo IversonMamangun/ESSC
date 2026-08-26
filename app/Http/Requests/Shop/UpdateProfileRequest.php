@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Shop;
 
+use App\Models\User;
+use App\Support\Phone;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -26,13 +28,34 @@ class UpdateProfileRequest extends FormRequest
     {
         $user = Auth::user();
 
+        $newPhoneLocal = Phone::toLocal((string) $this->input('phone'));
+
         $sensitiveChanged = $this->input('email') !== $user->email
-            || $this->input('phone') !== $user->phone;
+            || $newPhoneLocal !== $user->phone;
 
         return [
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
-            'phone' => ['required', 'string', 'regex:/^639\d{9}$/', Rule::unique('users', 'phone')->ignore($user->id)],
+
+            'email' => [
+                'required', 'email', 'max:255',
+                Rule::unique('users', 'email')->ignore($user->id),
+            ],
+
+            'phone' => [
+                'required',
+                'string',
+                'regex:/^639\d{9}$/',
+                function (string $attribute, mixed $value, \Closure $fail) use ($user) {
+                    $exists = User::where('phone', Phone::toLocal($value))
+                        ->where('id', '!=', $user->id)
+                        ->exists();
+
+                    if ($exists) {
+                        $fail('This phone number is already registered.');
+                    }
+                },
+            ],
+
             'avatar' => ['nullable', 'image', 'max:2048'],
             'verification_token' => [Rule::requiredIf($sensitiveChanged), 'string'],
         ];
