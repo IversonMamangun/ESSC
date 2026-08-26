@@ -23,14 +23,11 @@ class VerifyProfileOtpRequest extends FormRequest
      */
     public function rules(): array
     {
-        $isPhoneChange = $this->input('purpose') === VerificationCodePurpose::CHANGE_PHONE->value;
-
         return [
             'purpose' => ['required', Rule::in([
                 VerificationCodePurpose::CHANGE_EMAIL->value,
                 VerificationCodePurpose::CHANGE_PHONE->value,
             ])],
-            'phone' => [Rule::requiredIf($isPhoneChange), 'nullable', 'string'],
             'otp' => ['required', 'digits:6'],
         ];
     }

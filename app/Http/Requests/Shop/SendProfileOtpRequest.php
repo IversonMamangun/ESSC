@@ -25,19 +25,11 @@ class SendProfileOtpRequest extends FormRequest
      */
     public function rules(): array
     {
-        $isPhoneChange = $this->input('purpose') === VerificationCodePurpose::CHANGE_PHONE->value;
-
         return [
             'purpose' => ['required', Rule::in([
                 VerificationCodePurpose::CHANGE_EMAIL->value,
                 VerificationCodePurpose::CHANGE_PHONE->value,
             ])],
-            'phone' => [
-                Rule::requiredIf($isPhoneChange),
-                'nullable',
-                'regex:/^639\d{9}$/',
-                Rule::unique('users', 'phone')->ignore(Auth::id()),
-            ],
         ];
     }
 }
