@@ -115,13 +115,13 @@ class VerificationService
         return $verification;
     }
 
-    // public function consumeToken(string $token): void {
-    //     VerificationCode::query()
-    //         ->where('verification_token', $token)
-    //         ->update([
-    //             'verification_token' => null,
-    //         ]);
-    // }
+    public function consumeToken(string $token): void {
+        VerificationCode::query()
+            ->where('verification_token', $token)
+            ->update([
+                'verification_token' => null,
+            ]);
+    }
 
     public function deleteVerifications(string $target): void
     {

@@ -77,11 +77,15 @@ Route::middleware([
 ->group(function () {
     Route::get('/account/profile/edit', [CustomerProfileController::class, 'edit'])
         ->name('account.profile.edit');
+    Route::post('/account/profile/validate', [CustomerProfileController::class, 'validate'])
+        ->name('account.profile.validate');
     Route::patch('/account/profile', [CustomerProfileController::class, 'update'])
         ->name('account.profile.update');
     Route::post('/account/profile/otp/send', [CustomerProfileVerificationController::class, 'send'])
+        ->middleware('throttle:otp-send')
         ->name('account.profile.otp.send');
     Route::post('/account/profile/otp/verify', [CustomerProfileVerificationController::class, 'verify'])
+        ->middleware('throttle:otp-verify')
         ->name('account.profile.otp.verify');
 
     Route::get('/account/addresses', [CustomerUserAddressController::class, 'index'])
