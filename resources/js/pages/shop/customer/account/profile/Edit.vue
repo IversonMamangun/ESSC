@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Head, useForm, useHttp } from '@inertiajs/vue3';
-import { UserIcon, Camera, CheckCircle2 } from 'lucide-vue-next';
+import { UserIcon, CameraIcon, CheckCircle2Icon } from 'lucide-vue-next';
 import { computed, watch, ref } from 'vue';
 import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
 import Footer from '@/components/sections/Footer.vue';
@@ -27,16 +27,20 @@ const props = defineProps<{
   user: User;
 }>();
 
-const normalizePhone = (phone: string) => {
-  if (phone.startsWith('0')) {
-    return phone.slice(1);
-  }
-
-  return phone;
-};
+const normalizePhone = (phone: string) =>
+  phone.startsWith('0') ? phone.slice(1) : phone;
 
 const originalEmail = props.user.email ?? '';
 const originalPhone = normalizePhone(props.user.phone ?? '');
+
+// Local input only ever shows/accepts the raw 10-digit number (no "0" prefix,
+// no "+63"); form.phone stores exactly that same raw value.
+const localPhone = computed({
+  get: () => form.phone,
+  set: (value: string) => {
+    form.phone = value.replace(/[^0-9]/g, '');
+  },
+});
 
 const form = useForm({
   _method: 'PATCH',
@@ -68,14 +72,32 @@ watch([() => form.email, () => form.phone], () => {
 
 const handleAvatarChange = (event: Event) => {
   const target = event.target as HTMLInputElement;
-  if (target.files?.length) {
-    form.avatar = target.files[0];
-  }
+  if (target.files?.length) form.avatar = target.files[0];
 };
+
+// Pre-flight validation, run through useHttp (raw XHR) rather than
+// form.post(), since this endpoint returns plain JSON, not an Inertia
+// page response — running it through a page-visit would misbehave.
+const validateHttp = useHttp({ name: '', email: '', phone: '' });
 
 const submitProfile = () => {
   if (needsVerification.value && !form.verification_token) {
-    openOtpDialog();
+    validateHttp.name = form.name;
+    validateHttp.email = form.email;
+    validateHttp.phone = form.phone;
+
+    validateHttp
+      .post(shop.account.profile.validate.url())
+      .then(() => openOtpDialog())
+      .catch(() => {
+        // validateHttp.errors auto-populates on 422 — mirror it onto
+        // form.errors so the existing <InputError> bindings still work.
+        Object.keys(form.errors).forEach((key) => {
+          delete (form.errors as Record<string, string>)[key];
+        });
+        Object.assign(form.errors, validateHttp.errors);
+      });
+
     return;
   }
 
@@ -88,51 +110,100 @@ const submitProfile = () => {
   });
 };
 
-// --- OTP send/verify (plain HTTP, no page visit) ---
-const sendHttp = useHttp<{ purpose: string; phone?: string }, SendOtpResponse>({
-  purpose: '',
-  phone: undefined,
-});
-const verifyHttp = useHttp<
-  { purpose: string; phone?: string; otp: string },
-  VerifyOtpResponse
->({
-  purpose: '',
-  phone: undefined,
-  otp: '',
-});
+// --- OTP send/verify ---
+const sendHttp = useHttp<{ purpose: string }, SendOtpResponse>({ purpose: '' });
+const verifyHttp = useHttp<{ purpose: string; otp: string }, VerifyOtpResponse>(
+  {
+    purpose: '',
+    otp: '',
+  },
+);
 
 const otpOpen = ref(false);
 const maskedTarget = ref('');
+const sendError = ref('');
+const verifyError = ref('');
+
+const countdown = ref(0);
+let timerId: ReturnType<typeof setInterval>;
+
+const startTimer = (seconds: number) => {
+  countdown.value = Math.max(0, seconds);
+  clearInterval(timerId);
+  timerId = setInterval(() => {
+    if (countdown.value > 0) countdown.value--;
+    else clearInterval(timerId);
+  }, 1000);
+};
+
+const formattedTime = computed(() => {
+  const m = String(Math.floor(countdown.value / 60)).padStart(2, '0');
+  const s = String(countdown.value % 60).padStart(2, '0');
+  return `${m}:${s}`;
+});
 
 const openOtpDialog = () => {
   verifyHttp.otp = '';
+  verifyError.value = '';
   otpOpen.value = true;
   sendOtp();
 };
 
-const sendOtp = () => {
-  sendHttp.purpose = purpose.value;
-  sendHttp.phone = purpose.value === 'change_phone' ? form.phone : undefined;
+function extractErrorMessage(e: any, fallback: string): string {
+  const status = e?.response?.status;
+  const safeStatuses = [401, 403, 404, 422, 429];
 
-  sendHttp.post(shop.account.profile.otp.send.url(), {
-    onSuccess: (data) => {
+  if (!safeStatuses.includes(status)) {
+    return fallback;
+  }
+
+  const raw = e?.response?.data;
+  let parsed = raw;
+
+  if (typeof raw === 'string') {
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      return fallback;
+    }
+  }
+
+  return parsed?.message ?? fallback;
+}
+
+const sendOtp = () => {
+  sendError.value = '';
+  sendHttp.purpose = purpose.value;
+
+  sendHttp
+    .post(shop.account.profile.otp.send.url())
+    .then((data) => {
       maskedTarget.value = data.target;
-    },
-  });
+      startTimer(data.expires_in ?? 300);
+    })
+    .catch((e: any) => {
+      if (Object.keys(sendHttp.errors).length === 0) {
+        sendError.value = extractErrorMessage(e, 'Failed to send OTP.');
+      }
+    });
 };
 
 const verifyOtp = () => {
+  verifyError.value = '';
   verifyHttp.purpose = purpose.value;
-  verifyHttp.phone = purpose.value === 'change_phone' ? form.phone : undefined;
 
-  verifyHttp.post(shop.account.profile.otp.verify.url(), {
-    onSuccess: (data) => {
+  verifyHttp
+    .post(shop.account.profile.otp.verify.url())
+    .then((data) => {
       form.verification_token = data.verification_token;
       otpOpen.value = false;
       submitProfile();
-    },
-  });
+    })
+    .catch((e: any) => {
+      if (Object.keys(verifyHttp.errors).length === 0) {
+        verifyError.value = extractErrorMessage(e, 'Verification failed.');
+      }
+    });
 };
 </script>
 
@@ -217,7 +288,7 @@ const verifyOtp = () => {
 
                     <input
                       id="phone"
-                      :value="form.phone"
+                      v-model="localPhone"
                       type="tel"
                       maxlength="10"
                       placeholder="9123456789"
@@ -238,7 +309,7 @@ const verifyOtp = () => {
                   :disabled="form.processing || !form.isDirty"
                   class="mt-4 flex cursor-pointer items-center gap-2 rounded-xl bg-[#009933] px-8 py-3.5 font-black text-white shadow-md transition-all hover:bg-green-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#009933] disabled:active:scale-100"
                 >
-                  <CheckCircle2 class="h-5 w-5" />
+                  <CheckCircle2Icon class="h-5 w-5" />
                   {{
                     needsVerification && !form.verification_token
                       ? 'Verify & Save'
@@ -271,7 +342,7 @@ const verifyOtp = () => {
                     for="avatar"
                     class="absolute inset-0 flex cursor-pointer flex-col items-center justify-center rounded-full bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100"
                   >
-                    <Camera class="mb-1 h-6 w-6" />
+                    <CameraIcon class="mb-1 h-6 w-6" />
                     <span class="text-xs font-bold">Edit</span>
                     <input
                       id="avatar"
@@ -294,8 +365,9 @@ const verifyOtp = () => {
         <DialogHeader>
           <DialogTitle>Verify it's you</DialogTitle>
           <DialogDescription>
-            We sent a 6-digit code to
-            {{ maskedTarget || 'your registered number' }}.
+            To confirm it's you, enter the 6-digit code sent to your registered
+            number
+            {{ maskedTarget || 'on file' }}.
           </DialogDescription>
         </DialogHeader>
 
@@ -317,26 +389,28 @@ const verifyOtp = () => {
         </div>
 
         <p
-          v-if="verifyHttp.errors.otp"
+          v-if="sendError"
           class="text-center text-sm font-medium text-red-600"
         >
-          {{ verifyHttp.errors.otp }}
+          {{ sendError }}
         </p>
         <p
-          v-if="sendHttp.errors.phone"
+          v-if="verifyError"
           class="text-center text-sm font-medium text-red-600"
         >
-          {{ sendHttp.errors.phone }}
+          {{ verifyError }}
         </p>
 
         <div class="flex items-center justify-between pt-2">
           <button
             type="button"
-            :disabled="sendHttp.processing"
+            :disabled="sendHttp.processing || countdown > 0"
             @click="sendOtp"
             class="text-sm font-bold text-[#009933] disabled:opacity-50"
           >
-            {{ sendHttp.processing ? 'Sending…' : 'Resend code' }}
+            <span v-if="sendHttp.processing">Sending…</span>
+            <span v-else-if="countdown > 0">Resend in {{ formattedTime }}</span>
+            <span v-else>Resend code</span>
           </button>
           <Button
             :disabled="verifyHttp.processing || verifyHttp.otp.length !== 6"

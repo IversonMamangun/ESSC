@@ -48,6 +48,7 @@ export type UserAddress = {
 export interface SendOtpResponse {
   message: string;
   target: string;
+  expires_in: number;
 }
 export interface VerifyOtpResponse {
   verification_token: string;
