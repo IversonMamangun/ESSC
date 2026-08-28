@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('purpose')->default(VerificationCodePurpose::REGISTRATION->value);
             $table->string('target');
             $table->string('otp');
-            $table->timestamp('expires_at');
+            $table->dateTime('expires_at');
             $table->string('verification_token')->nullable();
             $table->timestamp('verified_at')->nullable();
             $table->unsignedTinyInteger('attempts')->default(0);
