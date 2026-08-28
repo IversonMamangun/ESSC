@@ -41,6 +41,7 @@ const localPhone = computed({
     form.phone = value.replace(/[^0-9]/g, '');
   },
 });
+const internationalPhone = computed(() => `63${form.phone}`);
 
 const form = useForm({
   _method: 'PATCH',
@@ -50,6 +51,11 @@ const form = useForm({
   avatar: null as File | null,
   verification_token: '',
 });
+
+form.transform((data) => ({
+  ...data,
+  phone: internationalPhone.value,
+}));
 
 const avatarPreview = computed(() =>
   form.avatar
@@ -84,14 +90,12 @@ const submitProfile = () => {
   if (needsVerification.value && !form.verification_token) {
     validateHttp.name = form.name;
     validateHttp.email = form.email;
-    validateHttp.phone = form.phone;
+    validateHttp.phone = internationalPhone.value;
 
     validateHttp
       .post(shop.account.profile.validate.url())
       .then(() => openOtpDialog())
       .catch(() => {
-        // validateHttp.errors auto-populates on 422 — mirror it onto
-        // form.errors so the existing <InputError> bindings still work.
         Object.keys(form.errors).forEach((key) => {
           delete (form.errors as Record<string, string>)[key];
         });
@@ -123,6 +127,7 @@ const otpOpen = ref(false);
 const maskedTarget = ref('');
 const sendError = ref('');
 const verifyError = ref('');
+const sendMessage = ref('');
 
 const countdown = ref(0);
 let timerId: ReturnType<typeof setInterval>;
@@ -174,11 +179,13 @@ function extractErrorMessage(e: any, fallback: string): string {
 const sendOtp = () => {
   sendError.value = '';
   sendHttp.purpose = purpose.value;
+  verifyHttp.clearErrors();
 
   sendHttp
     .post(shop.account.profile.otp.send.url())
     .then((data) => {
       maskedTarget.value = data.target;
+      sendMessage.value = data.message;
       startTimer(data.expires_in ?? 300);
     })
     .catch((e: any) => {
@@ -191,6 +198,7 @@ const sendOtp = () => {
 const verifyOtp = () => {
   verifyError.value = '';
   verifyHttp.purpose = purpose.value;
+  verifyHttp.clearErrors();
 
   verifyHttp
     .post(shop.account.profile.otp.verify.url())
@@ -388,6 +396,11 @@ const verifyOtp = () => {
           </InputOTP>
         </div>
 
+        <p v-if="sendMessage" class="text-center text-xs text-zinc-500">
+          {{ sendMessage }}
+        </p>
+
+        <InputError :message="verifyHttp.errors.otp" class="text-center" />
         <p
           v-if="sendError"
           class="text-center text-sm font-medium text-red-600"
