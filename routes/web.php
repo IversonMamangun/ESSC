@@ -24,6 +24,7 @@ use App\Http\Controllers\Seller\OrderController as SellerOrderController;
 use App\Http\Controllers\Seller\SalesController as SellerSalesController;
 use App\Http\Controllers\Seller\SalesAnalyticsController as SellerSalesAnalyticsController;
 use App\Http\Controllers\Seller\ReviewController as SellerReviewController;
+use App\Http\Controllers\Seller\ConversationController as SellerConversationController;
 
 Route::inertia('/', 'Welcome', [
     'canRegister' => true,
@@ -198,6 +199,11 @@ Route::middleware([
         ->name('reviews.index');
     Route::patch('reviews/{review}/reply', [SellerReviewController::class, 'reply'])
         ->name('reviews.reply');
+
+    Route::get('/conversations', [SellerConversationController::class, 'index'])
+        ->name('conversations.index');
+    Route::get('/conversations/{conversation}', [SellerConversationController::class, 'show'])
+        ->name('conversations.show');
 });
 
 // dedicated admin routes
