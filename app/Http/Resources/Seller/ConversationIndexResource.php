@@ -18,6 +18,7 @@ class ConversationIndexResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'uuid' => $this->uuid,
             'store_unread_count' => $this->store_unread_count,
             'last_message_at' => $this->last_message_at?->toIso8601String(),
             'last_message' => $this->relationLoaded('latestMessage')

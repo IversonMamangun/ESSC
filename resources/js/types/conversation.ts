@@ -20,12 +20,14 @@ export interface ConversationMessage {
 
 export interface SellerConversationShow {
   id: number;
+  uuid: string;
   user: User;
   messages: ConversationMessage[];
 }
 
 export interface SellerConversationIndex {
   id: number;
+  uuid: string;
   store_unread_count: number;
   last_message_at: string | null;
   last_message: string | null;

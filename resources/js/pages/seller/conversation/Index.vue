@@ -114,7 +114,7 @@ function formatConversationTime(date: string | null) {
           <Link
             v-for="conversation in props.conversations.data"
             :key="conversation.id"
-            :href="seller.conversations.show(conversation.id)"
+            :href="seller.conversations.show(conversation.uuid)"
             class="group relative flex min-h-[76px] items-center gap-3 border-b px-4 py-3.5 transition-colors outline-none last:border-b-0 hover:bg-muted/50 focus-visible:bg-muted/50 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
           >
             <!-- Avatar -->
