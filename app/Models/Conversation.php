@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Support\Str;
 
 #[Fillable([
     'user_id',
@@ -24,6 +25,18 @@ class Conversation extends Model
             'store_unread_count' => 'integer',
             'last_message_at' => 'datetime',
         ];
+    }
+    
+    protected static function booted(): void
+    {
+        static::creating(function (Conversation $conversation) {
+            $conversation->uuid ??= (string) Str::uuid();
+        });
+    }
+
+    public function getRouteKeyName(): string
+    {
+        return 'uuid';
     }
 
     public function user(): BelongsTo
