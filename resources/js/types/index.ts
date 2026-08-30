@@ -9,6 +9,7 @@ export * from './order';
 export * from './dashboard';
 export * from './review';
 export * from './return';
+export * from './conversation';
 
 export type ApiResponse<T> = {
   data: T;
