@@ -11,4 +11,9 @@ class ConversationPolicy
     {
         return $user->store?->id === $conversation->store_id;
     }
+
+    public function reply(User $user, Conversation $conversation): bool
+    {
+        return $this->view($user, $conversation);
+    }
 }
