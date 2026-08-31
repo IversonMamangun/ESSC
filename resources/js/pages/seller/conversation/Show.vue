@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, router, usePage } from '@inertiajs/vue3';
+import { Head, useForm, usePoll } from '@inertiajs/vue3';
 import {
   MessageCircleMoreIcon,
   StarIcon,
@@ -10,14 +10,8 @@ import {
   FileTextIcon,
   AlertCircleIcon,
 } from 'lucide-vue-next';
-import {
-  ref,
-  computed,
-  nextTick,
-  onMounted,
-  onBeforeUnmount,
-  watch,
-} from 'vue';
+import { ref, computed, nextTick, onMounted } from 'vue';
+import { usePage } from '@inertiajs/vue3';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -35,6 +29,7 @@ import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import Navbar from '@/components/sections/Navbar.vue';
 import TopBar from '@/components/sections/TopBar.vue';
 import SellerStoreHeader from '@/components/SellerStoreHeader.vue';
+import { toast } from 'vue-sonner';
 import seller from '@/routes/seller';
 import type {
   Auth,
@@ -52,10 +47,8 @@ const props = defineProps<{
 const page = usePage<{ auth: Auth }>();
 const currentUserId = computed(() => page.props.auth.user?.id);
 
-const messages = ref<ConversationMessage[]>([...props.conversation.messages]);
-const body = ref('');
-const files = ref<File[]>([]);
 const scrollContainer = ref<HTMLElement | null>(null);
+const fileInput = ref<HTMLInputElement | null>(null);
 
 interface RenderGroup {
   key: string;
@@ -67,7 +60,7 @@ interface RenderGroup {
 const groupedMessages = computed<RenderGroup[]>(() => {
   const groups: RenderGroup[] = [];
 
-  for (const message of messages.value) {
+  for (const message of props.conversation.messages) {
     const own = message.sender.id === currentUserId.value;
     const last = groups[groups.length - 1];
 
@@ -85,6 +78,7 @@ const groupedMessages = computed<RenderGroup[]>(() => {
 
   return groups;
 });
+
 function initials(name: string) {
   return name
     .split(' ')
@@ -104,6 +98,14 @@ function formatDateTime(date: string) {
   });
 }
 
+const lastMessage = computed(() => props.conversation.messages.at(-1));
+function isLastOwnMessage(message: ConversationMessage): boolean {
+  return (
+    lastMessage.value?.id === message.id &&
+    message.sender.id === currentUserId.value
+  );
+}
+
 function scrollToBottom() {
   nextTick(() => {
     scrollContainer.value?.scrollTo({
@@ -113,44 +115,39 @@ function scrollToBottom() {
   });
 }
 
-// --- Polling (no realtime yet) ---
-const POLL_INTERVAL_MS = 4000;
-let pollTimer: ReturnType<typeof setInterval> | null = null;
+// Poll only the `conversation` prop (partial reload) so Inertia::merge()
+// on the backend actually applies — a full reload would just replace it.
+usePoll(10000, { only: ['conversation'] });
 
-function poll() {
-  router.reload({
-    only: ['conversation'],
-  });
-}
-
-watch(
-  () => props.conversation.messages,
-  (newMessages, oldMessages) => {
-    const hasNewMessages =
-      newMessages.length !== (oldMessages?.length ?? messages.value.length);
-    messages.value = [...newMessages];
-    if (hasNewMessages) {
-      scrollToBottom();
-    }
-  },
-);
+// --- Sending ---
+const form = useForm<{ body: string; attachments: File[] }>({
+  body: '',
+  attachments: [],
+});
 
 function handleFileChange(event: Event) {
   const input = event.target as HTMLInputElement;
-  files.value = input.files ? Array.from(input.files) : [];
+  form.attachments = input.files ? Array.from(input.files) : [];
 }
 
 function sendMessage() {
-  //
+  if (form.processing) return;
+  if (!form.body.trim() && form.attachments.length === 0) return;
+
+  form.post(seller.conversations.messages.store.url(props.conversation.uuid), {
+    forceFormData: true,
+    preserveScroll: true,
+    onSuccess: () => {
+      form.reset('body', 'attachments');
+      if (fileInput.value) fileInput.value.value = '';
+      scrollToBottom();
+      toast.success('Message sent successfully!');
+    },
+  });
 }
 
 onMounted(() => {
   scrollToBottom();
-  pollTimer = setInterval(poll, POLL_INTERVAL_MS);
-});
-
-onBeforeUnmount(() => {
-  if (pollTimer) clearInterval(pollTimer);
 });
 
 const breadcrumbs = [
@@ -163,8 +160,8 @@ const breadcrumbs = [
     href: seller.conversations.index(),
   },
   {
-    title: `${props.conversation.user.name}`,
-    href: seller.conversations.show(props.conversation.id),
+    title: props.conversation.user.name,
+    href: seller.conversations.show(props.conversation.uuid),
   },
 ];
 </script>
@@ -288,13 +285,25 @@ const breadcrumbs = [
                     <span class="text-xs text-muted-foreground">
                       {{ formatDateTime(message.created_at) }}
                     </span>
+
+                    <span
+                      v-if="isLastOwnMessage(message)"
+                      class="text-xs text-muted-foreground"
+                    >
+                      &nbsp;&nbsp;·&nbsp;
+                      {{
+                        message.read_at
+                          ? `Seen ${formatDateTime(message.read_at)}`
+                          : 'Sent'
+                      }}
+                    </span>
                   </MessageFooter>
                 </MessageContent>
               </Message>
             </MessageGroup>
 
             <div
-              v-if="messages.length === 0"
+              v-if="groupedMessages.length === 0"
               class="flex flex-1 flex-col items-center justify-center gap-2 text-muted-foreground"
             >
               <MessageCircleMoreIcon class="size-8" />
@@ -305,22 +314,33 @@ const breadcrumbs = [
           <!-- Composer -->
           <form class="flex flex-col gap-2" @submit.prevent="sendMessage">
             <Textarea
-              v-model="body"
+              v-model="form.body"
               placeholder="Type a message..."
               rows="3"
               @keydown.enter.exact.prevent="sendMessage"
             />
+
+            <p v-if="form.errors.body" class="text-xs text-destructive">
+              {{ form.errors.body }}
+            </p>
+            <p
+              v-if="form.errors['attachments.0']"
+              class="text-xs text-destructive"
+            >
+              {{ form.errors['attachments.0'] }}
+            </p>
 
             <div class="flex items-center justify-between gap-2">
               <label
                 class="flex cursor-pointer items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
               >
                 <PaperclipIcon class="size-4" />
-                <span v-if="files.length > 0"
-                  >{{ files.length }} file(s) selected</span
+                <span v-if="form.attachments.length > 0"
+                  >{{ form.attachments.length }} file(s) selected</span
                 >
                 <span v-else>Attach files</span>
                 <input
+                  ref="fileInput"
                   type="file"
                   multiple
                   accept=".jpg,.jpeg,.png,.pdf"
@@ -329,7 +349,7 @@ const breadcrumbs = [
                 />
               </label>
 
-              <Button type="submit">
+              <Button type="submit" :disabled="form.processing">
                 <SendIcon class="mr-1.5 size-4" />
                 Send
               </Button>
