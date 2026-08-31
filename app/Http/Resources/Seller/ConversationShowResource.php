@@ -5,6 +5,7 @@ namespace App\Http\Resources\Seller;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Inertia;
 
 class ConversationShowResource extends JsonResource
 {
@@ -17,6 +18,7 @@ class ConversationShowResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'uuid' => $this->uuid,
             'user' => [
                 'id' => $this->user->id,
                 'name' => $this->user->name,
@@ -24,8 +26,8 @@ class ConversationShowResource extends JsonResource
                     ? Storage::url($this->user->avatar)
                     : null,
             ],
-            'messages' => $this->messages->map(function ($message) {
-                return [
+            'messages' => Inertia::merge(
+                $this->messages->map(fn ($message) => [
                     'id' => $message->id,
                     'body' => $message->body,
                     'created_at' => $message->created_at?->toIso8601String(),
@@ -39,17 +41,15 @@ class ConversationShowResource extends JsonResource
                             : null,
                     ],
 
-                    'attachments' => $message->attachments->map(function ($attachment) {
-                        return [
-                            'id' => $attachment->id,
-                            'url' => $attachment->url,
-                            'original_name' => $attachment->original_name,
-                            'mime_type' => $attachment->mime_type,
-                            'size' => $attachment->size,
-                        ];
-                    }),
-                ];
-            }),
+                    'attachments' => $message->attachments->map(fn ($attachment) => [
+                        'id' => $attachment->id,
+                        'url' => $attachment->url,
+                        'original_name' => $attachment->original_name,
+                        'mime_type' => $attachment->mime_type,
+                        'size' => $attachment->size,
+                    ]),
+                ])
+            )->append()->matchOn('id'),
         ];
     }
 }
