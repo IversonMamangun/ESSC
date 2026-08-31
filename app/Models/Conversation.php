@@ -58,4 +58,18 @@ class Conversation extends Model
     {
         return $this->hasOne(Message::class)->latestOfMany();
     }
+
+    public function markReadByStore(): void
+    {
+        if ($this->store_unread_count === 0) {
+            return;
+        }
+
+        $this->messages()
+            ->whereNull('read_at')
+            ->where('sender_id', '!=', $this->user_id)
+            ->update(['read_at' => now()]);
+
+        $this->update(['store_unread_count' => 0]);
+    }
 }

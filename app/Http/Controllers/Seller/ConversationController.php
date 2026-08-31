@@ -52,7 +52,7 @@ class ConversationController extends Controller
             'messages' => fn ($query) => $query->oldest()->with(['sender', 'attachments']),
         ]);
 
-        $conversation->update(['store_unread_count' => 0]);
+        $conversation->markReadByStore();
 
         return Inertia::render('seller/conversation/Show', [
             'conversation' => ConversationShowResource::make($conversation)->resolve(),
