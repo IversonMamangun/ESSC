@@ -26,6 +26,7 @@ use App\Http\Controllers\Seller\SalesAnalyticsController as SellerSalesAnalytics
 use App\Http\Controllers\Seller\ReviewController as SellerReviewController;
 use App\Http\Controllers\Seller\ConversationController as SellerConversationController;
 use App\Http\Controllers\Seller\MessageController as SellerMessageController;
+use App\Http\Controllers\Seller\MessageAttachmentController as SellerMessageAttachmentController;
 
 Route::inertia('/', 'Welcome', [
     'canRegister' => true,
@@ -207,6 +208,8 @@ Route::middleware([
         ->name('conversations.show');
     Route::post('/conversations/{conversation}/messages', [SellerMessageController::class, 'store'])
         ->name('conversations.messages.store');
+    Route::get('conversations/{conversation}/attachments/{attachment}', [SellerMessageAttachmentController::class, 'show'])
+        ->name('conversations.attachments.show');
 });
 
 // dedicated admin routes

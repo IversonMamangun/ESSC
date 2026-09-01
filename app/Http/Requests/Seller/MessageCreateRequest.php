@@ -28,7 +28,7 @@ class MessageCreateRequest extends FormRequest
         return [
             'body' => ['nullable', 'string', 'max:5000', 'required_without:attachments'],
             'attachments' => ['sometimes', 'array', 'max:5'],
-            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'],
+            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,pdf,mp4,webm,mov', 'max:10240'],
         ];
     }
 }
