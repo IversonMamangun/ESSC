@@ -37,6 +37,7 @@ import type {
   Store,
   SellerConversationShow,
   ConversationMessage,
+  MessageAttachmentType,
 } from '@/types';
 
 const props = defineProps<{
@@ -96,6 +97,13 @@ function formatDateTime(date: string) {
     hour: '2-digit',
     minute: '2-digit',
   });
+}
+
+function attachmentUrl(attachment: MessageAttachmentType): string {
+  return seller.conversations.attachments.show({
+    conversation: props.conversation.uuid,
+    attachment: attachment.id,
+  }).url;
 }
 
 const lastMessage = computed(() => props.conversation.messages.at(-1));
@@ -265,18 +273,43 @@ const breadcrumbs = [
                         class="mt-2 flex flex-col gap-1.5"
                         :class="{ 'pt-2': message.body }"
                       >
-                        <a
+                        <template
                           v-for="attachment in message.attachments"
                           :key="attachment.id"
-                          :href="attachment.url"
-                          target="_blank"
-                          class="flex items-center gap-1.5 rounded-md bg-black/5 px-2 py-1.5 text-xs underline underline-offset-2 dark:bg-white/10"
                         >
-                          <FileTextIcon class="size-3.5 shrink-0" />
-                          <span class="truncate">{{
-                            attachment.original_name
-                          }}</span>
-                        </a>
+                          <a
+                            v-if="attachment.mime_type.startsWith('image/')"
+                            :href="attachmentUrl(attachment)"
+                            target="_blank"
+                          >
+                            <img
+                              :src="attachmentUrl(attachment)"
+                              :alt="attachment.original_name"
+                              class="max-h-64 w-auto rounded-md object-cover"
+                            />
+                          </a>
+
+                          <video
+                            v-else-if="
+                              attachment.mime_type.startsWith('video/')
+                            "
+                            :src="attachmentUrl(attachment)"
+                            controls
+                            class="max-h-64 max-w-full rounded-md"
+                          />
+
+                          <a
+                            v-else
+                            :href="attachmentUrl(attachment)"
+                            target="_blank"
+                            class="flex items-center gap-1.5 rounded-md bg-black/5 px-2 py-1.5 text-xs underline underline-offset-2 dark:bg-white/10"
+                          >
+                            <FileTextIcon class="size-3.5 shrink-0" />
+                            <span class="truncate">{{
+                              attachment.original_name
+                            }}</span>
+                          </a>
+                        </template>
                       </div>
                     </BubbleContent>
                   </Bubble>
@@ -343,7 +376,7 @@ const breadcrumbs = [
                   ref="fileInput"
                   type="file"
                   multiple
-                  accept=".jpg,.jpeg,.png,.pdf"
+                  accept=".jpg,.jpeg,.png,.pdf,.mp4,.webm,.mov"
                   class="hidden"
                   @change="handleFileChange"
                 />
