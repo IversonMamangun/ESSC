@@ -24,23 +24,8 @@ class MessageAttachment extends Model
         ];
     }
 
-    protected $appends = [
-        'url',
-    ];
-
     public function message(): BelongsTo
     {
         return $this->belongsTo(Message::class);
-    }
-
-    public function getUrlAttribute(): ?string
-    {
-        if (! $this->path) {
-            return null;
-        }
-        
-        /** @var Filesystem $disk */
-        $disk = Storage::disk($this->disk);
-        return $disk->url($this->path);
     }
 }
