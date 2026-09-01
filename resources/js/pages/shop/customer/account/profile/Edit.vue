@@ -128,6 +128,7 @@ const maskedTarget = ref('');
 const sendError = ref('');
 const verifyError = ref('');
 const sendMessage = ref('');
+const lastFailedOtp = ref('');
 
 const countdown = ref(0);
 let timerId: ReturnType<typeof setInterval>;
@@ -150,6 +151,7 @@ const formattedTime = computed(() => {
 const openOtpDialog = () => {
   verifyHttp.otp = '';
   verifyError.value = '';
+  lastFailedOtp.value = '';
   otpOpen.value = true;
   sendOtp();
 };
@@ -196,6 +198,14 @@ const sendOtp = () => {
 };
 
 const verifyOtp = () => {
+  if (verifyHttp.processing) return;
+
+  if (verifyHttp.otp && verifyHttp.otp === lastFailedOtp.value) {
+    verifyError.value =
+      'That code was already rejected. Enter a new code or resend.';
+    return;
+  }
+
   verifyError.value = '';
   verifyHttp.purpose = purpose.value;
   verifyHttp.clearErrors();
@@ -208,6 +218,9 @@ const verifyOtp = () => {
       submitProfile();
     })
     .catch((e: any) => {
+      lastFailedOtp.value = verifyHttp.otp;
+      verifyHttp.otp = '';
+
       if (Object.keys(verifyHttp.errors).length === 0) {
         verifyError.value = extractErrorMessage(e, 'Verification failed.');
       }
@@ -380,11 +393,7 @@ const verifyOtp = () => {
         </DialogHeader>
 
         <div class="flex justify-center py-2">
-          <InputOTP
-            v-model="verifyHttp.otp"
-            :maxlength="6"
-            @complete="verifyOtp"
-          >
+          <InputOTP v-model="verifyHttp.otp" :maxlength="6">
             <InputOTPGroup>
               <InputOTPSlot :index="0" />
               <InputOTPSlot :index="1" />
