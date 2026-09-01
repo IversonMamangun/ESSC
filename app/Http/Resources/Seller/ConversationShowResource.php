@@ -43,7 +43,6 @@ class ConversationShowResource extends JsonResource
 
                     'attachments' => $message->attachments->map(fn ($attachment) => [
                         'id' => $attachment->id,
-                        'url' => $attachment->url,
                         'original_name' => $attachment->original_name,
                         'mime_type' => $attachment->mime_type,
                         'size' => $attachment->size,
