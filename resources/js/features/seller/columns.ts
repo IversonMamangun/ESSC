@@ -231,9 +231,11 @@ export const getSellerProductsColumns = ({
 
 export const getSellerOrdersColumns = ({
   viewOrder,
+  chatBuyer,
   handleAction,
   activeTab,
 }: {
+  chatBuyer: (buyerId: number) => void;
   viewOrder: (orderNumber: string) => void;
   handleAction: (order: SellerOrder, actionType: string) => void;
   activeTab: string;
@@ -305,6 +307,14 @@ export const getSellerOrdersColumns = ({
             onClick: () => viewOrder(order.order_number),
           },
           () => 'View Order Details',
+        ),
+        h(
+          DropdownMenuItem,
+          {
+            class: 'cursor-pointer text-blue-500 focus:text-blue-600',
+            onClick: () => chatBuyer(order.user_id),
+          },
+          () => 'Chat with Buyer',
         ),
       ];
 

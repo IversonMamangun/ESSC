@@ -204,6 +204,10 @@ Route::middleware([
 
     Route::get('/conversations', [SellerConversationController::class, 'index'])
         ->name('conversations.index');
+    Route::get('/conversations/check/{user}', [SellerConversationController::class, 'check'])
+        ->name('conversations.check');
+    Route::post('/conversations', [SellerConversationController::class, 'store'])
+        ->name('conversations.store');
     Route::get('/conversations/{conversation}', [SellerConversationController::class, 'show'])
         ->name('conversations.show');
     Route::post('/conversations/{conversation}/messages', [SellerMessageController::class, 'store'])
