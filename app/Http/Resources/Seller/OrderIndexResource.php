@@ -54,6 +54,7 @@ class OrderIndexResource extends JsonResource
 
         return [
             'id'           => $this->id,
+            'user_id'      => $this->user_id,
             'order_number' => $this->order_number,
             'status'       => $this->status,
             'status_label' => $this->status->label(),

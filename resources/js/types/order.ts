@@ -98,6 +98,7 @@ export interface PaginatedOrders {
 
 export interface SellerOrder {
   id: number;
+  user_id: number;
   order_number: string;
   status: OrderRawStatus;
   items_count: number;
