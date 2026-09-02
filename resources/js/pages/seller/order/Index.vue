@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { Head, useHttp, useForm, Link, router } from '@inertiajs/vue3';
-import { PackageIcon, SquarePenIcon, AlertCircleIcon } from 'lucide-vue-next';
+import {
+  PackageIcon,
+  SquarePenIcon,
+  AlertCircleIcon,
+  MessageCircleIcon,
+} from 'lucide-vue-next';
 import { ref, computed, h } from 'vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import ConfirmDialog from '@/components/ConfirmDialog.vue';
@@ -170,10 +175,62 @@ const processOrderAction = () => {
 const orderColumns = computed(() =>
   getSellerOrdersColumns({
     viewOrder,
+    chatBuyer,
     handleAction: handleOrderAction,
     activeTab: activeTab.value,
   }),
 );
+
+// state for chat-start flow (separate from order action confirm dialog)
+const chatConfirmOpen = ref(false);
+const chatTargetUserId = ref<number | null>(null);
+const chatChecking = ref(false);
+
+const chatForm = useForm<{ user_id: number | null }>({
+  user_id: null,
+});
+
+async function chatBuyer(buyerId: number) {
+  if (chatChecking.value) return;
+  chatChecking.value = true;
+
+  try {
+    const response = (await http.get(
+      seller.conversations.check.url(buyerId),
+    )) as ApiResponse<{ exists: boolean; conversation_uuid: string | null }>;
+
+    if (response.data.exists && response.data.conversation_uuid) {
+      router.visit(
+        seller.conversations.show.url(response.data.conversation_uuid),
+      );
+      return;
+    }
+
+    chatTargetUserId.value = buyerId;
+    chatConfirmOpen.value = true;
+  } catch (error) {
+    console.error(error);
+  } finally {
+    chatChecking.value = false;
+  }
+}
+
+function confirmStartChat() {
+  if (!chatTargetUserId.value) return;
+
+  chatForm.user_id = chatTargetUserId.value;
+  chatForm.post(seller.conversations.store.url(), {
+    onSuccess: () => {
+      chatConfirmOpen.value = false;
+      chatTargetUserId.value = null;
+    },
+  });
+}
+
+function cancelStartChat() {
+  chatTargetUserId.value = null;
+  chatForm.reset();
+}
 
 const breadcrumbs = [
   {
@@ -312,6 +369,23 @@ function changeTab(tab: string) {
     :order="detailsOrder"
     @update:open="handleDetailsOpenChange"
   />
+
+  <!-- Start Chat -->
+  <ConfirmDialog
+    v-model:open="chatConfirmOpen"
+    title="Start Conversation"
+    confirm-text="Start Chat"
+    :icon="MessageCircleIcon"
+    :confirm-disabled="chatForm.processing"
+    @confirm="confirmStartChat"
+    @cancel="cancelStartChat"
+  >
+    <template #description>
+      You don't have a conversation with this buyer yet. Starting one will
+      create a new conversation thread you can use to message them going
+      forward.
+    </template>
+  </ConfirmDialog>
 </template>
 
 <style scoped>
