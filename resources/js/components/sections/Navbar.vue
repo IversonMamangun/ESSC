@@ -6,6 +6,7 @@ import {
   LogOut,
   ShoppingCart,
   LayoutDashboard,
+  MessageCircle,
 } from 'lucide-vue-next';
 import { ref, onMounted, computed, onUnmounted } from 'vue';
 import { logout, login, register } from '@/routes';
@@ -42,7 +43,7 @@ onMounted(() => {
     isDarkMode.value = true;
     document.documentElement.classList.add('dark');
   }
-  
+
   document.addEventListener('click', closeMenuOutside);
 });
 
@@ -240,6 +241,14 @@ const navLinks = [
                   <Package class="h-4 w-4 text-[#009933]" /> My Purchases
                 </Link>
 
+                <Link
+                  v-if="user.user_type?.slug === 'customer'"
+                  :href="shop.conversations.index()"
+                  class="flex items-center gap-3 px-4 py-2.5 text-sm font-bold text-neutral-700 hover:bg-neutral-50 hover:text-[#009933] dark:text-gray-300 dark:hover:bg-neutral-800"
+                >
+                  <MessageCircle class="h-4 w-4 text-blue-600" /> Conversations
+                </Link>
+
                 <template v-if="user.user_type?.slug === 'seller'">
                   <Link
                     :href="seller.dashboard()"
@@ -416,6 +425,14 @@ const navLinks = [
                 class="flex items-center gap-3 rounded-xl border border-green-100 bg-green-50 px-4 py-3 text-sm font-bold text-[#009933] transition-colors hover:bg-green-100 dark:border-green-900 dark:bg-green-900/20"
               >
                 <Package class="h-5 w-5" /> My Purchases
+              </Link>
+
+              <Link
+                v-if="user.user_type?.slug === 'customer'"
+                :href="shop.orders.index()"
+                class="flex items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-bold text-blue-600 transition-colors hover:bg-blue-100 dark:border-blue-900 dark:bg-blue-900/20"
+              >
+                <MessageCircle class="h-5 w-5" /> Conversations
               </Link>
 
               <Link

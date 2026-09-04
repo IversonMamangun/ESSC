@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { Link, usePage } from '@inertiajs/vue3';
-import { UserIcon, MapPinIcon, PackageIcon } from 'lucide-vue-next';
+import {
+  UserIcon,
+  MapPinIcon,
+  PackageIcon,
+  MessageCircleIcon,
+} from 'lucide-vue-next';
 import shop from '@/routes/shop';
 
 interface Props {
@@ -74,6 +79,19 @@ const isActive = (path: string) => page.url.startsWith(path);
       >
         <PackageIcon class="h-5 w-5" />
         Purchases
+      </Link>
+
+      <Link
+        :href="shop.conversations.index()"
+        :class="[
+          isActive(shop.conversations.index().url)
+            ? 'bg-green-50 font-black text-[#009933] dark:bg-green-900/10'
+            : 'font-bold text-zinc-600 transition-colors hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800/50',
+          'flex items-center gap-3 rounded-xl px-4 py-3',
+        ]"
+      >
+        <MessageCircleIcon class="h-5 w-5" />
+        Conversations
       </Link>
     </nav>
   </div>
