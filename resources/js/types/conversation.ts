@@ -1,5 +1,6 @@
 import { LaravelPaginationItem } from './product';
 import { User } from './auth';
+import { Store } from './store';
 
 export interface MessageAttachmentType {
   id: number;
@@ -35,6 +36,37 @@ export interface SellerConversationIndex {
 
 export interface PaginatedSellerConversationIndex {
   data: SellerConversationIndex[];
+
+  links: {
+    first: string;
+    last: string;
+    prev: string | null;
+    next: string | null;
+  };
+
+  meta: {
+    current_page: number;
+    from: number;
+    last_page: number;
+    links: LaravelPaginationItem[];
+    path: string;
+    per_page: number;
+    to: number;
+    total: number;
+  };
+}
+
+export interface CustomerConversationIndex {
+  id: number;
+  uuid: string;
+  user_unread_count: number;
+  last_message_at: string | null;
+  last_message: string | null;
+  store: Store;
+}
+
+export interface PaginatedCustomerConversationIndex {
+  data: CustomerConversationIndex[];
 
   links: {
     first: string;

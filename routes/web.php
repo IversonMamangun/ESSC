@@ -16,6 +16,7 @@ use App\Http\Controllers\Shop\CheckoutController as CustomerCheckoutController;
 use App\Http\Controllers\Shop\OrderController as CustomerOrderController;
 use App\Http\Controllers\Shop\ReturnOrderController as CustomerReturnOrderController;
 use App\Http\Controllers\Shop\ReviewController as CustomerReviewController;
+use App\Http\Controllers\Shop\ConversationController as CustomerConversationController;
 use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
 use App\Http\Controllers\Seller\StoreController as SellerStoreController;
 use App\Http\Controllers\Seller\ProductController as SellerProductController;
@@ -149,6 +150,9 @@ Route::middleware([
         ->name('orders.review.store');
     Route::patch('/orders/{order:order_number}/review', [CustomerReviewController::class, 'update'])
         ->name('orders.review.update');
+
+    Route::get('/conversations', [CustomerConversationController::class, 'index'])
+        ->name('conversations.index');
 });
 
 // dedicated seller routes
