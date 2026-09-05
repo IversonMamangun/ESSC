@@ -86,3 +86,10 @@ export interface PaginatedCustomerConversationIndex {
     total: number;
   };
 }
+
+export interface CustomerConversationShow {
+  id: number;
+  uuid: string;
+  store: Store;
+  messages: ConversationMessage[];
+}
