@@ -9,7 +9,8 @@ class ConversationPolicy
 {
     public function view(User $user, Conversation $conversation): bool
     {
-        return $user->store?->id === $conversation->store_id;
+        return $user->id === $conversation->user_id
+            || $user->store?->id === $conversation->store_id;
     }
 
     public function reply(User $user, Conversation $conversation): bool

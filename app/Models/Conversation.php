@@ -67,9 +67,23 @@ class Conversation extends Model
 
         $this->messages()
             ->whereNull('read_at')
-            ->where('sender_id', '!=', $this->user_id)
+            ->where('sender_id', '!=', $this->store_id)
             ->update(['read_at' => now()]);
 
         $this->update(['store_unread_count' => 0]);
+    }
+
+    public function markReadByUser(): void
+    {
+        if ($this->user_unread_count === 0) {
+            return;
+        }
+
+        $this->messages()
+            ->whereNull('read_at')
+            ->where('sender_id', '!=', $this->user_id)
+            ->update(['read_at' => now()]);
+
+        $this->update(['user_unread_count' => 0]);
     }
 }
