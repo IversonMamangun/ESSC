@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Seller;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Seller\MessageCreateRequest;
+use App\Http\Requests\MessageCreateRequest;
 use App\Models\Conversation;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
