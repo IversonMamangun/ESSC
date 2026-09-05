@@ -39,4 +39,22 @@ class ConversationController extends Controller
             ->with(['store', 'latestMessage.attachments'])
             ->latest('last_message_at');
     }
+
+    public function show(Conversation $conversation): Response
+    {
+        Gate::authorize('view', $conversation);
+
+        $conversation->load([
+            'user',
+            'store',
+            'messages' => fn ($query) => $query->oldest()->with(['sender', 'attachments']),
+        ]);
+
+        $conversation->markReadByUser();
+
+        return Inertia::render('shop/customer/conversation/Show', [
+            'conversation' => ConversationShowResource::make($conversation)->resolve(),
+            'user' => $conversation->user,
+        ]);
+    }
 }
