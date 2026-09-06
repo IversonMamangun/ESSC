@@ -54,6 +54,7 @@ export interface OrderItem {
 export interface Order {
   id: number;
   order_number: string;
+  store_id: number;
   store_name: string;
   status: OrderDisplayStatus;
   shipping_fee: number;
