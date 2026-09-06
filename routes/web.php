@@ -17,6 +17,8 @@ use App\Http\Controllers\Shop\OrderController as CustomerOrderController;
 use App\Http\Controllers\Shop\ReturnOrderController as CustomerReturnOrderController;
 use App\Http\Controllers\Shop\ReviewController as CustomerReviewController;
 use App\Http\Controllers\Shop\ConversationController as CustomerConversationController;
+use App\Http\Controllers\Shop\MessageController as CustomerMessageController;
+use App\Http\Controllers\Shop\MessageAttachmentController as CustomerMessageAttachmentController;
 use App\Http\Controllers\Seller\DashboardController as SellerDashboardController;
 use App\Http\Controllers\Seller\StoreController as SellerStoreController;
 use App\Http\Controllers\Seller\ProductController as SellerProductController;
@@ -153,6 +155,16 @@ Route::middleware([
 
     Route::get('/conversations', [CustomerConversationController::class, 'index'])
         ->name('conversations.index');
+    Route::get('/conversations/check/{store}', [CustomerConversationController::class, 'check'])
+        ->name('conversations.check');
+    Route::post('/conversations', [CustomerConversationController::class, 'store'])
+        ->name('conversations.store');
+    Route::get('/conversations/{conversation}', [CustomerConversationController::class, 'show'])
+        ->name('conversations.show');
+    Route::post('/conversations/{conversation}/messages', [CustomerMessageController::class, 'store'])
+        ->name('conversations.messages.store');
+    Route::get('conversations/{conversation}/attachments/{attachment}', [CustomerMessageAttachmentController::class, 'show'])
+        ->name('conversations.attachments.show');
 });
 
 // dedicated seller routes
