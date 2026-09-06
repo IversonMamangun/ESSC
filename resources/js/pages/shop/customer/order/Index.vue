@@ -5,6 +5,7 @@ import {
   SearchIcon,
   CircleCheckBigIcon,
   CircleXIcon,
+  MessageCircleIcon,
 } from 'lucide-vue-next';
 import { ref, computed } from 'vue';
 import UserAccountSidebar from '@/components/accounts/UserAccountSidebar.vue';
@@ -22,6 +23,7 @@ import type {
   OrderIndexFilters,
   PaginatedOrders,
   ReviewShow,
+  ApiResponse,
 } from '@/types';
 
 const props = defineProps<{
@@ -208,6 +210,58 @@ const viewRatingOrder = async (orderNo: string) => {
 
   ratingItems.value = response.items;
 };
+
+// state for chat-start flow (separate from order action confirm dialog)
+const chatHttp = useHttp();
+const chatConfirmOpen = ref(false);
+const chatTargetStoreId = ref<number | null>(null);
+const chatChecking = ref(false);
+
+const chatForm = useForm<{ store_id: number | null }>({
+  store_id: null,
+});
+
+async function chatSeller(storeId: number) {
+  if (chatChecking.value) return;
+  chatChecking.value = true;
+
+  try {
+    const response = (await chatHttp.get(
+      shop.conversations.check.url(storeId),
+    )) as ApiResponse<{ exists: boolean; conversation_uuid: string | null }>;
+
+    if (response.data.exists && response.data.conversation_uuid) {
+      router.visit(
+        shop.conversations.show.url(response.data.conversation_uuid),
+      );
+      return;
+    }
+
+    chatTargetStoreId.value = storeId;
+    chatConfirmOpen.value = true;
+  } catch (error) {
+    console.error(error);
+  } finally {
+    chatChecking.value = false;
+  }
+}
+
+function confirmStartChat() {
+  if (!chatTargetStoreId.value) return;
+
+  chatForm.store_id = chatTargetStoreId.value;
+  chatForm.post(shop.conversations.store.url(), {
+    onSuccess: () => {
+      chatConfirmOpen.value = false;
+      chatTargetStoreId.value = null;
+    },
+  });
+}
+
+function cancelStartChat() {
+  chatTargetStoreId.value = null;
+  chatForm.reset();
+}
 </script>
 
 <template>
@@ -286,6 +340,7 @@ const viewRatingOrder = async (orderNo: string) => {
                 @requestReturn="requestReturnOrder"
                 @rate="rateOrder"
                 @viewRating="viewRatingOrder"
+                @chatSeller="chatSeller"
               />
             </div>
 
@@ -347,6 +402,23 @@ const viewRatingOrder = async (orderNo: string) => {
     :order-number="ratingOrderNo"
     :can-edit="ratingCanEdit"
   />
+
+  <!-- Start Chat -->
+  <ConfirmDialog
+    v-model:open="chatConfirmOpen"
+    title="Start Conversation"
+    confirm-text="Start Chat"
+    :icon="MessageCircleIcon"
+    :confirm-disabled="chatForm.processing"
+    @confirm="confirmStartChat"
+    @cancel="cancelStartChat"
+  >
+    <template #description>
+      You don't have a conversation with this seller yet. Starting one will
+      create a new conversation thread you can use to message them going
+      forward.
+    </template>
+  </ConfirmDialog>
 </template>
 
 <style scoped>

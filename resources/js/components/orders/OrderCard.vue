@@ -36,6 +36,7 @@ defineEmits<{
   (e: 'requestReturn', no: string): void;
   (e: 'rate', no: string): void;
   (e: 'viewRating', no: string): void;
+  (e: 'chatSeller', no: number): void;
 }>();
 
 const formatPrice = (value: number) => {
@@ -179,6 +180,14 @@ const autoCompleteText = computed(() => {
             View Rating
           </button>
         </template>
+
+        <button
+          @click="$emit('chatSeller', order.store_id)"
+          class="inline-flex cursor-pointer items-center justify-center rounded-xl border border-blue-200 bg-blue-100 px-4 py-2 text-sm font-bold text-blue-600 transition-colors hover:bg-blue-50 dark:border-blue-700 dark:bg-blue-800 dark:text-blue-200 dark:hover:bg-blue-700"
+        >
+          <MessageSquareIcon class="mr-2 h-4 w-4" />
+          Chat Seller
+        </button>
       </div>
 
       <div
