@@ -8,7 +8,7 @@ Schedule::command('queue:work --stop-when-empty --max-time=50')
     ->withoutOverlapping();
 
 // cron job for auto completion of delivered orders
-Schedule::command('orders:complete-delivered')
+Schedule::command('app:complete-delivered-orders')
     ->dailyAt('00:30')
     ->withoutOverlapping()
     ->onOneServer();
